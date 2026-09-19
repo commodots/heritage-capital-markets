@@ -1,11 +1,71 @@
-@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@import "tailwindcss";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-heritage-navy: #061A33;
+    --color-heritage-deep: #031426;
+    --color-heritage-gold: #F5B82E;
+    --color-heritage-gold-light: #FFCA45;
+    --color-heritage-offwhite: #F7F8FA;
+    --color-heritage-text: #10284A;
+    --color-heritage-muted: #64748B;
+    --color-heritage-border: #DCE2E8;
+
+    --font-display: "Playfair Display", serif;
+    --font-sans: "DM Sans", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-heritage-text);
+    background: #ffffff;
+}
+
+.font-display {
+    font-family: var(--font-display);
+}
+
+.container-heritage {
+    width: min(100% - 2rem, 1200px);
+    margin-inline: auto;
+}
+
+.btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--color-heritage-gold);
+    color: var(--color-heritage-deep);
+    font-weight: 600;
+    padding: 0.8rem 1.4rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+    background: var(--color-heritage-gold-light);
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: white;
+    border: 1px solid var(--color-heritage-gold);
+    font-weight: 600;
+    padding: 0.8rem 1.4rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+    background: rgba(245, 184, 46, 0.1);
 }
