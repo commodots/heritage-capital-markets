@@ -33,7 +33,7 @@ function formatDate(value) {
 
     <PublicLayout>
         <section class="bg-heritage-deep text-white">
-            <div class="mx-auto max-w-[1200px] px-6 py-20 lg:px-12">
+            <div class="mx-auto max-w-300 px-6 py-20 lg:px-12">
                 <Link href="/research-centre" class="text-xs text-white/60 hover:text-heritage-gold">
                     ← Research Centre
                 </Link>
@@ -56,13 +56,13 @@ function formatDate(value) {
         </section>
 
         <section class="bg-white">
-            <div class="mx-auto grid max-w-[1200px] gap-12 px-6 py-16 lg:grid-cols-[1fr_320px] lg:px-12">
+            <div class="mx-auto grid max-w-300 gap-12 px-6 py-16 lg:grid-cols-[1fr_320px] lg:px-12">
                 <article>
                     <img
                         v-if="report.featured_image"
                         :src="assetUrl(report.featured_image)"
                         :alt="report.title"
-                        class="mb-10 h-auto max-h-[520px] w-full rounded-xl object-cover"
+                        class="mb-10 h-auto max-h-130 w-full rounded-xl object-cover"
                     />
 
                     <div
