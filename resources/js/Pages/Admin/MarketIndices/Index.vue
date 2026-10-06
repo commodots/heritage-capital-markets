@@ -164,11 +164,11 @@ function flashMessage() {
 
         <!-- Sidebar -->
         <aside
-            class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-[#061A33] text-white lg:flex"
+            class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-heritage-navy text-white lg:flex"
         >
             <div class="flex h-20 items-center border-b border-white/10 px-6">
                 <div
-                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#F5B82E] text-xl font-bold text-[#061A33]"
+                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-heritage-gold text-xl font-bold text-heritage-navy"
                 >
                     H
                 </div>
@@ -216,7 +216,7 @@ function flashMessage() {
 
                 <a
                     href="/admin/market-indices"
-                    class="flex items-center gap-3 rounded-lg bg-[#F5B82E] px-4 py-3 text-sm font-semibold text-[#061A33]"
+                    class="flex items-center gap-3 rounded-lg bg-heritage-gold px-4 py-3 text-sm font-semibold text-heritage-navy"
                 >
                     <span class="text-lg">↗</span>
                     Market Indices
@@ -308,11 +308,11 @@ function flashMessage() {
                 class="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur sm:px-8"
             >
                 <div>
-                    <div class="text-xs font-semibold uppercase tracking-[0.18em] text-[#F5B82E]">
+                    <div class="text-xs font-semibold uppercase tracking-[0.18em] text-heritage-gold">
                         Homepage Management
                     </div>
 
-                    <h1 class="mt-1 text-xl font-bold text-[#061A33] sm:text-2xl">
+                    <h1 class="mt-1 text-xl font-bold text-heritage-navy sm:text-2xl">
                         Market Indices
                     </h1>
                 </div>
@@ -330,7 +330,7 @@ function flashMessage() {
                     <button
                         type="button"
                         @click="openCreate"
-                        class="inline-flex items-center gap-2 rounded-md bg-[#F5B82E] px-4 py-2.5 text-sm font-semibold text-[#061A33] shadow-sm transition hover:bg-[#FFCA45]"
+                        class="inline-flex items-center gap-2 rounded-md bg-heritage-gold px-4 py-2.5 text-sm font-semibold text-heritage-navy shadow-sm transition hover:bg-heritage-gold-light"
                     >
                         <span class="text-lg leading-none">+</span>
                         Add Index
@@ -351,7 +351,7 @@ function flashMessage() {
 
                 <!-- Intro -->
                 <div class="mb-7 max-w-3xl">
-                    <h2 class="text-lg font-bold text-[#061A33]">
+                    <h2 class="text-lg font-bold text-heritage-navy">
                         Manage market indicators
                     </h2>
 
@@ -369,7 +369,7 @@ function flashMessage() {
                             Total Indices
                         </div>
 
-                        <div class="mt-2 text-3xl font-bold text-[#061A33]">
+                        <div class="mt-2 text-3xl font-bold text-heritage-navy">
                             {{ indices.length }}
                         </div>
                     </div>
@@ -405,7 +405,7 @@ function flashMessage() {
                         ↗
                     </div>
 
-                    <h3 class="mt-4 text-lg font-bold text-[#061A33]">
+                    <h3 class="mt-4 text-lg font-bold text-heritage-navy">
                         No market indices yet
                     </h3>
 
@@ -417,7 +417,7 @@ function flashMessage() {
                     <button
                         type="button"
                         @click="openCreate"
-                        class="mt-6 rounded-md bg-[#061A33] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D]"
+                        class="mt-6 rounded-md bg-heritage-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D]"
                     >
                         Add Market Index
                     </button>
@@ -431,7 +431,7 @@ function flashMessage() {
 
                     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                         <div>
-                            <h3 class="font-bold text-[#061A33]">
+                            <h3 class="font-bold text-heritage-navy">
                                 Market Overview Data
                             </h3>
 
@@ -494,7 +494,7 @@ function flashMessage() {
                                     <!-- Order -->
                                     <td class="px-5 py-4">
 
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-[#061A33] text-xs font-bold text-[#F5B82E]">
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-heritage-navy text-xs font-bold text-heritage-gold">
                                             {{ index.sort_order }}
                                         </div>
 
@@ -503,7 +503,7 @@ function flashMessage() {
                                     <!-- Name -->
                                     <td class="px-5 py-4">
 
-                                        <div class="font-semibold text-[#061A33]">
+                                        <div class="font-semibold text-heritage-navy">
                                             {{ index.name }}
                                         </div>
 
@@ -519,7 +519,7 @@ function flashMessage() {
                                     <!-- Value -->
                                     <td class="px-5 py-4 text-right">
 
-                                        <span class="font-semibold tabular-nums text-[#061A33]">
+                                        <span class="font-semibold tabular-nums text-heritage-navy">
                                             {{ formatValue(index.value) }}
                                         </span>
 
@@ -587,7 +587,7 @@ function flashMessage() {
                                             <button
                                                 type="button"
                                                 @click="openEdit(index)"
-                                                class="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-[#061A33] transition hover:border-[#F5B82E] hover:bg-amber-50"
+                                                class="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-heritage-navy transition hover:border-heritage-gold hover:bg-amber-50"
                                             >
                                                 Edit
                                             </button>
@@ -623,7 +623,7 @@ function flashMessage() {
                             <div class="flex items-start justify-between gap-4">
 
                                 <div>
-                                    <div class="font-semibold text-[#061A33]">
+                                    <div class="font-semibold text-heritage-navy">
                                         {{ index.name }}
                                     </div>
 
@@ -661,7 +661,7 @@ function flashMessage() {
                                         Value
                                     </div>
 
-                                    <div class="mt-1 text-sm font-bold text-[#061A33]">
+                                    <div class="mt-1 text-sm font-bold text-heritage-navy">
                                         {{ formatValue(index.value) }}
                                     </div>
                                 </div>
@@ -707,7 +707,7 @@ function flashMessage() {
                                 <button
                                     type="button"
                                     @click="openEdit(index)"
-                                    class="flex-1 rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-[#061A33]"
+                                    class="flex-1 rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-heritage-navy"
                                 >
                                     Edit
                                 </button>
@@ -734,7 +734,7 @@ function flashMessage() {
         <!-- Modal -->
         <div
             v-if="showModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-[#061A33]/70 p-4"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
         >
 
             <div
@@ -742,14 +742,14 @@ function flashMessage() {
             >
 
                 <!-- Header -->
-                <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+                <div class="flex items-center justify-between border-b border-slate-200 px-6">
 
                     <div>
-                        <div class="text-xs font-semibold uppercase tracking-[0.18em] text-[#F5B82E]">
+                        <div class="text-xs font-semibold uppercase tracking-[0.18em] text-heritage-gold mt-2">
                             {{ editingIndex ? 'Edit Index' : 'New Index' }}
                         </div>
 
-                        <h2 class="mt-1 text-xl font-bold text-[#061A33]">
+                        <h2 class="mt-1 text-xl font-bold text-heritage-navy">
                             {{
                                 editingIndex
                                     ? 'Edit Market Index'
@@ -771,7 +771,7 @@ function flashMessage() {
                 <!-- Form -->
                 <form @submit.prevent="submit">
 
-                    <div class="space-y-5 px-6 py-6">
+                    <div class="space-y-5 px-6">
 
                         <!-- Name -->
                         <div>
@@ -783,7 +783,7 @@ function flashMessage() {
                                 v-model="form.name"
                                 type="text"
                                 placeholder="e.g. NGX All-Share Index"
-                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#F5B82E] focus:ring-2 focus:ring-[#F5B82E]/20"
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                             >
 
                             <div
@@ -804,7 +804,7 @@ function flashMessage() {
                                 v-model="form.symbol"
                                 type="text"
                                 placeholder="e.g. NGXASI"
-                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm uppercase outline-none transition focus:border-[#F5B82E] focus:ring-2 focus:ring-[#F5B82E]/20"
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm uppercase outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                             >
                         </div>
 
@@ -821,7 +821,7 @@ function flashMessage() {
                                     type="number"
                                     step="0.01"
                                     placeholder="102026.75"
-                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#F5B82E] focus:ring-2 focus:ring-[#F5B82E]/20"
+                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                                 >
 
                                 <div
@@ -842,7 +842,7 @@ function flashMessage() {
                                     type="number"
                                     step="0.01"
                                     placeholder="640.25"
-                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#F5B82E] focus:ring-2 focus:ring-[#F5B82E]/20"
+                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                                 >
 
                                 <div
@@ -864,7 +864,7 @@ function flashMessage() {
                                     type="number"
                                     step="0.01"
                                     placeholder="0.63"
-                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#F5B82E] focus:ring-2 focus:ring-[#F5B82E]/20"
+                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                                 >
 
                                 <div
@@ -927,7 +927,7 @@ function flashMessage() {
                                 v-model.number="form.sort_order"
                                 type="number"
                                 min="1"
-                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-[#F5B82E] focus:ring-2 focus:ring-[#F5B82E]/20"
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                             >
 
                             <div
@@ -957,7 +957,7 @@ function flashMessage() {
                                 @click="form.is_active = !form.is_active"
                                 :class="
                                     form.is_active
-                                        ? 'bg-[#F5B82E]'
+                                        ? 'bg-heritage-gold'
                                         : 'bg-slate-300'
                                 "
                                 class="relative h-6 w-11 rounded-full transition"
@@ -990,7 +990,7 @@ function flashMessage() {
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="rounded-md bg-[#061A33] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D] disabled:cursor-not-allowed disabled:opacity-50"
+                            class="rounded-md bg-heritage-navy px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {{
                                 form.processing

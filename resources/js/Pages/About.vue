@@ -106,7 +106,7 @@ const milestones = [
         <!-- =========================================================
              HERO
         ========================================================== -->
-        <section class="relative min-h-[560px] overflow-hidden bg-heritage-navy lg:min-h-[575px]">
+        <section class="relative min-h-140 overflow-hidden bg-heritage-navy lg:min-h-143.75">
 
             <!-- Building -->
             <img
@@ -116,12 +116,12 @@ const milestones = [
             />
 
             <!-- Dark brand overlay -->
-            <div class="absolute inset-0 bg-gradient-to-r from-heritage-deep via-heritage-navy/90 to-heritage-navy/20"></div>
+            <div class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-navy/90 to-heritage-navy/20"></div>
 
             <!-- Subtle decorative lines -->
-            <div class="hero-lines absolute -left-32 top-20 h-[400px] w-[400px] rounded-full border border-heritage-gold/10"></div>
-            <div class="hero-lines absolute -left-24 top-28 h-[350px] w-[350px] rounded-full border border-heritage-gold/10"></div>
-            <div class="hero-lines absolute -left-16 top-36 h-[300px] w-[300px] rounded-full border border-heritage-gold/10"></div>
+            <div class="hero-lines absolute -left-32 top-20 h-100 w-100 rounded-full border border-heritage-gold/10"></div>
+            <div class="hero-lines absolute -left-24 top-28 h-87.5 w-87.5 rounded-full border border-heritage-gold/10"></div>
+            <div class="hero-lines absolute -left-16 top-36 h-75 w-75 rounded-full border border-heritage-gold/10"></div>
 
             <div class="container-heritage relative z-10">
 
@@ -138,10 +138,10 @@ const milestones = [
                     </span>
                 </div>
 
-                <div class="grid min-h-[485px] items-center lg:grid-cols-[1fr_420px]">
+                <div class="grid min-h-121.25 items-center lg:grid-cols-[1fr_420px]">
 
                     <!-- Hero copy -->
-                    <div class="max-w-[600px] pb-16 pt-12 lg:pb-20">
+                    <div class="max-w-150 pb-16 pt-12 lg:pb-20">
 
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-heritage-gold">
                             Our Heritage. Your Advantage.
@@ -154,7 +154,7 @@ const milestones = [
                             </span>
                         </h1>
 
-                        <p class="mt-5 max-w-[510px] text-sm leading-6 text-white/90 sm:text-[15px]">
+                        <p class="mt-5 max-w-127.5 text-sm leading-6 text-white/90 sm:text-[15px]">
                             For over three decades, Heritage Capital Markets Limited
                             has been a trusted partner in Nigeria’s capital markets,
                             delivering innovative investment solutions and exceptional
@@ -173,7 +173,7 @@ const milestones = [
 
                             <a
                                 href="/contact-us"
-                                class="inline-flex items-center gap-2 rounded-[4px] border border-heritage-gold px-5 py-3 text-sm font-semibold text-white transition hover:bg-heritage-gold/10"
+                                class="inline-flex items-center gap-2 rounded-sm border border-heritage-gold px-5 py-3 text-sm font-semibold text-white transition hover:bg-heritage-gold/10"
                             >
                                 Talk to an Expert
                                 <svg
@@ -231,14 +231,14 @@ const milestones = [
              CREDIBILITY STRIP
         ========================================================== -->
         <section class="relative z-20 -mt-10 px-4">
-            <div class="mx-auto max-w-[1140px]">
+            <div class="mx-auto max-w-285">
 
                 <div class="grid overflow-hidden rounded-md border border-white/20 bg-heritage-navy shadow-xl md:grid-cols-2 lg:grid-cols-4">
 
                     <article
                         v-for="(item, index) in credibilityItems"
                         :key="item.title"
-                        class="relative flex min-h-[90px] items-center gap-4 px-5 py-5"
+                        class="relative flex min-h-22.5 items-center gap-4 px-5 py-5"
                     >
 
                         <div class="flex h-11 w-11 shrink-0 items-center justify-center text-heritage-gold">
@@ -401,7 +401,7 @@ const milestones = [
                             <img
                                 :src="receptionImage"
                                 alt="The Heritage Place reception"
-                                class="h-[430px] w-full object-cover object-center transition duration-700 hover:scale-[1.02]"
+                                class="h-107.5 w-full object-cover object-center transition duration-700 hover:scale-[1.02]"
                             />
                         </div>
 
@@ -655,7 +655,7 @@ const milestones = [
                     <!-- Timeline -->
                     <div class="relative pt-8">
 
-                        <div class="absolute left-0 right-0 top-[52px] hidden h-px bg-white/60 lg:block"></div>
+                        <div class="absolute left-0 right-0 top-13 hidden h-px bg-white/60 lg:block"></div>
 
                         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
 
@@ -741,7 +741,7 @@ const milestones = [
                         <img
                             :src="teamImage"
                             alt="Heritage Capital Markets team"
-                            class="h-[250px] w-full object-cover"
+                            class="h-62.5 w-full object-cover"
                         />
 
                         <div class="absolute bottom-0 left-0 right-0 bg-heritage-deep/80 px-4 py-3 text-[10px] text-white">
@@ -751,7 +751,7 @@ const milestones = [
 
 
                     <!-- Careers -->
-                    <div class="relative min-h-[250px] overflow-hidden rounded-md bg-heritage-gold">
+                    <div class="relative min-h-62.5 overflow-hidden rounded-md bg-heritage-gold">
 
                         <div class="absolute inset-0 opacity-10">
                             <img
@@ -763,7 +763,7 @@ const milestones = [
 
                         <div class="relative flex h-full flex-col justify-between p-7">
 
-                            <h3 class="max-w-[180px] font-display text-2xl font-semibold leading-tight text-heritage-deep">
+                            <h3 class="max-w-45 font-display text-2xl font-semibold leading-tight text-heritage-deep">
                                 Join a Team
                                 <span class="block">
                                     That Makes
@@ -775,7 +775,7 @@ const milestones = [
 
                             <a
                                 href="#"
-                                class="inline-flex w-fit items-center gap-2 rounded-[4px] bg-heritage-deep px-5 py-3 text-xs font-semibold text-white transition hover:bg-heritage-navy"
+                                class="inline-flex w-fit items-center gap-2 rounded-sm bg-heritage-deep px-5 py-3 text-xs font-semibold text-white transition hover:bg-heritage-navy"
                             >
                                 View Careers
                                 <span>→</span>

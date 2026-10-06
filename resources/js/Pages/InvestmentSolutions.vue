@@ -85,7 +85,7 @@ const journey = [
              HERO
         ====================================================== -->
         <section
-            class="relative min-h-[570px] overflow-hidden bg-heritage-deep text-white lg:min-h-[650px]"
+            class="relative min-h-142.5 overflow-hidden bg-heritage-deep text-white lg:min-h-162.5"
         >
 
             <!-- Background -->
@@ -98,11 +98,11 @@ const journey = [
 				/>
 
                 <div
-                    class="absolute inset-0 bg-gradient-to-r from-[#031426] via-[#031426]/90 to-[#031426]/25"
+                    class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/25"
                 ></div>
 
                 <div
-                    class="absolute inset-0 bg-gradient-to-t from-[#031426]/70 via-transparent to-transparent"
+                    class="absolute inset-0 bg-linear-to-t from-heritage-deep/70 via-transparent to-transparent"
                 ></div>
 
             </div>
@@ -119,7 +119,7 @@ const journey = [
 
 
             <div
-                class="relative z-10 mx-auto max-w-[1400px] px-6 py-8 lg:px-12 lg:py-10"
+                class="relative z-10 mx-auto max-w-350 px-6 py-8 lg:px-12 lg:py-10"
             >
 
                 <!-- Breadcrumb -->
@@ -224,7 +224,7 @@ const journey = [
         <section class="border-b border-heritage-border bg-white">
 
             <div
-                class="mx-auto grid max-w-[1400px] md:grid-cols-2 lg:grid-cols-4"
+                class="mx-auto grid max-w-350 md:grid-cols-2 lg:grid-cols-4"
             >
 
                 <div
@@ -300,7 +300,7 @@ const journey = [
         <section class="bg-white">
 
             <div
-                class="mx-auto max-w-[1400px] px-6 py-14 lg:px-12 lg:py-16"
+                class="mx-auto max-w-350 px-6 py-14 lg:px-12 lg:py-16"
             >
 
                 <div
@@ -343,7 +343,7 @@ const journey = [
                     <article
                         v-for="solution in solutionCards"
                         :key="solution.id"
-                        class="group flex min-h-[170px] overflow-hidden rounded-lg border border-heritage-border bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                        class="group flex min-h-42.5 overflow-hidden rounded-lg border border-heritage-border bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                     >
 
                         <div
@@ -419,7 +419,7 @@ const journey = [
         <section class="bg-[#F7F5EF]">
 
             <div
-                class="mx-auto max-w-[1400px] px-6 py-8 lg:px-12"
+                class="mx-auto max-w-350 px-6 py-8 lg:px-12"
             >
 
                 <div
@@ -460,7 +460,7 @@ const journey = [
                             <!-- Connecting line -->
                             <div
                                 v-if="index < journey.length - 1"
-                                class="absolute left-12 right-[-1.5rem] top-5 hidden h-px bg-heritage-navy/30 lg:block"
+                                class="absolute left-12 -right-6 top-5 hidden h-px bg-heritage-navy/30 lg:block"
                             ></div>
 
 
@@ -478,7 +478,7 @@ const journey = [
                             </h3>
 
                             <p
-                                class="mt-1 max-w-[180px] text-xs leading-5 text-heritage-muted"
+                                class="mt-1 max-w-45 text-xs leading-5 text-heritage-muted"
                             >
                                 {{ step.text }}
                             </p>

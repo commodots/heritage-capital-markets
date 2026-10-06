@@ -75,11 +75,11 @@ const journey = [
             <div class="absolute inset-0">
                 <img v-if="solutionImage" :src="solutionImage" :alt="solution.title"
                      class="h-full w-full object-cover" />
-                <div class="absolute inset-0 bg-gradient-to-r from-[#031426] via-[#031426]/90 to-[#031426]/45"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-[#031426]/80 via-transparent to-transparent"></div>
+                <div class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/45"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-heritage-deep/80 via-transparent to-transparent"></div>
             </div>
 
-            <div class="relative z-10 mx-auto max-w-[1400px] px-6 py-14 lg:px-12 lg:py-20">
+            <div class="relative z-10 mx-auto max-w-350 px-6 py-14 lg:px-12 lg:py-20">
                 <div class="mb-10 flex flex-wrap items-center gap-2 text-xs text-white/70">
                     <Link href="/" class="hover:text-heritage-gold">Home</Link>
                     <span>›</span>
@@ -114,7 +114,7 @@ const journey = [
         </section>
 
         <section class="bg-white">
-            <div class="mx-auto max-w-[1200px] px-6 py-14 lg:px-12 lg:py-20">
+            <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-20">
                 <div class="grid gap-10 lg:grid-cols-[1.15fr_.85fr]">
                     <div>
                         <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Overview</div>
@@ -139,7 +139,7 @@ const journey = [
         </section>
 
         <section class="bg-[#F7F5EF]">
-            <div class="mx-auto max-w-[1200px] px-6 py-14 lg:px-12 lg:py-18">
+            <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-18">
                 <div class="max-w-2xl">
                     <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">What You Can Expect</div>
                     <h2 class="mt-3 font-display text-3xl text-heritage-navy sm:text-4xl">
@@ -161,7 +161,7 @@ const journey = [
         </section>
 
         <section class="bg-white">
-            <div class="mx-auto max-w-[1200px] px-6 py-14 lg:px-12 lg:py-18">
+            <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-18">
                 <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
                     <div>
                         <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Our Approach</div>
@@ -173,7 +173,7 @@ const journey = [
                     <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
                         <div v-for="(step, index) in journey" :key="step.number" class="relative">
                             <div v-if="index < journey.length - 1"
-                                 class="absolute left-10 right-[-1.5rem] top-5 hidden h-px bg-heritage-navy/20 lg:block"></div>
+                                 class="absolute left-10 -right-6 top-5 hidden h-px bg-heritage-navy/20 lg:block"></div>
                             <div class="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-heritage-gold text-xs font-bold text-heritage-deep">
                                 {{ step.number }}
                             </div>
@@ -186,7 +186,7 @@ const journey = [
         </section>
 
         <section v-if="relatedSolutions.length" class="bg-heritage-offwhite">
-            <div class="mx-auto max-w-[1200px] px-6 py-14 lg:px-12">
+            <div class="mx-auto max-w-300 px-6 py-14 lg:px-12">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Explore More</div>

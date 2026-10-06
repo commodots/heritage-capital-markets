@@ -140,8 +140,8 @@ const statusClass = (active) =>
 
     <div class="min-h-screen bg-slate-50 text-heritage-text">
         <!-- Sidebar -->
-        <aside class="fixed inset-y-0 left-0 z-40 hidden w-[258px] flex-col bg-heritage-deep text-white lg:flex">
-            <div class="flex h-[82px] items-center border-b border-white/10 px-6">
+        <aside class="fixed inset-y-0 left-0 z-40 hidden w-64.5 flex-col bg-heritage-deep text-white lg:flex">
+            <div class="flex h-20.5 items-center border-b border-white/10 px-6">
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center bg-heritage-gold font-display text-2xl font-semibold text-heritage-deep">
                     H
                 </div>
@@ -197,12 +197,12 @@ const statusClass = (active) =>
             </nav>
 
             <div class="border-t border-white/10 p-5">
-                <a href="/" target="_blank" class="text-sm font-medium text-heritage-gold hover:text-heritage-gold-light">View Website ↗</a>
+                <a href="/admin" target="_blank" class="text-sm font-medium text-heritage-gold hover:text-heritage-gold-light">View Website ↗</a>
             </div>
         </aside>
 
-        <div class="lg:pl-[258px]">
-            <header class="sticky top-0 z-30 flex h-[82px] items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur lg:px-8">
+        <div class="lg:pl-64.5">
+            <header class="sticky top-0 z-30 flex h-20.5 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur lg:px-8">
                 <div>
                     <div class="text-xs text-slate-400">Homepage Management</div>
                     <h1 class="font-display text-xl font-semibold text-heritage-navy">Hero Slides</h1>
@@ -411,7 +411,7 @@ const statusClass = (active) =>
         </div>
 
         <!-- Delete Confirmation -->
-        <div v-if="deleteTarget" class="fixed inset-0 z-[60] flex items-center justify-center bg-heritage-deep/60 p-4 backdrop-blur-sm">
+        <div v-if="deleteTarget" class="fixed inset-0 z-60 flex items-center justify-center bg-heritage-deep/60 p-4 backdrop-blur-sm">
             <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">!</div>
                 <h3 class="mt-4 font-display text-2xl font-semibold text-heritage-navy">Delete this slide?</h3>

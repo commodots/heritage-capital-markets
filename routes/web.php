@@ -30,6 +30,27 @@ use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\EnquiryController;
 
+use App\Http\Controllers\Auth\LoginController;
+
+/*
+    |--------------------------------------------------------------------------
+    |Authentication
+    |--------------------------------------------------------------------------
+    */
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'create'])
+        ->name('login');
+
+    Route::post('login', [LoginController::class, 'store'])
+        ->name('login.store');
+});
+
+Route::post('/logout', [LoginController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -140,7 +161,7 @@ Route::post('/open-account', [OpenAccountController::class, 'store'])
 |--------------------------------------------------------------------------
 */
 
-Route::get('/404', fn () => Inertia::render('Errors/404'))
+Route::get('/404', fn() => Inertia::render('Errors/404'))
     ->name('errors.404');
 
 
@@ -150,265 +171,266 @@ Route::get('/404', fn () => Inertia::render('Errors/404'))
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')
+    ->middleware(['auth', 'admin'])
+    ->group(function () {
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Dashboard
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/', [DashboardController::class, 'index'])
-        ->name('admin.dashboard');
+        Route::get('/', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Homepage Management
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/homepage/hero-slides', [HeroSlideController::class, 'index'])
-        ->name('admin.homepage.hero-slides');
+        Route::get('/homepage/hero-slides', [HeroSlideController::class, 'index'])
+            ->name('admin.homepage.hero-slides');
 
-    Route::post('/homepage/hero-slides', [HeroSlideController::class, 'store'])
-        ->name('admin.homepage.hero-slides.store');
+        Route::post('/homepage/hero-slides', [HeroSlideController::class, 'store'])
+            ->name('admin.homepage.hero-slides.store');
 
-    Route::post('/homepage/hero-slides/{heroSlide}', [HeroSlideController::class, 'update'])
-        ->name('admin.homepage.hero-slides.update');
+        Route::post('/homepage/hero-slides/{heroSlide}', [HeroSlideController::class, 'update'])
+            ->name('admin.homepage.hero-slides.update');
 
-    Route::post('/homepage/hero-slides/{heroSlide}/toggle', [HeroSlideController::class, 'toggle'])
-        ->name('admin.homepage.hero-slides.toggle');
+        Route::post('/homepage/hero-slides/{heroSlide}/toggle', [HeroSlideController::class, 'toggle'])
+            ->name('admin.homepage.hero-slides.toggle');
 
-    Route::delete('/homepage/hero-slides/{heroSlide}', [HeroSlideController::class, 'destroy'])
-        ->name('admin.homepage.hero-slides.destroy');
+        Route::delete('/homepage/hero-slides/{heroSlide}', [HeroSlideController::class, 'destroy'])
+            ->name('admin.homepage.hero-slides.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Homepage Settings
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/homepage/settings', [HomepageSettingsController::class, 'index'])
-        ->name('admin.homepage.settings');
+        Route::get('/homepage/settings', [HomepageSettingsController::class, 'index'])
+            ->name('admin.homepage.settings');
 
-    Route::post('/homepage/settings', [HomepageSettingsController::class, 'update'])
-        ->name('admin.homepage.settings.update');
+        Route::post('/homepage/settings', [HomepageSettingsController::class, 'update'])
+            ->name('admin.homepage.settings.update');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Pages
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/pages', [PageController::class, 'index'])
-        ->name('admin.pages');
+        Route::get('/pages', [PageController::class, 'index'])
+            ->name('admin.pages');
 
-    Route::post('/pages', [PageController::class, 'store'])
-        ->name('admin.pages.store');
+        Route::post('/pages', [PageController::class, 'store'])
+            ->name('admin.pages.store');
 
-    Route::post('/pages/{page}', [PageController::class, 'update'])
-        ->name('admin.pages.update');
+        Route::post('/pages/{page}', [PageController::class, 'update'])
+            ->name('admin.pages.update');
 
-    Route::post('/pages/{page}/toggle', [PageController::class, 'toggle'])
-        ->name('admin.pages.toggle');
+        Route::post('/pages/{page}/toggle', [PageController::class, 'toggle'])
+            ->name('admin.pages.toggle');
 
-    Route::delete('/pages/{page}', [PageController::class, 'destroy'])
-        ->name('admin.pages.destroy');
+        Route::delete('/pages/{page}', [PageController::class, 'destroy'])
+            ->name('admin.pages.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Investment Solutions
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/investment-solutions', [AdminInvestmentSolutionController::class, 'index'])
-        ->name('admin.investment-solutions');
+        Route::get('/investment-solutions', [AdminInvestmentSolutionController::class, 'index'])
+            ->name('admin.investment-solutions');
 
-    Route::post('/investment-solutions', [AdminInvestmentSolutionController::class, 'store'])
-        ->name('admin.investment-solutions.store');
+        Route::post('/investment-solutions', [AdminInvestmentSolutionController::class, 'store'])
+            ->name('admin.investment-solutions.store');
 
-    Route::post('/investment-solutions/{investmentSolution}', [AdminInvestmentSolutionController::class, 'update'])
-        ->name('admin.investment-solutions.update');
+        Route::post('/investment-solutions/{investmentSolution}', [AdminInvestmentSolutionController::class, 'update'])
+            ->name('admin.investment-solutions.update');
 
-    Route::post('/investment-solutions/{investmentSolution}/toggle', [AdminInvestmentSolutionController::class, 'toggle'])
-        ->name('admin.investment-solutions.toggle');
+        Route::post('/investment-solutions/{investmentSolution}/toggle', [AdminInvestmentSolutionController::class, 'toggle'])
+            ->name('admin.investment-solutions.toggle');
 
-    Route::delete('/investment-solutions/{investmentSolution}', [AdminInvestmentSolutionController::class, 'destroy'])
-        ->name('admin.investment-solutions.destroy');
+        Route::delete('/investment-solutions/{investmentSolution}', [AdminInvestmentSolutionController::class, 'destroy'])
+            ->name('admin.investment-solutions.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Market Indices
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/market-indices', [MarketIndexController::class, 'index'])
-        ->name('admin.market-indices');
+        Route::get('/market-indices', [MarketIndexController::class, 'index'])
+            ->name('admin.market-indices');
 
-    Route::post('/market-indices', [MarketIndexController::class, 'store'])
-        ->name('admin.market-indices.store');
+        Route::post('/market-indices', [MarketIndexController::class, 'store'])
+            ->name('admin.market-indices.store');
 
-    Route::post('/market-indices/{marketIndex}', [MarketIndexController::class, 'update'])
-        ->name('admin.market-indices.update');
+        Route::post('/market-indices/{marketIndex}', [MarketIndexController::class, 'update'])
+            ->name('admin.market-indices.update');
 
-    Route::post('/market-indices/{marketIndex}/toggle', [MarketIndexController::class, 'toggle'])
-        ->name('admin.market-indices.toggle');
+        Route::post('/market-indices/{marketIndex}/toggle', [MarketIndexController::class, 'toggle'])
+            ->name('admin.market-indices.toggle');
 
-    Route::delete('/market-indices/{marketIndex}', [MarketIndexController::class, 'destroy'])
-        ->name('admin.market-indices.destroy');
+        Route::delete('/market-indices/{marketIndex}', [MarketIndexController::class, 'destroy'])
+            ->name('admin.market-indices.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Research Reports
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/research-reports', [ResearchReportController::class, 'index'])
-        ->name('admin.research-reports');
+        Route::get('/research-reports', [ResearchReportController::class, 'index'])
+            ->name('admin.research-reports');
 
-    Route::post('/research-reports', [ResearchReportController::class, 'store'])
-        ->name('admin.research-reports.store');
+        Route::post('/research-reports', [ResearchReportController::class, 'store'])
+            ->name('admin.research-reports.store');
 
-    Route::post('/research-reports/{researchReport}', [ResearchReportController::class, 'update'])
-        ->name('admin.research-reports.update');
+        Route::post('/research-reports/{researchReport}', [ResearchReportController::class, 'update'])
+            ->name('admin.research-reports.update');
 
-    Route::post('/research-reports/{researchReport}/toggle', [ResearchReportController::class, 'toggle'])
-        ->name('admin.research-reports.toggle');
+        Route::post('/research-reports/{researchReport}/toggle', [ResearchReportController::class, 'toggle'])
+            ->name('admin.research-reports.toggle');
 
-    Route::delete('/research-reports/{researchReport}', [ResearchReportController::class, 'destroy'])
-        ->name('admin.research-reports.destroy');
+        Route::delete('/research-reports/{researchReport}', [ResearchReportController::class, 'destroy'])
+            ->name('admin.research-reports.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Articles / News
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/articles', [ArticleController::class, 'index'])
-        ->name('admin.articles');
+        Route::get('/articles', [ArticleController::class, 'index'])
+            ->name('admin.articles');
 
-    Route::post('/articles', [ArticleController::class, 'store'])
-        ->name('admin.articles.store');
+        Route::post('/articles', [ArticleController::class, 'store'])
+            ->name('admin.articles.store');
 
-    Route::post('/articles/{article}', [ArticleController::class, 'update'])
-        ->name('admin.articles.update');
+        Route::post('/articles/{article}', [ArticleController::class, 'update'])
+            ->name('admin.articles.update');
 
-    Route::post('/articles/{article}/toggle', [ArticleController::class, 'toggle'])
-        ->name('admin.articles.toggle');
+        Route::post('/articles/{article}/toggle', [ArticleController::class, 'toggle'])
+            ->name('admin.articles.toggle');
 
-    Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])
-        ->name('admin.articles.destroy');
+        Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])
+            ->name('admin.articles.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Events
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/events', [EventController::class, 'index'])
-        ->name('admin.events');
+        Route::get('/events', [EventController::class, 'index'])
+            ->name('admin.events');
 
-    Route::post('/events', [EventController::class, 'store'])
-        ->name('admin.events.store');
+        Route::post('/events', [EventController::class, 'store'])
+            ->name('admin.events.store');
 
-    Route::post('/events/{event}', [EventController::class, 'update'])
-        ->name('admin.events.update');
+        Route::post('/events/{event}', [EventController::class, 'update'])
+            ->name('admin.events.update');
 
-    Route::post('/events/{event}/toggle', [EventController::class, 'toggle'])
-        ->name('admin.events.toggle');
+        Route::post('/events/{event}/toggle', [EventController::class, 'toggle'])
+            ->name('admin.events.toggle');
 
-    Route::delete('/events/{event}', [EventController::class, 'destroy'])
-        ->name('admin.events.destroy');
+        Route::delete('/events/{event}', [EventController::class, 'destroy'])
+            ->name('admin.events.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | FAQs
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/faqs', [FaqController::class, 'index'])
-        ->name('admin.faqs');
+        Route::get('/faqs', [FaqController::class, 'index'])
+            ->name('admin.faqs');
 
-    Route::post('/faqs', [FaqController::class, 'store'])
-        ->name('admin.faqs.store');
+        Route::post('/faqs', [FaqController::class, 'store'])
+            ->name('admin.faqs.store');
 
-    Route::post('/faqs/{faq}', [FaqController::class, 'update'])
-        ->name('admin.faqs.update');
+        Route::post('/faqs/{faq}', [FaqController::class, 'update'])
+            ->name('admin.faqs.update');
 
-    Route::post('/faqs/{faq}/toggle', [FaqController::class, 'toggle'])
-        ->name('admin.faqs.toggle');
+        Route::post('/faqs/{faq}/toggle', [FaqController::class, 'toggle'])
+            ->name('admin.faqs.toggle');
 
-    Route::delete('/faqs/{faq}', [FaqController::class, 'destroy'])
-        ->name('admin.faqs.destroy');
+        Route::delete('/faqs/{faq}', [FaqController::class, 'destroy'])
+            ->name('admin.faqs.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Media Library
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/media', [MediaController::class, 'index'])
-        ->name('admin.media');
+        Route::get('/media', [MediaController::class, 'index'])
+            ->name('admin.media');
 
-    Route::post('/media', [MediaController::class, 'store'])
-        ->name('admin.media.store');
+        Route::post('/media', [MediaController::class, 'store'])
+            ->name('admin.media.store');
 
-    Route::delete('/media/{media}', [MediaController::class, 'destroy'])
-        ->name('admin.media.destroy');
+        Route::delete('/media/{media}', [MediaController::class, 'destroy'])
+            ->name('admin.media.destroy');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Newsletter Subscribers
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])
-        ->name('admin.newsletter-subscribers');
+        Route::get('/newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])
+            ->name('admin.newsletter-subscribers');
 
-    Route::post('/newsletter-subscribers/{newsletterSubscriber}/toggle', [NewsletterSubscriberController::class, 'toggle'])
-        ->name('admin.newsletter-subscribers.toggle');
+        Route::post('/newsletter-subscribers/{newsletterSubscriber}/toggle', [NewsletterSubscriberController::class, 'toggle'])
+            ->name('admin.newsletter-subscribers.toggle');
 
-    Route::get('/newsletter-subscribers/export', [NewsletterSubscriberController::class, 'export'])
-        ->name('admin.newsletter-subscribers.export');
+        Route::get('/newsletter-subscribers/export', [NewsletterSubscriberController::class, 'export'])
+            ->name('admin.newsletter-subscribers.export');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Site Settings
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/settings', [SiteSettingController::class, 'index'])
-        ->name('admin.settings');
+        Route::get('/settings', [SiteSettingController::class, 'index'])
+            ->name('admin.settings');
 
-    Route::post('/settings', [SiteSettingController::class, 'update'])
-        ->name('admin.settings.update');
+        Route::post('/settings', [SiteSettingController::class, 'update'])
+            ->name('admin.settings.update');
 
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Enquiries
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/enquiries', [EnquiryController::class, 'index'])
-        ->name('admin.enquiries');
+        Route::get('/enquiries', [EnquiryController::class, 'index'])
+            ->name('admin.enquiries');
 
-    Route::get('/enquiries/{enquiry}', [EnquiryController::class, 'show'])
-        ->name('admin.enquiries.show');
+        Route::get('/enquiries/{enquiry}', [EnquiryController::class, 'show'])
+            ->name('admin.enquiries.show');
 
-    Route::post('/enquiries/{enquiry}', [EnquiryController::class, 'update'])
-        ->name('admin.enquiries.update');
-
-});
+        Route::post('/enquiries/{enquiry}', [EnquiryController::class, 'update'])
+            ->name('admin.enquiries.update');
+    });

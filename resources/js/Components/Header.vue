@@ -16,10 +16,10 @@ const closeMobile = () => {
 <template>
     <header class="sticky top-0 z-50 bg-heritage-navy text-white shadow-lg">
 
-        <div class="mx-auto flex h-[74px] max-w-[1440px] items-center px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto flex h-18.5 max-w-360 items-center px-4 sm:px-6 lg:px-8">
 
             <!-- Logo -->
-            <a href="/" class="flex w-[205px] shrink-0 items-center" @click="closeMobile">
+            <a href="/" class="flex w-51.25 shrink-0 items-center" @click="closeMobile">
                 <div class="flex items-center">
                     <img :src="heritageLogo" alt="Heritage Capital Markets Limited" class="h-10 w-auto max-w-full object-contain">
 
@@ -33,16 +33,16 @@ const closeMobile = () => {
                 <!-- Home -->
                 <a
                     href="/"
-                    class="relative flex h-[74px] items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
+                    class="relative flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
                 >
                     Home
-                    <span class="absolute bottom-0 left-0 h-[3px] w-full bg-heritage-gold"></span>
+                    <span class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"></span>
                 </a>
 
                 <!-- About -->
                 <a
                     href="/about-us"
-                    class="flex h-[74px] items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
+                    class="flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
                 >
                     About Us
                 </a>
@@ -51,7 +51,7 @@ const closeMobile = () => {
                 <div class="group relative">
 
                     <button
-                        class="flex h-[74px] items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
+                        class="flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
                         type="button"
                     >
                         Investment Solutions
@@ -129,7 +129,7 @@ const closeMobile = () => {
                 <div class="group relative">
 
                     <button
-                        class="flex h-[74px] items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
+                        class="flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
                         type="button"
                     >
                         Research Centre
@@ -180,7 +180,7 @@ const closeMobile = () => {
                 <div class="group relative">
 
                     <button
-                        class="flex h-[74px] items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
+                        class="flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
                         type="button"
                     >
                         Resources
@@ -230,7 +230,7 @@ const closeMobile = () => {
                 <!-- Contact -->
                 <a
                     href="/contact-us"
-                    class="flex h-[74px] items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
+                    class="flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
                 >
                     Contact Us
                 </a>
