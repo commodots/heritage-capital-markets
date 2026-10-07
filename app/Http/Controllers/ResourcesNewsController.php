@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\Event;
 use Inertia\Inertia;
 
 class ResourcesNewsController extends Controller
@@ -15,8 +16,17 @@ class ResourcesNewsController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $upcomingEvents = Event::query()
+            ->where('is_published', true)
+            ->whereNotNull('event_date')
+            ->where('event_date', '>=', now())
+            ->orderBy('event_date')
+            ->orderBy('sort_order')
+            ->get();
+
         return Inertia::render('ResourcesNews', [
             'articles' => $articles,
+            'upcomingEvents' => $upcomingEvents,
         ]);
     }
 
