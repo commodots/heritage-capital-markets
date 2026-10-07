@@ -1,6 +1,7 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
 defineProps({
     articles: {
@@ -43,9 +44,12 @@ function formatEventDate(value) {
 </script>
 
 <template>
-    <Head title="Resources & News | Heritage Capital Markets" />
-
     <PublicLayout>
+        <SeoHead
+            title="Resources & News"
+            description="Explore market perspectives, company updates, investment insights, and upcoming events from Heritage Capital Markets."
+            canonical-path="/resources-news"
+        />
         <section class="bg-heritage-deep text-white">
             <div class="mx-auto max-w-350 px-6 py-24 lg:px-12">
                 <div class="max-w-3xl">

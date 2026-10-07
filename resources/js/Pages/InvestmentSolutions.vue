@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
 const props = defineProps({
     solutions: {
@@ -80,6 +81,11 @@ const journey = [
 
 <template>
     <PublicLayout>
+        <SeoHead
+            title="Investment Solutions"
+            description="Explore Heritage Capital Markets' investment and capital market solutions, designed around client objectives and investment priorities."
+            canonical-path="/investment-solutions"
+        />
 
         <!-- =====================================================
              HERO

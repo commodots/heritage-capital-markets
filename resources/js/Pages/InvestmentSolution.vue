@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
 const props = defineProps({
     solution: { type: Object, required: true },
@@ -14,7 +15,13 @@ function assetUrl(path) {
 }
 
 const solutionImage = computed(() => assetUrl(props.solution.featured_image))
-const pageTitle = computed(() => `${props.solution.title} | Heritage Capital Markets`)
+const pageTitle = computed(() => props.solution.meta_title || props.solution.title)
+const pageDescription = computed(() =>
+    props.solution.meta_description
+    || props.solution.short_description
+    || 'Learn more about this investment solution from Heritage Capital Markets.'
+)
+const canonicalPath = computed(() => `/investment-solutions/${encodeURIComponent(props.solution.slug)}`)
 
 const benefits = computed(() => {
     const map = {
@@ -68,9 +75,12 @@ const journey = [
 </script>
 
 <template>
-    <Head :title="pageTitle" />
-
     <PublicLayout>
+        <SeoHead
+            :title="pageTitle"
+            :description="pageDescription"
+            :canonical-path="canonicalPath"
+        />
         <section class="relative overflow-hidden bg-heritage-deep text-white">
             <div class="absolute inset-0">
                 <img v-if="solutionImage" :src="solutionImage" :alt="solution.title"

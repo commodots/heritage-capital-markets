@@ -1,6 +1,7 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
 defineProps({
     reports: {
@@ -25,14 +26,17 @@ function formatDate(value) {
 </script>
 
 <template>
-    <Head title="Research Centre | Heritage Capital Markets" />
-
     <PublicLayout>
+        <SeoHead
+            title="Research Centre"
+            description="Read Heritage Capital Markets research, market perspectives, and investment insights to support informed decisions."
+            canonical-path="/research-centre"
+        />
         <section class="relative overflow-hidden bg-heritage-deep text-white">
             <div class="absolute inset-0 bg-[url('/images/hero/slide-02-market-insights.webp')] bg-cover bg-center opacity-35"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/40"></div>
+            <div class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/40"></div>
 
-            <div class="relative mx-auto max-w-[1400px] px-6 py-24 lg:px-12">
+            <div class="relative mx-auto max-w-350 px-6 py-24 lg:px-12">
                 <div class="max-w-3xl">
                     <div class="text-[10px] font-semibold uppercase tracking-[0.28em] text-heritage-gold">
                         Research & Insights
@@ -48,7 +52,7 @@ function formatDate(value) {
         </section>
 
         <section class="bg-white">
-            <div class="mx-auto max-w-[1400px] px-6 py-20 lg:px-12">
+            <div class="mx-auto max-w-350 px-6 py-20 lg:px-12">
                 <div class="grid gap-10 lg:grid-cols-[300px_1fr]">
                     <div>
                         <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">

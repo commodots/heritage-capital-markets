@@ -1,17 +1,26 @@
 <script setup>
+import { computed } from 'vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import SeoHead from '@/Components/SeoHead.vue'
 
 import buildingImage from '@/assets/about/heritage-building.jpg';
 import receptionImage from '@/assets/about/heritage-reception.jpg';
 import teamImage from '@/assets/about/heritage-team.jpg';
 import journeyImage from '@/assets/about/heritage-journey.jpg';
 
-defineProps({
+const props = defineProps({
     page: {
         type: Object,
         default: () => ({}),
     },
 });
+
+const seoTitle = computed(() => props.page.meta_title || props.page.title || 'About Heritage')
+const seoDescription = computed(() =>
+    props.page.meta_description
+    || props.page.excerpt
+    || 'Learn about Heritage Capital Markets, our experience in Nigeria’s capital markets, and our client-focused approach.'
+)
 
 const credibilityItems = [
     {
@@ -102,6 +111,11 @@ const milestones = [
 
 <template>
     <PublicLayout>
+        <SeoHead
+            :title="seoTitle"
+            :description="seoDescription"
+            canonical-path="/about-us"
+        />
 
         <!-- =========================================================
              HERO

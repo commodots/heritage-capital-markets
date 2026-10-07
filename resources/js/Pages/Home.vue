@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
 /*
 |--------------------------------------------------------------------------
@@ -166,12 +167,17 @@ const researchItems = [
 
 <template>
     <PublicLayout>
+        <SeoHead
+            title="Home"
+            description="Explore Heritage Capital Markets' investment solutions, market insights, research, and professional capital market services."
+            canonical-path="/"
+        />
 
         <!-- =========================================================
              HERO
         ========================================================== -->
         <section
-            class="relative min-h-[610px] overflow-hidden bg-heritage-deep text-white lg:min-h-[680px]"
+            class="relative min-h-152.5 overflow-hidden bg-heritage-deep text-white lg:min-h-170"
             @mouseenter="stopCarousel"
             @mouseleave="startCarousel"
         >
@@ -196,12 +202,12 @@ const researchItems = [
 
             <!-- Overlay -->
             <div
-                class="absolute inset-0 bg-gradient-to-r from-heritage-deep/95 via-heritage-deep/70 to-heritage-deep/20"
+                class="absolute inset-0 bg-linear-to-r from-heritage-deep/95 via-heritage-deep/70 to-heritage-deep/20"
             ></div>
 
             <!-- Content -->
             <div
-                class="relative z-10 mx-auto flex min-h-[610px] max-w-[1400px] items-center px-6 py-20 lg:min-h-[680px] lg:px-12"
+                class="relative z-10 mx-auto flex min-h-152.5 max-w-350 items-center px-6 py-20 lg:min-h-170 lg:px-12"
             >
                 <div class="max-w-2xl pl-10 sm:pl-14 lg:pl-20 xl:pl-24">
 
@@ -348,7 +354,7 @@ const researchItems = [
         ========================================================== -->
         <section class="bg-heritage-navy text-white">
 
-            <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div class="mx-auto max-w-350 px-6 lg:px-12">
 
                 <div
                     class="grid divide-y divide-white/10 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4"
@@ -526,7 +532,7 @@ const researchItems = [
         ========================================================== -->
         <section class="border-b border-heritage-border bg-white">
 
-            <div class="mx-auto max-w-[1400px] px-6 py-6 lg:px-12">
+            <div class="mx-auto max-w-350 px-6 py-6 lg:px-12">
 
                 <div
                     class="grid gap-5 lg:grid-cols-[210px_1fr] lg:items-center"
@@ -598,7 +604,7 @@ const researchItems = [
         ========================================================== -->
         <section class="bg-heritage-offwhite">
 
-            <div class="mx-auto max-w-[1400px] px-6 py-14 lg:px-12">
+            <div class="mx-auto max-w-350 px-6 py-14 lg:px-12">
 
                 <div class="grid gap-8 lg:grid-cols-[270px_1fr]">
 
@@ -709,7 +715,7 @@ const researchItems = [
         ========================================================== -->
         <section class="bg-white">
 
-            <div class="mx-auto max-w-[1400px] px-6 py-14 lg:px-12">
+            <div class="mx-auto max-w-350 px-6 py-14 lg:px-12">
 
                 <!-- Section Header -->
                 <div class="max-w-2xl">
@@ -961,7 +967,7 @@ const researchItems = [
         ========================================================== -->
         <section class="bg-heritage-offwhite">
 
-            <div class="mx-auto max-w-[1400px] px-6 py-14 lg:px-12">
+            <div class="mx-auto max-w-350 px-6 py-14 lg:px-12">
 
                 <!-- Header -->
                 <div
@@ -1010,7 +1016,7 @@ const researchItems = [
                         class="group overflow-hidden rounded-xl bg-heritage-navy text-white"
                     >
 
-                        <div class="relative h-[390px] overflow-hidden">
+                        <div class="relative h-97.5 overflow-hidden">
 
                             <img
                                 :src="researchItems[0].image"
@@ -1019,7 +1025,7 @@ const researchItems = [
                             />
 
                             <div
-                                class="absolute inset-0 bg-gradient-to-t from-heritage-deep via-heritage-deep/40 to-transparent"
+                                class="absolute inset-0 bg-linear-to-t from-heritage-deep via-heritage-deep/40 to-transparent"
                             ></div>
 
                             <div
@@ -1179,7 +1185,7 @@ const researchItems = [
         <section class="bg-white">
 
             <div
-                class="mx-auto max-w-[1400px] px-6 py-14 lg:px-12"
+                class="mx-auto max-w-350 px-6 py-14 lg:px-12"
             >
 
                 <div
@@ -1246,7 +1252,7 @@ const researchItems = [
                         <img
                             :src="impactImage"
                             alt="Heritage Capital Markets team"
-                            class="h-[430px] w-full object-cover"
+                            class="h-107.5 w-full object-cover"
                             loading="lazy"
                         />
 

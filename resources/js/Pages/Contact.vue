@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from 'vue'
-import { Head, useForm, usePage } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
 const page = usePage()
 
@@ -24,14 +25,17 @@ function submit() {
 </script>
 
 <template>
-    <Head title="Contact Us | Heritage Capital Markets" />
-
     <PublicLayout>
+        <SeoHead
+            title="Contact Us"
+            description="Contact Heritage Capital Markets about our investment solutions, professional services, or other enquiries."
+            canonical-path="/contact-us"
+        />
         <section class="relative overflow-hidden bg-heritage-deep text-white">
             <div class="absolute inset-0 bg-[url('/images/pages/heritage-building.jpg')] bg-cover bg-center opacity-35"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/45"></div>
+            <div class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/45"></div>
 
-            <div class="relative mx-auto max-w-[1400px] px-6 py-24 lg:px-12 lg:py-28">
+            <div class="relative mx-auto max-w-350 px-6 py-24 lg:px-12 lg:py-28">
                 <div class="max-w-3xl">
                     <div class="text-[10px] font-semibold uppercase tracking-[0.28em] text-heritage-gold">
                         Contact Heritage
@@ -48,7 +52,7 @@ function submit() {
         </section>
 
         <section class="bg-white">
-            <div class="mx-auto grid max-w-[1400px] gap-12 px-6 py-20 lg:grid-cols-[0.8fr_1.2fr] lg:px-12">
+            <div class="mx-auto grid max-w-350 gap-12 px-6 py-20 lg:grid-cols-[0.8fr_1.2fr] lg:px-12">
                 <div>
                     <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">
                         Get In Touch

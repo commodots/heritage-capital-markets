@@ -1,8 +1,10 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Link } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
+import SeoHead from '@/Components/SeoHead.vue'
 
-defineProps({
+const props = defineProps({
     report: {
         type: Object,
         required: true,
@@ -12,6 +14,12 @@ defineProps({
         default: () => [],
     },
 })
+
+const seoDescription = computed(() =>
+    props.report.excerpt
+    || 'Read this research report from Heritage Capital Markets.'
+)
+const canonicalPath = computed(() => `/research-centre/reports/${props.report.id}`)
 
 function assetUrl(path) {
     if (!path) return '/images/hero/slide-02-market-insights.webp'
@@ -29,9 +37,12 @@ function formatDate(value) {
 </script>
 
 <template>
-    <Head :title="`${report.title} | Heritage Capital Markets`" />
-
     <PublicLayout>
+        <SeoHead
+            :title="report.title"
+            :description="seoDescription"
+            :canonical-path="canonicalPath"
+        />
         <section class="bg-heritage-deep text-white">
             <div class="mx-auto max-w-300 px-6 py-20 lg:px-12">
                 <Link href="/research-centre" class="text-xs text-white/60 hover:text-heritage-gold">
