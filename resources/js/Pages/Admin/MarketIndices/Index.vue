@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+import { useAccessibleDialog } from '@/Composables/useAccessibleDialog'
 
 const props = defineProps({
     indices: {
@@ -12,6 +13,7 @@ const props = defineProps({
 const page = usePage()
 
 const showModal = ref(false)
+const { handleKeydown: handleDialogKeydown, setDialogElement } = useAccessibleDialog(showModal, () => closeModal())
 const editingIndex = ref(null)
 
 const form = useForm({
@@ -158,18 +160,16 @@ function flashMessage() {
 </script>
 
 <template>
+
     <Head title="Market Indices" />
 
     <div class="min-h-screen bg-slate-100">
 
         <!-- Sidebar -->
-        <aside
-            class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-heritage-navy text-white lg:flex"
-        >
+        <aside class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-heritage-navy text-white lg:flex">
             <div class="flex h-20 items-center border-b border-white/10 px-6">
                 <div
-                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-heritage-gold text-xl font-bold text-heritage-navy"
-                >
+                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-heritage-gold text-xl font-bold text-heritage-navy">
                     H
                 </div>
 
@@ -178,7 +178,7 @@ function flashMessage() {
                         HERITAGE
                     </div>
 
-                    <div class="text-[10px] uppercase tracking-[0.2em] text-white/50">
+                    <div class="text-[10px] uppercase tracking-[0.2em] text-white/75">
                         Capital Markets
                     </div>
                 </div>
@@ -186,10 +186,8 @@ function flashMessage() {
 
             <nav class="flex-1 space-y-1 px-3 py-6">
 
-                <a
-                    href="/admin"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
-                >
+                <a href="/admin"
+                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white">
                     <span class="text-lg">⌂</span>
                     Dashboard
                 </a>
@@ -198,26 +196,20 @@ function flashMessage() {
                     Homepage
                 </div>
 
-                <a
-                    href="/admin/homepage/hero-slides"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
-                >
+                <a href="/admin/homepage/hero-slides"
+                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white">
                     <span class="text-lg">▣</span>
                     Hero Slides
                 </a>
 
-                <a
-                    href="/admin/investment-solutions"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
-                >
+                <a href="/admin/investment-solutions"
+                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white">
                     <span class="text-lg">◆</span>
                     Investment Solutions
                 </a>
 
-                <a
-                    href="/admin/market-indices"
-                    class="flex items-center gap-3 rounded-lg bg-heritage-gold px-4 py-3 text-sm font-semibold text-heritage-navy"
-                >
+                <a href="/admin/market-indices"
+                    class="flex items-center gap-3 rounded-lg bg-heritage-gold px-4 py-3 text-sm font-semibold text-heritage-navy">
                     <span class="text-lg">↗</span>
                     Market Indices
                 </a>
@@ -226,34 +218,22 @@ function flashMessage() {
                     Content
                 </div>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">▤</span>
                     Pages
                 </a>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">▥</span>
                     Research & Reports
                 </a>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">◈</span>
                     News & Articles
                 </a>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">?</span>
                     FAQs
                 </a>
@@ -262,26 +242,17 @@ function flashMessage() {
                     Administration
                 </div>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">▧</span>
                     Media Library
                 </a>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">✉</span>
                     Enquiries
                 </a>
 
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">⚙</span>
                     Site Settings
                 </a>
@@ -289,7 +260,7 @@ function flashMessage() {
 
             <div class="border-t border-white/10 p-4">
                 <div class="rounded-lg bg-white/5 p-4">
-                    <div class="text-xs text-white/40">
+                    <div class="text-xs text-white/75">
                         Heritage CMS
                     </div>
 
@@ -305,8 +276,7 @@ function flashMessage() {
 
             <!-- Header -->
             <header
-                class="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur sm:px-8"
-            >
+                class="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur sm:px-8">
                 <div>
                     <div class="text-xs font-semibold uppercase tracking-[0.18em] text-heritage-gold">
                         Homepage Management
@@ -319,19 +289,13 @@ function flashMessage() {
 
                 <div class="flex items-center gap-3">
 
-                    <a
-                        href="/"
-                        target="_blank"
-                        class="hidden rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 sm:inline-flex"
-                    >
+                    <a href="/" target="_blank"
+                        class="hidden rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 sm:inline-flex">
                         View Website
                     </a>
 
-                    <button
-                        type="button"
-                        @click="openCreate"
-                        class="inline-flex items-center gap-2 rounded-md bg-heritage-gold px-4 py-2.5 text-sm font-semibold text-heritage-navy shadow-sm transition hover:bg-heritage-gold-light"
-                    >
+                    <button type="button" @click="openCreate"
+                        class="inline-flex items-center gap-2 rounded-md bg-heritage-gold px-4 py-2.5 text-sm font-semibold text-heritage-navy shadow-sm transition hover:bg-heritage-gold-light">
                         <span class="text-lg leading-none">+</span>
                         Add Index
                     </button>
@@ -342,10 +306,8 @@ function flashMessage() {
             <div class="p-5 sm:p-8">
 
                 <!-- Flash -->
-                <div
-                    v-if="flashMessage()"
-                    class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
-                >
+                <div v-if="flashMessage()"
+                    class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
                     {{ flashMessage() }}
                 </div>
 
@@ -365,7 +327,7 @@ function flashMessage() {
                 <div class="mb-8 grid gap-4 sm:grid-cols-3">
 
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Total Indices
                         </div>
 
@@ -375,7 +337,7 @@ function flashMessage() {
                     </div>
 
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Active
                         </div>
 
@@ -385,11 +347,11 @@ function flashMessage() {
                     </div>
 
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Inactive
                         </div>
 
-                        <div class="mt-2 text-3xl font-bold text-slate-400">
+                        <div class="mt-2 text-3xl font-bold text-slate-500">
                             {{ inactiveCount }}
                         </div>
                     </div>
@@ -397,11 +359,10 @@ function flashMessage() {
                 </div>
 
                 <!-- Empty -->
-                <div
-                    v-if="indices.length === 0"
-                    class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center"
-                >
-                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl text-slate-400">
+                <div v-if="indices.length === 0"
+                    class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+                    <div
+                        class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl text-slate-500">
                         ↗
                     </div>
 
@@ -414,20 +375,14 @@ function flashMessage() {
                         Overview section.
                     </p>
 
-                    <button
-                        type="button"
-                        @click="openCreate"
-                        class="mt-6 rounded-md bg-heritage-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D]"
-                    >
+                    <button type="button" @click="openCreate"
+                        class="mt-6 rounded-md bg-heritage-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D]">
                         Add Market Index
                     </button>
                 </div>
 
                 <!-- Desktop table -->
-                <div
-                    v-else
-                    class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-                >
+                <div v-else class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                         <div>
@@ -435,12 +390,12 @@ function flashMessage() {
                                 Market Overview Data
                             </h3>
 
-                            <p class="mt-1 text-xs text-slate-400">
+                            <p class="mt-1 text-xs text-slate-500">
                                 Values are currently manually managed.
                             </p>
                         </div>
 
-                        <div class="text-xs text-slate-400">
+                        <div class="text-xs text-slate-500">
                             {{ indices.length }}
                             {{ indices.length === 1 ? 'index' : 'indices' }}
                         </div>
@@ -452,31 +407,38 @@ function flashMessage() {
                             <thead>
                                 <tr class="border-b border-slate-100 bg-slate-50 text-left">
 
-                                    <th class="w-20 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="w-20 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Order
                                     </th>
 
-                                    <th class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Index
                                     </th>
 
-                                    <th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Value
                                     </th>
 
-                                    <th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Change
                                     </th>
 
-                                    <th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         %
                                     </th>
 
-                                    <th class="w-28 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="w-28 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Status
                                     </th>
 
-                                    <th class="w-40 px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                    <th
+                                        class="w-40 px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Actions
                                     </th>
 
@@ -485,16 +447,14 @@ function flashMessage() {
 
                             <tbody>
 
-                                <tr
-                                    v-for="index in indices"
-                                    :key="index.id"
-                                    class="border-b border-slate-100 last:border-0 hover:bg-slate-50/70"
-                                >
+                                <tr v-for="index in indices" :key="index.id"
+                                    class="border-b border-slate-100 last:border-0 hover:bg-slate-50/70">
 
                                     <!-- Order -->
                                     <td class="px-5 py-4">
 
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-heritage-navy text-xs font-bold text-heritage-gold">
+                                        <div
+                                            class="flex h-8 w-8 items-center justify-center rounded-md bg-heritage-navy text-xs font-bold text-heritage-gold">
                                             {{ index.sort_order }}
                                         </div>
 
@@ -507,10 +467,8 @@ function flashMessage() {
                                             {{ index.name }}
                                         </div>
 
-                                        <div
-                                            v-if="index.symbol"
-                                            class="mt-1 text-xs uppercase tracking-wider text-slate-400"
-                                        >
+                                        <div v-if="index.symbol"
+                                            class="mt-1 text-xs uppercase tracking-wider text-slate-500">
                                             {{ index.symbol }}
                                         </div>
 
@@ -528,14 +486,10 @@ function flashMessage() {
                                     <!-- Change -->
                                     <td class="px-5 py-4 text-right">
 
-                                        <span
-                                            :class="
-                                                index.is_positive
-                                                    ? 'text-emerald-600'
-                                                    : 'text-red-600'
-                                            "
-                                            class="font-semibold tabular-nums"
-                                        >
+                                        <span :class="index.is_positive
+                                                ? 'text-emerald-600'
+                                                : 'text-red-600'
+                                            " class="font-semibold tabular-nums">
                                             {{ index.is_positive ? '+' : '-' }}{{ formatChange(index.change) }}
                                         </span>
 
@@ -544,14 +498,10 @@ function flashMessage() {
                                     <!-- Percentage -->
                                     <td class="px-5 py-4 text-right">
 
-                                        <span
-                                            :class="
-                                                index.is_positive
-                                                    ? 'text-emerald-600'
-                                                    : 'text-red-600'
-                                            "
-                                            class="font-semibold tabular-nums"
-                                        >
+                                        <span :class="index.is_positive
+                                                ? 'text-emerald-600'
+                                                : 'text-red-600'
+                                            " class="font-semibold tabular-nums">
                                             {{ index.is_positive ? '+' : '-' }}{{ formatPercent(index.change_percent) }}
                                         </span>
 
@@ -560,16 +510,10 @@ function flashMessage() {
                                     <!-- Status -->
                                     <td class="px-5 py-4">
 
-                                        <button
-                                            type="button"
-                                            @click="toggleIndex(index)"
-                                            :class="
-                                                index.is_active
-                                                    ? 'bg-emerald-100 text-emerald-700'
-                                                    : 'bg-slate-100 text-slate-500'
-                                            "
-                                            class="rounded-full px-3 py-1 text-xs font-semibold"
-                                        >
+                                        <button type="button" @click="toggleIndex(index)" :class="index.is_active
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : 'bg-slate-100 text-slate-500'
+                                            " class="rounded-full px-3 py-1 text-xs font-semibold">
                                             {{
                                                 index.is_active
                                                     ? 'Active'
@@ -584,19 +528,13 @@ function flashMessage() {
 
                                         <div class="flex justify-end gap-2">
 
-                                            <button
-                                                type="button"
-                                                @click="openEdit(index)"
-                                                class="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-heritage-navy transition hover:border-heritage-gold hover:bg-amber-50"
-                                            >
+                                            <button type="button" @click="openEdit(index)"
+                                                class="rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-heritage-navy transition hover:border-heritage-gold hover:bg-amber-50">
                                                 Edit
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                @click="deleteIndex(index)"
-                                                class="rounded-md border border-red-100 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                            >
+                                            <button type="button" @click="deleteIndex(index)"
+                                                class="rounded-md border border-red-100 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50">
                                                 Delete
                                             </button>
 
@@ -614,11 +552,7 @@ function flashMessage() {
                     <!-- Mobile -->
                     <div class="divide-y divide-slate-100 md:hidden">
 
-                        <div
-                            v-for="index in indices"
-                            :key="index.id"
-                            class="p-5"
-                        >
+                        <div v-for="index in indices" :key="index.id" class="p-5">
 
                             <div class="flex items-start justify-between gap-4">
 
@@ -627,24 +561,16 @@ function flashMessage() {
                                         {{ index.name }}
                                     </div>
 
-                                    <div
-                                        v-if="index.symbol"
-                                        class="mt-1 text-xs uppercase tracking-wider text-slate-400"
-                                    >
+                                    <div v-if="index.symbol"
+                                        class="mt-1 text-xs uppercase tracking-wider text-slate-500">
                                         {{ index.symbol }}
                                     </div>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    @click="toggleIndex(index)"
-                                    :class="
-                                        index.is_active
-                                            ? 'bg-emerald-100 text-emerald-700'
-                                            : 'bg-slate-100 text-slate-500'
-                                    "
-                                    class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                                >
+                                <button type="button" @click="toggleIndex(index)" :class="index.is_active
+                                        ? 'bg-emerald-100 text-emerald-700'
+                                        : 'bg-slate-100 text-slate-500'
+                                    " class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold">
                                     {{
                                         index.is_active
                                             ? 'Active'
@@ -657,7 +583,7 @@ function flashMessage() {
                             <div class="mt-4 grid grid-cols-3 gap-3">
 
                                 <div class="rounded-lg bg-slate-50 p-3">
-                                    <div class="text-[10px] uppercase tracking-wider text-slate-400">
+                                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
                                         Value
                                     </div>
 
@@ -667,35 +593,27 @@ function flashMessage() {
                                 </div>
 
                                 <div class="rounded-lg bg-slate-50 p-3">
-                                    <div class="text-[10px] uppercase tracking-wider text-slate-400">
+                                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
                                         Change
                                     </div>
 
-                                    <div
-                                        :class="
-                                            index.is_positive
-                                                ? 'text-emerald-600'
-                                                : 'text-red-600'
-                                        "
-                                        class="mt-1 text-sm font-bold"
-                                    >
+                                    <div :class="index.is_positive
+                                            ? 'text-emerald-600'
+                                            : 'text-red-600'
+                                        " class="mt-1 text-sm font-bold">
                                         {{ index.is_positive ? '+' : '-' }}{{ formatChange(index.change) }}
                                     </div>
                                 </div>
 
                                 <div class="rounded-lg bg-slate-50 p-3">
-                                    <div class="text-[10px] uppercase tracking-wider text-slate-400">
+                                    <div class="text-[10px] uppercase tracking-wider text-slate-500">
                                         Percent
                                     </div>
 
-                                    <div
-                                        :class="
-                                            index.is_positive
-                                                ? 'text-emerald-600'
-                                                : 'text-red-600'
-                                        "
-                                        class="mt-1 text-sm font-bold"
-                                    >
+                                    <div :class="index.is_positive
+                                            ? 'text-emerald-600'
+                                            : 'text-red-600'
+                                        " class="mt-1 text-sm font-bold">
                                         {{ index.is_positive ? '+' : '-' }}{{ formatPercent(index.change_percent) }}
                                     </div>
                                 </div>
@@ -704,19 +622,13 @@ function flashMessage() {
 
                             <div class="mt-4 flex gap-2">
 
-                                <button
-                                    type="button"
-                                    @click="openEdit(index)"
-                                    class="flex-1 rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-heritage-navy"
-                                >
+                                <button type="button" @click="openEdit(index)"
+                                    class="flex-1 rounded-md border border-slate-200 px-3 py-2 text-xs font-semibold text-heritage-navy">
                                     Edit
                                 </button>
 
-                                <button
-                                    type="button"
-                                    @click="deleteIndex(index)"
-                                    class="flex-1 rounded-md border border-red-100 px-3 py-2 text-xs font-semibold text-red-600"
-                                >
+                                <button type="button" @click="deleteIndex(index)"
+                                    class="flex-1 rounded-md border border-red-100 px-3 py-2 text-xs font-semibold text-red-600">
                                     Delete
                                 </button>
 
@@ -732,18 +644,11 @@ function flashMessage() {
         </main>
 
         <!-- Modal -->
-        <div
-            v-if="showModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
-            @keydown.esc.prevent="closeModal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="market-index-modal-title"
-        >
+        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
+            @click.self="closeModal" @keydown="handleDialogKeydown" :ref="setDialogElement" tabindex="-1" role="dialog"
+            aria-modal="true" aria-labelledby="market-index-modal-title">
 
-            <div
-                class="w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl"
-            >
+            <div class="w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl">
 
                 <!-- Header -->
                 <div class="flex items-center justify-between border-b border-slate-200 px-6">
@@ -762,12 +667,8 @@ function flashMessage() {
                         </h2>
                     </div>
 
-                    <button
-                        type="button"
-                        @click="closeModal"
-                        aria-label="Close market index form"
-                        class="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-400 transition hover:bg-slate-100"
-                    >
+                    <button type="button" @click="closeModal" aria-label="Close market index form"
+                        class="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-500 transition hover:bg-slate-100">
                         ×
                     </button>
 
@@ -784,17 +685,11 @@ function flashMessage() {
                                 Index Name <span class="text-red-500">*</span>
                             </label>
 
-                            <input
-                                v-model="form.name"
-                                type="text"
+                            <input v-model="form.name" aria-label="Index name" type="text"
                                 placeholder="e.g. NGX All-Share Index"
-                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
-                            >
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                            <div
-                                v-if="form.errors.name"
-                                class="mt-1 text-xs text-red-600"
-                            >
+                            <div v-if="form.errors.name" class="mt-1 text-xs text-red-600">
                                 {{ form.errors.name }}
                             </div>
                         </div>
@@ -805,12 +700,9 @@ function flashMessage() {
                                 Symbol / Code
                             </label>
 
-                            <input
-                                v-model="form.symbol"
-                                type="text"
+                            <input v-model="form.symbol" aria-label="Symbol or code" type="text"
                                 placeholder="e.g. NGXASI"
-                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm uppercase outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
-                            >
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm uppercase outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
                         </div>
 
                         <!-- Values -->
@@ -821,18 +713,11 @@ function flashMessage() {
                                     Current Value <span class="text-red-500">*</span>
                                 </label>
 
-                                <input
-                                    v-model="form.value"
-                                    type="number"
-                                    step="0.01"
+                                <input v-model="form.value" aria-label="Current value" type="number" step="0.01"
                                     placeholder="102026.75"
-                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
-                                >
+                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                                <div
-                                    v-if="form.errors.value"
-                                    class="mt-1 text-xs text-red-600"
-                                >
+                                <div v-if="form.errors.value" class="mt-1 text-xs text-red-600">
                                     {{ form.errors.value }}
                                 </div>
                             </div>
@@ -842,18 +727,11 @@ function flashMessage() {
                                     Change <span class="text-red-500">*</span>
                                 </label>
 
-                                <input
-                                    v-model="form.change"
-                                    type="number"
-                                    step="0.01"
+                                <input v-model="form.change" aria-label="Change" type="number" step="0.01"
                                     placeholder="640.25"
-                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
-                                >
+                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                                <div
-                                    v-if="form.errors.change"
-                                    class="mt-1 text-xs text-red-600"
-                                >
+                                <div v-if="form.errors.change" class="mt-1 text-xs text-red-600">
                                     {{ form.errors.change }}
                                 </div>
                             </div>
@@ -864,18 +742,11 @@ function flashMessage() {
                                     <span class="text-red-500">*</span>
                                 </label>
 
-                                <input
-                                    v-model="form.change_percent"
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="0.63"
-                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
-                                >
+                                <input v-model="form.change_percent" aria-label="Change percent" type="number"
+                                    step="0.01" placeholder="0.63"
+                                    class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                                <div
-                                    v-if="form.errors.change_percent"
-                                    class="mt-1 text-xs text-red-600"
-                                >
+                                <div v-if="form.errors.change_percent" class="mt-1 text-xs text-red-600">
                                     {{ form.errors.change_percent }}
                                 </div>
                             </div>
@@ -891,29 +762,17 @@ function flashMessage() {
 
                             <div class="grid grid-cols-2 gap-3">
 
-                                <button
-                                    type="button"
-                                    @click="form.is_positive = true"
-                                    :class="
-                                        form.is_positive
-                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                            : 'border-slate-200 bg-white text-slate-500'
-                                    "
-                                    class="rounded-lg border px-4 py-3 text-sm font-semibold transition"
-                                >
+                                <button type="button" @click="form.is_positive = true" :class="form.is_positive
+                                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                        : 'border-slate-200 bg-white text-slate-500'
+                                    " class="rounded-lg border px-4 py-3 text-sm font-semibold transition">
                                     ↑ Positive
                                 </button>
 
-                                <button
-                                    type="button"
-                                    @click="form.is_positive = false"
-                                    :class="
-                                        !form.is_positive
-                                            ? 'border-red-500 bg-red-50 text-red-700'
-                                            : 'border-slate-200 bg-white text-slate-500'
-                                    "
-                                    class="rounded-lg border px-4 py-3 text-sm font-semibold transition"
-                                >
+                                <button type="button" @click="form.is_positive = false" :class="!form.is_positive
+                                        ? 'border-red-500 bg-red-50 text-red-700'
+                                        : 'border-slate-200 bg-white text-slate-500'
+                                    " class="rounded-lg border px-4 py-3 text-sm font-semibold transition">
                                     ↓ Negative
                                 </button>
 
@@ -928,17 +787,10 @@ function flashMessage() {
                                 Display Order <span class="text-red-500">*</span>
                             </label>
 
-                            <input
-                                v-model.number="form.sort_order"
-                                type="number"
-                                min="1"
-                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
-                            >
+                            <input v-model.number="form.sort_order" aria-label="Display order" type="number" min="1"
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                            <div
-                                v-if="form.errors.sort_order"
-                                class="mt-1 text-xs text-red-600"
-                            >
+                            <div v-if="form.errors.sort_order" class="mt-1 text-xs text-red-600">
                                 {{ form.errors.sort_order }}
                             </div>
 
@@ -952,29 +804,20 @@ function flashMessage() {
                                     Publish Index
                                 </div>
 
-                                <div class="mt-1 text-xs text-slate-400">
+                                <div class="mt-1 text-xs text-slate-500">
                                     Active indices appear on the public website.
                                 </div>
                             </div>
 
-                            <button
-                                type="button"
-                                @click="form.is_active = !form.is_active"
-                                :class="
-                                    form.is_active
-                                        ? 'bg-heritage-gold'
-                                        : 'bg-slate-300'
-                                "
-                                class="relative h-6 w-11 rounded-full transition"
-                            >
-                                <span
-                                    :class="
-                                        form.is_active
-                                            ? 'translate-x-6'
-                                            : 'translate-x-1'
+                            <button type="button" @click="form.is_active = !form.is_active" :class="form.is_active
+                                    ? 'bg-heritage-gold'
+                                    : 'bg-slate-300'
+                                " class="relative h-6 w-11 rounded-full transition">
+                                <span :class="form.is_active
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'
                                     "
-                                    class="absolute left-0 top-1 h-4 w-4 rounded-full bg-white shadow transition"
-                                ></span>
+                                    class="absolute left-0 top-1 h-4 w-4 rounded-full bg-white shadow transition"></span>
                             </button>
 
                         </div>
@@ -984,19 +827,13 @@ function flashMessage() {
                     <!-- Footer -->
                     <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
 
-                        <button
-                            type="button"
-                            @click="closeModal"
-                            class="rounded-md border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
-                        >
+                        <button type="button" @click="closeModal"
+                            class="rounded-md border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">
                             Cancel
                         </button>
 
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            class="rounded-md bg-heritage-navy px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D] disabled:cursor-not-allowed disabled:opacity-50"
-                        >
+                        <button type="submit" :disabled="form.processing"
+                            class="rounded-md bg-heritage-navy px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B294D] disabled:cursor-not-allowed disabled:opacity-50">
                             {{
                                 form.processing
                                     ? 'Saving...'

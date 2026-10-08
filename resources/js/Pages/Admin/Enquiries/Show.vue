@@ -46,7 +46,7 @@ const formatDate = (date) => {
 
                     <a
                         href="/admin/enquiries"
-                        class="text-sm font-semibold text-slate-500 hover:text-[#061A33]"
+                        class="text-sm font-semibold text-slate-500 hover:text-heritage-navy"
                     >
                         ← Back to Enquiries
                     </a>
@@ -77,6 +77,7 @@ const formatDate = (date) => {
 
                             <select
                                 :value="enquiry.status"
+                                :aria-label="`Update status for ${enquiry.name}`"
                                 @change="updateStatus($event.target.value)"
                                 :disabled="processing"
                                 class="rounded-lg border px-4 py-2 text-sm font-semibold"
@@ -115,7 +116,7 @@ const formatDate = (date) => {
 
                                 <a
                                     :href="`mailto:${enquiry.email}`"
-                                    class="mt-1 block text-sm font-semibold text-[#061A33]"
+                                    class="mt-1 block text-sm font-semibold text-heritage-navy"
                                 >
                                     {{ enquiry.email }}
                                 </a>

@@ -31,11 +31,12 @@ const submit = () => {
             <form @submit.prevent="submit" class="space-y-5">
 
                 <div>
-                    <label class="mb-2 block text-sm font-medium">
+                    <label for="login-email" class="mb-2 block text-sm font-medium">
                         Email
                     </label>
 
                     <input
+                        id="login-email"
                         v-model="form.email"
                         type="email"
                         class="w-full rounded-lg border border-slate-300 px-4 py-3"
@@ -51,11 +52,12 @@ const submit = () => {
                 </div>
 
                 <div>
-                    <label class="mb-2 block text-sm font-medium">
+                    <label for="login-password" class="mb-2 block text-sm font-medium">
                         Password
                     </label>
 
                     <input
+                        id="login-password"
                         v-model="form.password"
                         type="password"
                         class="w-full rounded-lg border border-slate-300 px-4 py-3"

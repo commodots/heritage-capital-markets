@@ -111,7 +111,7 @@ const submit = () => {
                             type="button"
                             :disabled="processing"
                             @click="submit"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#061A33] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0a2748] disabled:cursor-not-allowed disabled:opacity-60"
+                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-heritage-navy px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0a2748] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             <svg
                                 v-if="processing"
@@ -170,8 +170,9 @@ const submit = () => {
 
                                 <input
                                     v-model="form.homepage_why_eyebrow"
+                                    aria-label="Why Heritage eyebrow"
                                     type="text"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 />
                             </div>
 
@@ -184,8 +185,9 @@ const submit = () => {
 
                                 <input
                                     v-model="form.homepage_why_title"
+                                    aria-label="Why Heritage title"
                                     type="text"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 />
                             </div>
 
@@ -198,8 +200,9 @@ const submit = () => {
 
                                 <textarea
                                     v-model="form.homepage_why_description"
+                                    aria-label="Why Heritage description"
                                     rows="5"
-                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 ></textarea>
                             </div>
                         </div>
@@ -259,8 +262,9 @@ const submit = () => {
                                                     `homepage_stat_${number}_value`
                                                 ]
                                             "
+                                            :aria-label="`Statistic ${number} value`"
                                             type="text"
-                                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                         />
                                     </div>
 
@@ -277,8 +281,9 @@ const submit = () => {
                                                     `homepage_stat_${number}_label`
                                                 ]
                                             "
+                                            :aria-label="`Statistic ${number} label`"
                                             type="text"
-                                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                         />
                                     </div>
                                 </div>
@@ -325,8 +330,9 @@ const submit = () => {
 
                                 <input
                                     v-model="form.homepage_about_eyebrow"
+                                    aria-label="About Heritage eyebrow"
                                     type="text"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 />
                             </div>
 
@@ -339,8 +345,9 @@ const submit = () => {
 
                                 <input
                                     v-model="form.homepage_about_title"
+                                    aria-label="About Heritage title"
                                     type="text"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 />
                             </div>
 
@@ -353,8 +360,9 @@ const submit = () => {
 
                                 <textarea
                                     v-model="form.homepage_about_text_1"
+                                    aria-label="About Heritage paragraph 1"
                                     rows="5"
-                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 ></textarea>
                             </div>
 
@@ -367,8 +375,9 @@ const submit = () => {
 
                                 <textarea
                                     v-model="form.homepage_about_text_2"
+                                    aria-label="About Heritage paragraph 2"
                                     rows="5"
-                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 ></textarea>
                             </div>
 
@@ -381,8 +390,9 @@ const submit = () => {
 
                                 <input
                                     v-model="form.homepage_about_button"
+                                    aria-label="About Heritage button label"
                                     type="text"
-                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-[#061A33] focus:ring-2 focus:ring-[#061A33]/10"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 />
                             </div>
                         </div>
@@ -407,7 +417,7 @@ const submit = () => {
                         <button
                             type="submit"
                             :disabled="processing"
-                            class="inline-flex items-center justify-center rounded-lg bg-[#061A33] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0a2748] disabled:cursor-not-allowed disabled:opacity-60"
+                            class="inline-flex items-center justify-center rounded-lg bg-heritage-navy px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0a2748] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {{ processing ? 'Saving...' : 'Save Changes' }}
                         </button>

@@ -33,6 +33,7 @@ function submit() {
                     <input
                         v-model="search"
                         type="search"
+                        aria-label="Search investment solutions, news and research"
                         placeholder="Search investment solutions, news and research..."
                         class="min-w-0 flex-1 border border-white/20 bg-white px-5 py-4 text-heritage-navy outline-none"
                     />

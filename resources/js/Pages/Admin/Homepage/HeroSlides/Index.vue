@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
+import { useAccessibleDialog } from '@/Composables/useAccessibleDialog'
 
 const props = defineProps({
     slides: {
@@ -12,6 +13,7 @@ const props = defineProps({
 const page = usePage()
 
 const showForm = ref(false)
+const { handleKeydown: handleDialogKeydown, setDialogElement } = useAccessibleDialog(showForm, () => closeForm())
 const editingSlide = ref(null)
 const deleteTarget = ref(null)
 
@@ -204,7 +206,7 @@ const statusClass = (active) =>
         <div class="lg:pl-64.5">
             <header class="sticky top-0 z-30 flex h-20.5 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur lg:px-8">
                 <div>
-                    <div class="text-xs text-slate-400">Homepage Management</div>
+                    <div class="text-xs text-slate-500">Homepage Management</div>
                     <h1 class="font-display text-xl font-semibold text-heritage-navy">Hero Slides</h1>
                 </div>
 
@@ -240,15 +242,15 @@ const statusClass = (active) =>
 
                 <div class="mb-5 grid gap-4 sm:grid-cols-3">
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs uppercase tracking-wider text-slate-400">Total Slides</div>
+                        <div class="text-xs uppercase tracking-wider text-slate-500">Total Slides</div>
                         <div class="mt-1 text-2xl font-semibold text-heritage-navy">{{ slides.length }}</div>
                     </div>
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs uppercase tracking-wider text-slate-400">Active</div>
+                        <div class="text-xs uppercase tracking-wider text-slate-500">Active</div>
                         <div class="mt-1 text-2xl font-semibold text-emerald-600">{{ slides.filter(s => s.is_active).length }}</div>
                     </div>
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs uppercase tracking-wider text-slate-400">Inactive</div>
+                        <div class="text-xs uppercase tracking-wider text-slate-500">Inactive</div>
                         <div class="mt-1 text-2xl font-semibold text-slate-500">{{ slides.filter(s => !s.is_active).length }}</div>
                     </div>
                 </div>
@@ -270,14 +272,14 @@ const statusClass = (active) =>
                                 :alt="slide.title"
                                 class="h-14 w-20 rounded-md object-cover"
                             />
-                            <div v-else class="flex h-14 w-20 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-400">No image</div>
+                            <div v-else class="flex h-14 w-20 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500">No image</div>
                         </div>
 
                         <div class="min-w-0">
                             <div class="text-[10px] font-semibold uppercase tracking-wider text-heritage-gold">{{ slide.eyebrow }}</div>
                             <div class="mt-1 truncate font-display text-lg font-semibold text-heritage-navy">{{ slide.title }}</div>
                             <div class="mt-1 line-clamp-2 text-xs text-slate-500">{{ slide.description }}</div>
-                            <div class="mt-2 text-xs text-slate-400">
+                            <div class="mt-2 text-xs text-slate-500">
                                 {{ slide.primary_label || 'Primary CTA' }}
                                 <span class="mx-1">·</span>
                                 {{ slide.secondary_label || 'Secondary CTA' }}
@@ -308,7 +310,7 @@ const statusClass = (active) =>
                     </div>
 
                     <div v-if="!slides.length" class="p-12 text-center">
-                        <div class="text-4xl text-slate-300">▣</div>
+                        <div class="text-4xl text-slate-500">▣</div>
                         <h3 class="mt-3 font-display text-xl font-semibold text-heritage-navy">No hero slides yet</h3>
                         <p class="mt-1 text-sm text-slate-500">Add the first slide to begin building the homepage carousel.</p>
                         <button type="button" @click="openCreate" class="mt-5 rounded-lg bg-heritage-gold px-5 py-2.5 text-sm font-semibold text-heritage-deep">Add Hero Slide</button>
@@ -321,7 +323,10 @@ const statusClass = (active) =>
         <div
             v-if="showForm"
             class="fixed inset-0 z-50 overflow-y-auto bg-heritage-deep/60 p-4 backdrop-blur-sm"
-            @keydown.esc.prevent="closeForm"
+            @click.self="closeForm"
+            @keydown="handleDialogKeydown"
+            :ref="setDialogElement"
+            tabindex="-1"
             role="dialog"
             aria-modal="true"
             aria-labelledby="hero-slide-modal-title"
@@ -335,65 +340,65 @@ const statusClass = (active) =>
                                 {{ editingSlide ? 'Edit Hero Slide' : 'Add Hero Slide' }}
                             </h3>
                         </div>
-                        <button type="button" @click="closeForm" aria-label="Close hero slide form" class="text-2xl text-slate-400 hover:text-slate-700">×</button>
+                        <button type="button" @click="closeForm" aria-label="Close hero slide form" class="text-2xl text-slate-500 hover:text-slate-700">×</button>
                     </div>
 
                     <form @submit.prevent="submit" class="max-h-[78vh] overflow-y-auto p-6">
                         <div class="grid gap-5 md:grid-cols-2">
                             <div class="md:col-span-2">
                                 <label class="text-xs font-semibold text-slate-600">Eyebrow</label>
-                                <input v-model="form.eyebrow" type="text" placeholder="BUILDING WEALTH. CREATING VALUE." class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/10">
+                                <input v-model="form.eyebrow" aria-label="Eyebrow" type="text" placeholder="BUILDING WEALTH. CREATING VALUE." class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/10">
                                 <p v-if="form.errors.eyebrow" class="mt-1 text-xs text-red-600">{{ form.errors.eyebrow }}</p>
                             </div>
 
                             <div class="md:col-span-2">
                                 <label class="text-xs font-semibold text-slate-600">Title *</label>
-                                <input v-model="form.title" type="text" required placeholder="Your Trusted Partner in Investment Excellence." class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/10">
+                                <input v-model="form.title" aria-label="Title" type="text" required placeholder="Your Trusted Partner in Investment Excellence." class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/10">
                                 <p v-if="form.errors.title" class="mt-1 text-xs text-red-600">{{ form.errors.title }}</p>
                             </div>
 
                             <div class="md:col-span-2">
                                 <label class="text-xs font-semibold text-slate-600">Description</label>
-                                <textarea v-model="form.description" rows="3" placeholder="Short supporting text for the slide." class="mt-1.5 w-full resize-none rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/10"></textarea>
+                                <textarea v-model="form.description" aria-label="Description" rows="3" placeholder="Short supporting text for the slide." class="mt-1.5 w-full resize-none rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/10"></textarea>
                             </div>
 
                             <div class="md:col-span-2">
                                 <label class="text-xs font-semibold text-slate-600">Hero Image</label>
-                                <input type="file" accept=".jpg,.jpeg,.png,.webp" @change="form.image = $event.target.files[0]" class="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm">
-                                <p class="mt-1 text-xs text-slate-400">JPG, PNG or WebP · maximum 5MB. Leave empty when editing to keep the current image.</p>
+                                <input type="file" aria-label="Hero image" accept=".jpg,.jpeg,.png,.webp" @change="form.image = $event.target.files[0]" class="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm">
+                                <p class="mt-1 text-xs text-slate-500">JPG, PNG or WebP · maximum 5MB. Leave empty when editing to keep the current image.</p>
                                 <p v-if="form.errors.image" class="mt-1 text-xs text-red-600">{{ form.errors.image }}</p>
                             </div>
 
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Primary Button</label>
-                                <input v-model="form.primary_label" type="text" placeholder="Explore Our Solutions" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model="form.primary_label" aria-label="Primary button label" type="text" placeholder="Explore Our Solutions" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Primary URL</label>
-                                <input v-model="form.primary_url" type="text" placeholder="/investment-solutions" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model="form.primary_url" aria-label="Primary button URL" type="text" placeholder="/investment-solutions" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
 
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Secondary Button</label>
-                                <input v-model="form.secondary_label" type="text" placeholder="Open an Account" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model="form.secondary_label" aria-label="Secondary button label" type="text" placeholder="Open an Account" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Secondary URL</label>
-                                <input v-model="form.secondary_url" type="text" placeholder="/open-account" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model="form.secondary_url" aria-label="Secondary button URL" type="text" placeholder="/open-account" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
 
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Location Label</label>
-                                <input v-model="form.location_label" type="text" placeholder="Heritage" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model="form.location_label" aria-label="Location label" type="text" placeholder="Heritage" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Location Text</label>
-                                <input v-model="form.location_text" type="text" placeholder="The Heritage Place" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model="form.location_text" aria-label="Location text" type="text" placeholder="The Heritage Place" class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
 
                             <div>
                                 <label class="text-xs font-semibold text-slate-600">Display Order *</label>
-                                <input v-model.number="form.sort_order" type="number" min="1" required class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
+                                <input v-model.number="form.sort_order" aria-label="Display order" type="number" min="1" required class="mt-1.5 w-full rounded-lg border border-slate-200 px-4 py-3 text-sm">
                             </div>
 
                             <div class="flex items-end">

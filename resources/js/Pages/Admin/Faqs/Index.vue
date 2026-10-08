@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { useAccessibleDialog } from '@/Composables/useAccessibleDialog'
 
 defineProps({
     faqs: {
@@ -12,6 +13,7 @@ defineProps({
 
 const editing = ref(null)
 const showModal = ref(false)
+const { handleKeydown: handleDialogKeydown, setDialogElement } = useAccessibleDialog(showModal, reset)
 
 const form = useForm({
     question: '',
@@ -134,7 +136,9 @@ function remove(faq) {
                 v-if="showModal"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
                 @click.self="reset"
-                @keydown.esc.prevent="reset"
+                @keydown="handleDialogKeydown"
+                :ref="setDialogElement"
+                tabindex="-1"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="faq-modal-title"

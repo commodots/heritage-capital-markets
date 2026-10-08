@@ -211,7 +211,7 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
         <!-- Copyright -->
         <div class="border-t border-white/10">
 
-            <div class="mx-auto flex max-w-350 flex-col gap-3 px-5 py-5 text-xs text-white/55 md:flex-row md:items-center md:justify-between lg:px-8">
+            <div class="mx-auto flex max-w-350 flex-col gap-3 px-5 py-5 text-xs text-white/75 md:flex-row md:items-center md:justify-between lg:px-8">
 
                 <div>
                     © {{ new Date().getFullYear() }} Heritage Capital Markets Limited.

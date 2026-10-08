@@ -103,7 +103,7 @@ const updateStatus = (enquiry, status) => {
                             </p>
 
                             <p class="mt-2 text-3xl font-bold text-amber-600">
-                                {{ enquiries.filter(e => e.status === 'new').length }}
+                                {{enquiries.filter(e => e.status === 'new').length}}
                             </p>
                         </div>
 
@@ -113,26 +113,20 @@ const updateStatus = (enquiry, status) => {
                             </p>
 
                             <p class="mt-2 text-3xl font-bold text-blue-600">
-                                {{ enquiries.filter(e => e.status === 'in_progress').length }}
+                                {{enquiries.filter(e => e.status === 'in_progress').length}}
                             </p>
                         </div>
                     </div>
 
                     <div class="mb-5 flex flex-wrap gap-2">
-                        <button
-                            v-for="item in [
-                                ['all', 'All'],
-                                ['new', 'New'],
-                                ['in_progress', 'In Progress'],
-                                ['closed', 'Closed'],
-                            ]"
-                            :key="item[0]"
-                            @click="filter = item[0]"
-                            :class="filter === item[0]
-                                ? 'bg-[#061A33] text-white'
-                                : 'border bg-white text-slate-600'"
-                            class="rounded-lg px-4 py-2 text-sm font-semibold"
-                        >
+                        <button v-for="item in [
+                            ['all', 'All'],
+                            ['new', 'New'],
+                            ['in_progress', 'In Progress'],
+                            ['closed', 'Closed'],
+                        ]" :key="item[0]" @click="filter = item[0]" :class="filter === item[0]
+                                ? 'bg-heritage-navy text-white'
+                                : 'border bg-white text-slate-600'" class="rounded-lg px-4 py-2 text-sm font-semibold">
                             {{ item[1] }}
                         </button>
                     </div>
@@ -165,11 +159,8 @@ const updateStatus = (enquiry, status) => {
                                 </thead>
 
                                 <tbody class="divide-y divide-slate-100">
-                                    <tr
-                                        v-for="enquiry in filteredEnquiries"
-                                        :key="enquiry.id"
-                                        class="hover:bg-slate-50"
-                                    >
+                                    <tr v-for="enquiry in filteredEnquiries" :key="enquiry.id"
+                                        class="hover:bg-slate-50">
                                         <td class="px-6 py-4">
                                             <p class="text-sm font-semibold text-slate-900">
                                                 {{ enquiry.name }}
@@ -179,10 +170,7 @@ const updateStatus = (enquiry, status) => {
                                                 {{ enquiry.email }}
                                             </p>
 
-                                            <p
-                                                v-if="enquiry.phone"
-                                                class="text-xs text-slate-500"
-                                            >
+                                            <p v-if="enquiry.phone" class="text-xs text-slate-500">
                                                 {{ enquiry.phone }}
                                             </p>
                                         </td>
@@ -196,12 +184,11 @@ const updateStatus = (enquiry, status) => {
                                         </td>
 
                                         <td class="px-6 py-4">
-                                            <select
-                                                :value="enquiry.status"
+                                            <select :value="enquiry.status"
+                                                :aria-label="`Update status for ${enquiry.name}`"
                                                 @change="updateStatus(enquiry, $event.target.value)"
                                                 :class="statusClass(enquiry.status)"
-                                                class="rounded-full border-0 px-3 py-1 text-xs font-semibold"
-                                            >
+                                                class="rounded-full border-0 px-3 py-1 text-xs font-semibold">
                                                 <option value="new">
                                                     New
                                                 </option>
@@ -217,20 +204,15 @@ const updateStatus = (enquiry, status) => {
                                         </td>
 
                                         <td class="px-6 py-4 text-right">
-                                            <a
-                                                :href="`/admin/enquiries/${enquiry.id}`"
-                                                class="rounded-lg border px-3 py-2 text-xs font-semibold"
-                                            >
+                                            <a :href="`/admin/enquiries/${enquiry.id}`"
+                                                class="rounded-lg border px-3 py-2 text-xs font-semibold">
                                                 View
                                             </a>
                                         </td>
                                     </tr>
 
                                     <tr v-if="!filteredEnquiries.length">
-                                        <td
-                                            colspan="5"
-                                            class="px-6 py-16 text-center text-sm text-slate-500"
-                                        >
+                                        <td colspan="5" class="px-6 py-16 text-center text-sm text-slate-500">
                                             No enquiries found.
                                         </td>
                                     </tr>

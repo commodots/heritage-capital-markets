@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+import { useAccessibleDialog } from '@/Composables/useAccessibleDialog'
 
 const props = defineProps({
     solutions: {
@@ -12,6 +13,7 @@ const props = defineProps({
 const page = usePage()
 
 const showModal = ref(false)
+const { handleKeydown: handleDialogKeydown, setDialogElement } = useAccessibleDialog(showModal, () => closeModal())
 const editingSolution = ref(null)
 const imagePreview = ref(null)
 
@@ -193,7 +195,7 @@ function flashMessage() {
                     <div class="text-sm font-bold tracking-wide">
                         HERITAGE
                     </div>
-                    <div class="text-[10px] uppercase tracking-[0.2em] text-white/50">
+                    <div class="text-[10px] uppercase tracking-[0.2em] text-white/75">
                         Capital Markets
                     </div>
                 </div>
@@ -234,22 +236,22 @@ function flashMessage() {
                     Content
                 </div>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">▤</span>
                     Pages
                 </a>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">▥</span>
                     Research & Reports
                 </a>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">◈</span>
                     News & Articles
                 </a>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">?</span>
                     FAQs
                 </a>
@@ -258,17 +260,17 @@ function flashMessage() {
                     Administration
                 </div>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">▧</span>
                     Media Library
                 </a>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">✉</span>
                     Enquiries
                 </a>
 
-                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50">
+                <a href="#" class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/75">
                     <span class="text-lg">⚙</span>
                     Site Settings
                 </a>
@@ -277,7 +279,7 @@ function flashMessage() {
             <!-- Footer -->
             <div class="border-t border-white/10 p-4">
                 <div class="rounded-lg bg-white/5 p-4">
-                    <div class="text-xs text-white/40">
+                    <div class="text-xs text-white/75">
                         Heritage CMS
                     </div>
                     <div class="mt-1 text-sm font-medium">
@@ -342,7 +344,7 @@ function flashMessage() {
                 <div class="mb-8 grid gap-4 sm:grid-cols-3">
 
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Total Solutions
                         </div>
 
@@ -352,7 +354,7 @@ function flashMessage() {
                     </div>
 
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Active
                         </div>
 
@@ -362,11 +364,11 @@ function flashMessage() {
                     </div>
 
                     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">
                             Inactive
                         </div>
 
-                        <div class="mt-2 text-3xl font-bold text-slate-400">
+                        <div class="mt-2 text-3xl font-bold text-slate-500">
                             {{ inactiveCount }}
                         </div>
                     </div>
@@ -377,7 +379,7 @@ function flashMessage() {
                 <div v-if="solutions.length === 0"
                     class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
                     <div
-                        class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl text-slate-400">
+                        class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl text-slate-500">
                         ◆
                     </div>
 
@@ -407,12 +409,12 @@ function flashMessage() {
                                 Investment Solutions
                             </h3>
 
-                            <p class="mt-0.5 text-xs text-slate-400">
+                            <p class="mt-0.5 text-xs text-slate-500">
                                 Drag/order management will be added with the CMS refinement.
                             </p>
                         </div>
 
-                        <div class="text-xs text-slate-400">
+                        <div class="text-xs text-slate-500">
                             {{ solutions.length }} solution{{ solutions.length === 1 ? '' : 's' }}
                         </div>
                     </div>
@@ -423,27 +425,27 @@ function flashMessage() {
                             <thead>
                                 <tr class="border-b border-slate-100 bg-slate-50 text-left">
                                     <th
-                                        class="w-20 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        class="w-20 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Order
                                     </th>
 
                                     <th
-                                        class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Solution
                                     </th>
 
                                     <th
-                                        class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        class="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Description
                                     </th>
 
                                     <th
-                                        class="w-28 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        class="w-28 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Status
                                     </th>
 
                                     <th
-                                        class="w-40 px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                        class="w-40 px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                         Actions
                                     </th>
                                 </tr>
@@ -479,7 +481,7 @@ function flashMessage() {
                                                     {{ solution.title }}
                                                 </div>
 
-                                                <div v-if="solution.slug" class="mt-1 text-xs text-slate-400">
+                                                <div v-if="solution.slug" class="mt-1 text-xs text-slate-500">
                                                     /{{ solution.slug }}
                                                 </div>
                                             </div>
@@ -500,8 +502,8 @@ function flashMessage() {
                                     <!-- Status -->
                                     <td class="px-5 py-4">
                                         <button type="button" @click="toggleSolution(solution)" :class="solution.is_active
-                                                ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-slate-100 text-slate-500'
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-slate-100 text-slate-500'
                                             " class="rounded-full px-3 py-1 text-xs font-semibold transition">
                                             {{
                                                 solution.is_active
@@ -552,14 +554,14 @@ function flashMessage() {
                                                 {{ solution.title }}
                                             </div>
 
-                                            <div class="mt-1 text-xs text-slate-400">
+                                            <div class="mt-1 text-xs text-slate-500">
                                                 Order {{ solution.sort_order }}
                                             </div>
                                         </div>
 
                                         <button type="button" @click="toggleSolution(solution)" :class="solution.is_active
-                                                ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-slate-100 text-slate-500'
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-slate-100 text-slate-500'
                                             " class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold">
                                             {{
                                                 solution.is_active
@@ -601,8 +603,8 @@ function flashMessage() {
 
         <!-- Modal -->
         <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
-            @keydown.esc.prevent="closeModal" role="dialog" aria-modal="true"
-            aria-labelledby="investment-solution-modal-title">
+            @click.self="closeModal" @keydown="handleDialogKeydown" :ref="setDialogElement" tabindex="-1" role="dialog"
+            aria-modal="true" aria-labelledby="investment-solution-modal-title">
             <div class="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-xl bg-white shadow-2xl">
 
                 <!-- Modal header -->
@@ -621,9 +623,8 @@ function flashMessage() {
                         </h2>
                     </div>
 
-                    <button type="button" @click="closeModal"
-                        aria-label="Close investment solution form"
-                        class="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+                    <button type="button" @click="closeModal" aria-label="Close investment solution form"
+                        class="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
                         ×
                     </button>
                 </div>
@@ -638,7 +639,7 @@ function flashMessage() {
                                 Basic Information
                             </h3>
 
-                            <p class="mt-1 text-xs text-slate-400">
+                            <p class="mt-1 text-xs text-slate-500">
                                 Define how the solution appears on the website.
                             </p>
                         </div>
@@ -649,7 +650,7 @@ function flashMessage() {
                                 Title <span class="text-red-500">*</span>
                             </label>
 
-                            <input v-model="form.title" @blur="slugifyTitle" type="text"
+                            <input v-model="form.title" aria-label="Title" @blur="slugifyTitle" type="text"
                                 placeholder="e.g. Portfolio Management"
                                 class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
@@ -664,10 +665,10 @@ function flashMessage() {
                                 Slug
                             </label>
 
-                            <input v-model="form.slug" type="text" placeholder="portfolio-management"
+                            <input v-model="form.slug" aria-label="Slug" type="text" placeholder="portfolio-management"
                                 class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                            <p class="mt-1 text-xs text-slate-400">
+                            <p class="mt-1 text-xs text-slate-500">
                                 Used for the public page URL.
                             </p>
 
@@ -682,7 +683,7 @@ function flashMessage() {
                                 Short Description
                             </label>
 
-                            <textarea v-model="form.short_description" rows="3"
+                            <textarea v-model="form.short_description" aria-label="Short description" rows="3"
                                 placeholder="Brief description shown on solution cards..."
                                 class="w-full resize-none rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"></textarea>
 
@@ -697,7 +698,7 @@ function flashMessage() {
                                 Full Description
                             </label>
 
-                            <textarea v-model="form.description" rows="6"
+                            <textarea v-model="form.description" aria-label="Full description" rows="6"
                                 placeholder="Detailed description for the solution page..."
                                 class="w-full resize-y rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"></textarea>
 
@@ -719,16 +720,17 @@ function flashMessage() {
                                     <img v-if="imagePreview" :src="imagePreview" alt="Preview"
                                         class="h-full w-full object-cover">
 
-                                    <div v-else class="text-center text-xs text-slate-400">
+                                    <div v-else class="text-center text-xs text-slate-500">
                                         No image
                                     </div>
                                 </div>
 
                                 <div>
-                                    <input type="file" accept=".jpg,.jpeg,.png,.webp" @change="handleImage"
+                                    <input type="file" aria-label="Featured image" accept=".jpg,.jpeg,.png,.webp"
+                                        @change="handleImage"
                                         class="block w-full rounded-md border border-slate-200 bg-white px-3 py-3 text-sm text-slate-500 file:mr-4 file:rounded-md file:border-0 file:bg-heritage-navy file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white">
 
-                                    <p class="mt-2 text-xs leading-5 text-slate-400">
+                                    <p class="mt-2 text-xs leading-5 text-slate-500">
                                         JPG, PNG or WebP. Maximum file size: 5MB.
                                     </p>
 
@@ -755,10 +757,11 @@ function flashMessage() {
                                         Icon
                                     </label>
 
-                                    <input v-model="form.icon" type="text" placeholder="e.g. briefcase"
+                                    <input v-model="form.icon" aria-label="Icon" type="text"
+                                        placeholder="e.g. briefcase"
                                         class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
-                                    <p class="mt-1 text-xs text-slate-400">
+                                    <p class="mt-1 text-xs text-slate-500">
                                         Icon name/class for future icon integration.
                                     </p>
                                 </div>
@@ -769,7 +772,8 @@ function flashMessage() {
                                         Display Order <span class="text-red-500">*</span>
                                     </label>
 
-                                    <input v-model.number="form.sort_order" type="number" min="1"
+                                    <input v-model.number="form.sort_order" aria-label="Display order" type="number"
+                                        min="1"
                                         class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
 
                                     <div v-if="form.errors.sort_order" class="mt-1 text-xs text-red-600">
@@ -783,7 +787,8 @@ function flashMessage() {
                                         Button Label
                                     </label>
 
-                                    <input v-model="form.button_label" type="text" placeholder="Learn More"
+                                    <input v-model="form.button_label" aria-label="Button label" type="text"
+                                        placeholder="Learn More"
                                         class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
                                 </div>
 
@@ -793,7 +798,8 @@ function flashMessage() {
                                         Button URL
                                     </label>
 
-                                    <input v-model="form.button_url" type="text" placeholder="/investment-solutions"
+                                    <input v-model="form.button_url" aria-label="Button URL" type="text"
+                                        placeholder="/investment-solutions"
                                         class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
                                 </div>
 
@@ -806,18 +812,18 @@ function flashMessage() {
                                         Publish Solution
                                     </div>
 
-                                    <div class="mt-1 text-xs text-slate-400">
+                                    <div class="mt-1 text-xs text-slate-500">
                                         Active solutions are displayed on the public website.
                                     </div>
                                 </div>
 
                                 <button type="button" @click="form.is_active = !form.is_active" :class="form.is_active
-                                        ? 'bg-heritage-gold'
-                                        : 'bg-slate-300'
+                                    ? 'bg-heritage-gold'
+                                    : 'bg-slate-300'
                                     " class="relative h-6 w-11 rounded-full transition">
                                     <span :class="form.is_active
-                                            ? 'translate-x-6'
-                                            : 'translate-x-1'
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'
                                         "
                                         class="absolute left-0 top-1 h-4 w-4 rounded-full bg-white shadow transition"></span>
                                 </button>

@@ -474,7 +474,7 @@ const statusClass = (status) => {
                                     {{ enquiry.subject || enquiry.email }}
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-slate-400">
+                                <p class="mt-1 text-[11px] text-slate-500">
                                     {{ formatDate(enquiry.created_at) }}
                                 </p>
                             </div>

@@ -94,7 +94,7 @@ const logout = () => {
                             Homepage
                         </span>
 
-                        <span class="text-white/40 transition" :class="homepageOpen ? 'rotate-180' : ''">
+                        <span class="text-white/75 transition" :class="homepageOpen ? 'rotate-180' : ''">
                             ⌄
                         </span>
                     </button>
@@ -306,13 +306,13 @@ const logout = () => {
 
                         <div class="relative">
 
-                            <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                            <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                                 <circle cx="11" cy="11" r="7" />
                                 <path d="m20 20-4-4" />
                             </svg>
 
-                            <input type="search" placeholder="Search..."
+                            <input type="search" aria-label="Search admin pages" placeholder="Search..."
                                 class="w-full rounded-md border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-heritage-gold focus:bg-white" />
 
                         </div>
@@ -348,7 +348,7 @@ const logout = () => {
                                     Administrator
                                 </div>
 
-                                <div class="text-[10px] text-slate-400">
+                                <div class="text-[10px] text-slate-500">
                                     CMS Administrator
                                 </div>
                             </div>

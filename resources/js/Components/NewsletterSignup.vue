@@ -75,8 +75,8 @@ function submit() {
                         :aria-describedby="form.errors.email || form.errors.website || feedback ? `${instanceId}-feedback` : undefined"
                         class="min-w-0 flex-1 rounded border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-heritage-gold/40"
                         :class="compact
-                            ? 'border-white/20 bg-white text-heritage-navy placeholder:text-slate-400'
-                            : 'border-heritage-border bg-white text-heritage-navy placeholder:text-slate-400'"
+                            ? 'border-white/20 bg-white text-heritage-navy placeholder:text-slate-500'
+                            : 'border-heritage-border bg-white text-heritage-navy placeholder:text-slate-500'"
                     >
                     <button
                         type="submit"

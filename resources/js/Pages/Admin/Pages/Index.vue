@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { useAccessibleDialog } from '@/Composables/useAccessibleDialog'
 
 
 const props = defineProps({
@@ -12,6 +13,7 @@ const props = defineProps({
 })
 
 const showModal = ref(false)
+const { handleKeydown: handleDialogKeydown, setDialogElement } = useAccessibleDialog(showModal, () => closeModal())
 const editingPage = ref(null)
 const imagePreview = ref(null)
 const processing = ref(false)
@@ -731,7 +733,9 @@ function assetUrl(path) {
             v-if="showModal"
             class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-deep/60 p-4 backdrop-blur-sm"
             @click.self="closeModal"
-            @keydown.esc.prevent="closeModal"
+            @keydown="handleDialogKeydown"
+            :ref="setDialogElement"
+            tabindex="-1"
             role="dialog"
             aria-modal="true"
             aria-labelledby="page-modal-title"
@@ -804,6 +808,7 @@ function assetUrl(path) {
 
                                 <input
                                     v-model="form.title"
+                                    aria-label="Page title"
                                     @blur="generateSlug"
                                     type="text"
                                     required
@@ -833,6 +838,7 @@ function assetUrl(path) {
 
                                     <input
                                         v-model="form.slug"
+                                        aria-label="URL slug"
                                         type="text"
                                         required
                                         placeholder="about-us"
@@ -855,6 +861,7 @@ function assetUrl(path) {
 
                                 <input
                                     v-model="form.eyebrow"
+                                    aria-label="Eyebrow"
                                     type="text"
                                     placeholder="ABOUT HERITAGE"
                                     class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
@@ -874,6 +881,7 @@ function assetUrl(path) {
 
                                 <textarea
                                     v-model="form.excerpt"
+                                    aria-label="Excerpt"
                                     rows="3"
                                     placeholder="Short introduction or summary of this page."
                                     class="w-full resize-none rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
@@ -938,6 +946,7 @@ function assetUrl(path) {
 
                                 <input
                                     type="file"
+                                    aria-label="Upload image"
                                     accept=".jpg,.jpeg,.png,.webp"
                                     @change="handleImage"
                                     class="block w-full rounded border border-heritage-border bg-white px-3 py-2 text-xs text-heritage-muted"
@@ -978,6 +987,7 @@ function assetUrl(path) {
 
                             <textarea
                                 v-model="form.content"
+                                aria-label="Page content"
                                 rows="12"
                                 placeholder="Enter the main content for this page..."
                                 class="w-full resize-y rounded border border-heritage-border px-4 py-3 text-sm leading-6 outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
@@ -1017,6 +1027,7 @@ function assetUrl(path) {
 
                                 <input
                                     v-model="form.meta_title"
+                                    aria-label="Meta title"
                                     type="text"
                                     maxlength="255"
                                     placeholder="Heritage Capital Markets | About Us"
@@ -1036,6 +1047,7 @@ function assetUrl(path) {
 
                                 <textarea
                                     v-model="form.meta_description"
+                                    aria-label="Meta description"
                                     rows="3"
                                     maxlength="500"
                                     placeholder="Brief description of this page for search engines."
@@ -1075,6 +1087,7 @@ function assetUrl(path) {
 
                                 <input
                                     v-model.number="form.sort_order"
+                                    aria-label="Display order"
                                     type="number"
                                     min="0"
                                     required

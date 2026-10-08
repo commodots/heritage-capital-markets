@@ -145,7 +145,7 @@ const milestones = [
                         Home
                     </a>
 
-                    <span class="mx-2 text-white/30">›</span>
+                    <span class="mx-2 text-white/75">›</span>
 
                     <span class="text-white/85">
                         About Us
@@ -695,7 +695,7 @@ const milestones = [
                                     {{ item.title }}
                                 </p>
 
-                                <p class="mt-1 text-[10px] leading-4 text-white/55">
+                                <p class="mt-1 text-[10px] leading-4 text-white/75">
                                     {{ item.text }}
                                 </p>
 

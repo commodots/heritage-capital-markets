@@ -2,6 +2,7 @@
 import { onBeforeUnmount, ref } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { useAccessibleDialog } from '@/Composables/useAccessibleDialog'
 
 const props = defineProps({
   events: {
@@ -12,6 +13,7 @@ const props = defineProps({
 
 const editing = ref(null)
 const showModal = ref(false)
+const { handleKeydown: handleDialogKeydown, setDialogElement } = useAccessibleDialog(showModal, reset)
 const imagePreview = ref(null)
 const imageInput = ref(null)
 let previewObjectUrl = null
@@ -204,7 +206,8 @@ onBeforeUnmount(clearPreviewObjectUrl)
       </div>
 
       <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
-        @click.self="reset"@keydown.esc.prevent="reset" role="dialog" aria-modal="true"
+        @click.self="reset" @keydown="handleDialogKeydown" :ref="setDialogElement" tabindex="-1"
+        role="dialog" aria-modal="true"
         aria-labelledby="event-modal-title">
         <form class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-2xl"
           @submit.prevent="submit">
