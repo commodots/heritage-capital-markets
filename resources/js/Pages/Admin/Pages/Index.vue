@@ -731,6 +731,10 @@ function assetUrl(path) {
             v-if="showModal"
             class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-deep/60 p-4 backdrop-blur-sm"
             @click.self="closeModal"
+            @keydown.esc.prevent="closeModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="page-modal-title"
         >
 
             <div
@@ -751,6 +755,7 @@ function assetUrl(path) {
                         </div>
 
                         <h2
+                            id="page-modal-title"
                             class="mt-1 font-display text-2xl text-heritage-navy"
                         >
                             {{ editingPage ? 'Edit Page' : 'Add Page' }}
@@ -761,6 +766,7 @@ function assetUrl(path) {
                     <button
                         type="button"
                         @click="closeModal"
+                        aria-label="Close page form"
                         class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-heritage-muted transition hover:bg-slate-100 hover:text-heritage-navy"
                     >
                         ×

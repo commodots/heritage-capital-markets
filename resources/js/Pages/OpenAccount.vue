@@ -60,6 +60,7 @@ function submit() {
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Phone *</span>
                                 <input v-model="form.phone" type="tel" class="mt-2 w-full border border-slate-300 px-4 py-3 outline-none focus:border-heritage-gold" required />
+                                <span v-if="form.errors.phone" class="mt-1 block text-xs text-red-600">{{ form.errors.phone }}</span>
                             </label>
 
                             <label class="block">

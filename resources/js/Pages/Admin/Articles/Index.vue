@@ -194,13 +194,17 @@ onBeforeUnmount(clearPreviewObjectUrl)
                 v-if="showModal"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
                 @click.self="reset"
+                @keydown.esc.prevent="reset"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="article-modal-title"
             >
                 <form
                     class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-2xl"
                     @submit.prevent="submit"
                 >
                     <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-heritage-navy">
+                        <h2 id="article-modal-title" class="text-lg font-semibold text-heritage-navy">
                             {{ editing ? 'Edit article' : 'Create article' }}
                         </h2>
                         <button

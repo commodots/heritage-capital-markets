@@ -194,7 +194,7 @@ function flashMessage() {
                     Dashboard
                 </a>
 
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
                     Homepage
                 </div>
 
@@ -222,7 +222,7 @@ function flashMessage() {
                     Market Indices
                 </a>
 
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
                     Content
                 </div>
 
@@ -258,7 +258,7 @@ function flashMessage() {
                     FAQs
                 </a>
 
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
                     Administration
                 </div>
 
@@ -735,6 +735,10 @@ function flashMessage() {
         <div
             v-if="showModal"
             class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
+            @keydown.esc.prevent="closeModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="market-index-modal-title"
         >
 
             <div
@@ -749,7 +753,7 @@ function flashMessage() {
                             {{ editingIndex ? 'Edit Index' : 'New Index' }}
                         </div>
 
-                        <h2 class="mt-1 text-xl font-bold text-heritage-navy">
+                        <h2 id="market-index-modal-title" class="mt-1 text-xl font-bold text-heritage-navy">
                             {{
                                 editingIndex
                                     ? 'Edit Market Index'
@@ -761,6 +765,7 @@ function flashMessage() {
                     <button
                         type="button"
                         @click="closeModal"
+                        aria-label="Close market index form"
                         class="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-400 transition hover:bg-slate-100"
                     >
                         ×

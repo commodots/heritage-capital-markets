@@ -148,7 +148,7 @@ const statusClass = (active) =>
                 <div class="ml-3 leading-none">
                     <div class="font-display text-xl font-semibold">Heritage</div>
                     <div class="mt-1 text-[9px] font-semibold tracking-[0.16em] text-white/65">CAPITAL MARKETS</div>
-                    <div class="mt-2 text-[9px] uppercase tracking-[0.16em] text-white/40">Admin Panel</div>
+                    <div class="mt-2 text-[9px] uppercase tracking-[0.16em] text-white/65">Admin Panel</div>
                 </div>
             </div>
 
@@ -158,7 +158,7 @@ const statusClass = (active) =>
                     Dashboard
                 </Link>
 
-                <div class="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Content Management</div>
+                <div class="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/65">Content Management</div>
 
                 <div class="mt-3 space-y-1">
                     <div class="rounded-md bg-white/10">
@@ -183,13 +183,13 @@ const statusClass = (active) =>
                     <Link href="/admin/media" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Media Library</Link>
                 </div>
 
-                <div class="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Communication</div>
+                <div class="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/65">Communication</div>
                 <div class="mt-3 space-y-1">
                     <Link href="/admin/enquiries" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Enquiries</Link>
                     <Link href="/admin/newsletter-subscribers" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Newsletter Subscribers</Link>
                 </div>
 
-                <div class="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Settings</div>
+                <div class="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/65">Settings</div>
                 <div class="mt-3 space-y-1">
                     <Link href="/admin/settings" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Site Settings</Link>
                     <Link href="/admin/users" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Users</Link>
@@ -318,17 +318,24 @@ const statusClass = (active) =>
         </div>
 
         <!-- Form Modal -->
-        <div v-if="showForm" class="fixed inset-0 z-50 overflow-y-auto bg-heritage-deep/60 p-4 backdrop-blur-sm">
+        <div
+            v-if="showForm"
+            class="fixed inset-0 z-50 overflow-y-auto bg-heritage-deep/60 p-4 backdrop-blur-sm"
+            @keydown.esc.prevent="closeForm"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="hero-slide-modal-title"
+        >
             <div class="flex min-h-full items-center justify-center">
                 <div class="w-full max-w-3xl rounded-2xl bg-white shadow-2xl">
                     <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
                         <div>
                             <div class="text-xs uppercase tracking-wider text-heritage-gold">Homepage Carousel</div>
-                            <h3 class="mt-1 font-display text-2xl font-semibold text-heritage-navy">
+                            <h3 id="hero-slide-modal-title" class="mt-1 font-display text-2xl font-semibold text-heritage-navy">
                                 {{ editingSlide ? 'Edit Hero Slide' : 'Add Hero Slide' }}
                             </h3>
                         </div>
-                        <button type="button" @click="closeForm" class="text-2xl text-slate-400 hover:text-slate-700">×</button>
+                        <button type="button" @click="closeForm" aria-label="Close hero slide form" class="text-2xl text-slate-400 hover:text-slate-700">×</button>
                     </div>
 
                     <form @submit.prevent="submit" class="max-h-[78vh] overflow-y-auto p-6">

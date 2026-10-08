@@ -199,13 +199,17 @@ onBeforeUnmount(clearPreviewObjectUrl)
                 v-if="showModal"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
                 @click.self="reset"
+                @keydown.esc.prevent="reset"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="research-report-modal-title"
             >
                 <form
                     class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-2xl"
                     @submit.prevent="submit"
                 >
                     <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-heritage-navy">
+                        <h2 id="research-report-modal-title" class="text-lg font-semibold text-heritage-navy">
                             {{ editing ? 'Edit research report' : 'Create research report' }}
                         </h2>
                         <button

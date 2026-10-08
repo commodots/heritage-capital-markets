@@ -28,7 +28,7 @@ const closeMobile = () => {
             </a>
 
             <!-- Desktop Navigation -->
-            <nav class="hidden flex-1 items-center justify-center gap-3 xl:gap-5 lg:flex">
+            <nav aria-label="Main navigation" class="hidden flex-1 items-center justify-center gap-3 xl:gap-5 lg:flex">
 
                 <!-- Home -->
                 <a
@@ -70,7 +70,7 @@ const closeMobile = () => {
                     </button>
 
                     <div
-                        class="invisible absolute left-0 top-full w-64 translate-y-2 rounded-b-md bg-white py-3 text-heritage-text opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
+                        class="invisible absolute left-0 top-full w-64 translate-y-2 rounded-b-md bg-white py-3 text-heritage-text opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
                     >
 
                         <a
@@ -148,7 +148,7 @@ const closeMobile = () => {
                     </button>
 
                     <div
-                        class="invisible absolute left-0 top-full w-56 translate-y-2 rounded-b-md bg-white py-3 text-heritage-text opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
+                        class="invisible absolute left-0 top-full w-56 translate-y-2 rounded-b-md bg-white py-3 text-heritage-text opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
                     >
 
                         <a
@@ -199,7 +199,7 @@ const closeMobile = () => {
                     </button>
 
                     <div
-                        class="invisible absolute left-0 top-full w-52 translate-y-2 rounded-b-md bg-white py-3 text-heritage-text opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
+                        class="invisible absolute left-0 top-full w-52 translate-y-2 rounded-b-md bg-white py-3 text-heritage-text opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
                     >
 
                         <!-- Planned Resources page -->
@@ -291,7 +291,9 @@ const closeMobile = () => {
             <button
                 @click="toggleMobile"
                 class="flex h-10 w-10 items-center justify-center rounded border border-white/20 lg:hidden"
-                aria-label="Open menu"
+                :aria-label="mobileOpen ? 'Close menu' : 'Open menu'"
+                :aria-expanded="mobileOpen"
+                aria-controls="mobile-navigation"
                 type="button"
             >
                 <svg
@@ -320,10 +322,11 @@ const closeMobile = () => {
         <!-- Mobile Navigation -->
         <div
             v-if="mobileOpen"
+            id="mobile-navigation"
             class="border-t border-white/10 bg-heritage-deep px-5 py-5 lg:hidden"
         >
 
-            <div class="space-y-1">
+            <nav aria-label="Mobile navigation" class="space-y-1">
 
                 <a
                     href="/"
@@ -502,7 +505,7 @@ const closeMobile = () => {
 
                 </div>
 
-            </div>
+            </nav>
         </div>
 
     </header>

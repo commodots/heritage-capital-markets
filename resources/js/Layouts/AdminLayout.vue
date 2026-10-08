@@ -26,13 +26,14 @@ const logout = () => {
              SIDEBAR
         ====================================================== -->
         <aside
+            id="admin-sidebar"
             class="fixed inset-y-0 left-0 z-50 flex w-64.5 flex-col bg-heritage-navy transition-transform duration-300 lg:translate-x-0"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
 
             <!-- BRAND -->
             <div class="flex h-20.5 items-center border-b border-white/10 px-6">
 
-                <a href="/admin" class="flex w-51.25 shrink-0 items-center" @click="closeMobile">
+                <a href="/admin" class="flex w-51.25 shrink-0 items-center" @click="closeSidebar">
                     <div class="flex items-center">
                         <img :src="heritageLogo" alt="Heritage Capital Markets Limited"
                             class="h-10 w-auto max-w-full object-contain">
@@ -43,7 +44,7 @@ const logout = () => {
 
 
 
-                <button type="button" class="ml-auto text-xl text-white/50 lg:hidden" @click="closeSidebar">
+                <button type="button" class="ml-auto text-xl text-white/80 lg:hidden" aria-label="Close admin navigation" @click="closeSidebar">
                     ×
                 </button>
 
@@ -56,7 +57,7 @@ const logout = () => {
                 <!-- MAIN -->
                 <div class="mb-5">
 
-                    <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
+                    <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
                         Main
                     </p>
 
@@ -77,7 +78,13 @@ const logout = () => {
                 <!-- HOMEPAGE -->
                 <div class="mb-5">
 
-                    <button type="button" @click="homepageOpen = !homepageOpen" class="admin-nav-item w-full">
+                    <button
+                        type="button"
+                        @click="homepageOpen = !homepageOpen"
+                        class="admin-nav-item w-full"
+                        :aria-expanded="homepageOpen"
+                        aria-controls="admin-homepage-navigation"
+                    >
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" />
                             <path d="M9 21v-7h6v7" />
@@ -92,7 +99,7 @@ const logout = () => {
                         </span>
                     </button>
 
-                    <div v-if="homepageOpen" class="ml-8 mt-1 space-y-0.5 border-l border-white/10 pl-2">
+                    <div v-if="homepageOpen" id="admin-homepage-navigation" class="ml-8 mt-1 space-y-0.5 border-l border-white/10 pl-2">
 
                         <a href="/admin/homepage/hero-slides" class="admin-sub-item">
                             Hero Slides
@@ -110,7 +117,7 @@ const logout = () => {
                 <!-- CONTENT -->
                 <div class="mb-5">
 
-                    <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
+                    <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
                         Content Management
                     </p>
 
@@ -280,8 +287,14 @@ const logout = () => {
                 <div class="flex h-full items-center justify-between px-5 sm:px-7">
 
                     <!-- MOBILE MENU -->
-                    <button type="button" class="rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
-                        @click="sidebarOpen = true">
+                    <button
+                        type="button"
+                        class="rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden"
+                        @click="sidebarOpen = true"
+                        aria-label="Open admin navigation"
+                        :aria-expanded="sidebarOpen"
+                        aria-controls="admin-sidebar"
+                    >
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                             <path d="M4 6h16M4 12h16M4 18h16" />
                         </svg>

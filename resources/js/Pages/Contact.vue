@@ -100,40 +100,48 @@ function submit() {
                     <form class="space-y-5" @submit.prevent="submit">
                         <div class="grid gap-5 md:grid-cols-2">
                             <div>
-                                <label class="text-xs font-semibold text-heritage-navy">Full Name *</label>
-                                <input v-model="form.name" type="text" required
+                                <label for="contact-name" class="text-xs font-semibold text-heritage-navy">Full Name *</label>
+                                <input id="contact-name" v-model="form.name" type="text" required
+                                    :aria-invalid="Boolean(form.errors.name)"
+                                    :aria-describedby="form.errors.name ? 'contact-name-error' : undefined"
                                     class="mt-2 w-full rounded border border-heritage-border bg-white px-4 py-3 text-sm outline-none focus:border-heritage-gold" />
-                                <div v-if="form.errors.name" class="mt-1 text-xs text-red-600">{{ form.errors.name }}</div>
+                                <div v-if="form.errors.name" id="contact-name-error" class="mt-1 text-xs text-red-600">{{ form.errors.name }}</div>
                             </div>
 
                             <div>
-                                <label class="text-xs font-semibold text-heritage-navy">Email Address *</label>
-                                <input v-model="form.email" type="email" required
+                                <label for="contact-email" class="text-xs font-semibold text-heritage-navy">Email Address *</label>
+                                <input id="contact-email" v-model="form.email" type="email" required
+                                    :aria-invalid="Boolean(form.errors.email)"
+                                    :aria-describedby="form.errors.email ? 'contact-email-error' : undefined"
                                     class="mt-2 w-full rounded border border-heritage-border bg-white px-4 py-3 text-sm outline-none focus:border-heritage-gold" />
-                                <div v-if="form.errors.email" class="mt-1 text-xs text-red-600">{{ form.errors.email }}</div>
+                                <div v-if="form.errors.email" id="contact-email-error" class="mt-1 text-xs text-red-600">{{ form.errors.email }}</div>
                             </div>
                         </div>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             <div>
-                                <label class="text-xs font-semibold text-heritage-navy">Phone</label>
-                                <input v-model="form.phone" type="text"
+                                <label for="contact-phone" class="text-xs font-semibold text-heritage-navy">Phone</label>
+                                <input id="contact-phone" v-model="form.phone" type="tel"
                                     class="mt-2 w-full rounded border border-heritage-border bg-white px-4 py-3 text-sm outline-none focus:border-heritage-gold" />
                             </div>
 
                             <div>
-                                <label class="text-xs font-semibold text-heritage-navy">Subject *</label>
-                                <input v-model="form.subject" type="text" required
+                                <label for="contact-subject" class="text-xs font-semibold text-heritage-navy">Subject *</label>
+                                <input id="contact-subject" v-model="form.subject" type="text" required
+                                    :aria-invalid="Boolean(form.errors.subject)"
+                                    :aria-describedby="form.errors.subject ? 'contact-subject-error' : undefined"
                                     class="mt-2 w-full rounded border border-heritage-border bg-white px-4 py-3 text-sm outline-none focus:border-heritage-gold" />
-                                <div v-if="form.errors.subject" class="mt-1 text-xs text-red-600">{{ form.errors.subject }}</div>
+                                <div v-if="form.errors.subject" id="contact-subject-error" class="mt-1 text-xs text-red-600">{{ form.errors.subject }}</div>
                             </div>
                         </div>
 
                         <div>
-                            <label class="text-xs font-semibold text-heritage-navy">Message *</label>
-                            <textarea v-model="form.message" rows="7" required
+                            <label for="contact-message" class="text-xs font-semibold text-heritage-navy">Message *</label>
+                            <textarea id="contact-message" v-model="form.message" rows="7" required
+                                :aria-invalid="Boolean(form.errors.message)"
+                                :aria-describedby="form.errors.message ? 'contact-message-error' : undefined"
                                 class="mt-2 w-full resize-none rounded border border-heritage-border bg-white px-4 py-3 text-sm outline-none focus:border-heritage-gold"></textarea>
-                            <div v-if="form.errors.message" class="mt-1 text-xs text-red-600">{{ form.errors.message }}</div>
+                            <div v-if="form.errors.message" id="contact-message-error" class="mt-1 text-xs text-red-600">{{ form.errors.message }}</div>
                         </div>
 
                         <button

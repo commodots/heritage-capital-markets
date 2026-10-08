@@ -208,7 +208,7 @@ function flashMessage() {
                     Dashboard
                 </a>
 
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
                     Homepage
                 </div>
 
@@ -230,7 +230,7 @@ function flashMessage() {
                     Market Indices
                 </a>
 
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
                     Content
                 </div>
 
@@ -254,7 +254,7 @@ function flashMessage() {
                     FAQs
                 </a>
 
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
                     Administration
                 </div>
 
@@ -600,7 +600,9 @@ function flashMessage() {
         </main>
 
         <!-- Modal -->
-        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4">
+        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-heritage-navy/70 p-4"
+            @keydown.esc.prevent="closeModal" role="dialog" aria-modal="true"
+            aria-labelledby="investment-solution-modal-title">
             <div class="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-xl bg-white shadow-2xl">
 
                 <!-- Modal header -->
@@ -610,7 +612,7 @@ function flashMessage() {
                             {{ editingSolution ? 'Edit Solution' : 'New Solution' }}
                         </div>
 
-                        <h2 class="mt-1 text-xl font-bold text-heritage-navy">
+                        <h2 id="investment-solution-modal-title" class="mt-1 text-xl font-bold text-heritage-navy">
                             {{
                                 editingSolution
                                     ? 'Edit Investment Solution'
@@ -620,6 +622,7 @@ function flashMessage() {
                     </div>
 
                     <button type="button" @click="closeModal"
+                        aria-label="Close investment solution form"
                         class="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
                         ×
                     </button>
