@@ -1,10 +1,16 @@
+<script setup>
+import NewsletterSignup from '@/Components/NewsletterSignup.vue'
+</script>
+
 <template>
     <footer class="bg-heritage-deep text-white">
+
+        <NewsletterSignup compact />
 
         <!-- CTA -->
         <section class="border-b border-white/10 bg-heritage-navy">
 
-            <div class="mx-auto flex max-w-[1400px] flex-col gap-6 px-5 py-8 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <div class="mx-auto flex max-w-350 flex-col gap-6 px-5 py-8 lg:flex-row lg:items-center lg:justify-between lg:px-8">
 
                 <div>
                     <h2 class="font-display text-2xl lg:text-3xl">
@@ -40,7 +46,7 @@
         </section>
 
         <!-- Main Footer -->
-        <div class="mx-auto max-w-[1400px] px-5 py-12 lg:px-8">
+        <div class="mx-auto max-w-350 px-5 py-12 lg:px-8">
 
             <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
 
@@ -205,7 +211,7 @@
         <!-- Copyright -->
         <div class="border-t border-white/10">
 
-            <div class="mx-auto flex max-w-[1400px] flex-col gap-3 px-5 py-5 text-xs text-white/55 md:flex-row md:items-center md:justify-between lg:px-8">
+            <div class="mx-auto flex max-w-350 flex-col gap-3 px-5 py-5 text-xs text-white/55 md:flex-row md:items-center md:justify-between lg:px-8">
 
                 <div>
                     © {{ new Date().getFullYear() }} Heritage Capital Markets Limited.

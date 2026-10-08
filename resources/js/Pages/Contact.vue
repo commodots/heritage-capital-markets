@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import SeoHead from '@/Components/SeoHead.vue'
+import buildingImage from '@/assets/about/heritage-building.jpg'
 
 const page = usePage()
 
@@ -32,7 +33,10 @@ function submit() {
             canonical-path="/contact-us"
         />
         <section class="relative overflow-hidden bg-heritage-deep text-white">
-            <div class="absolute inset-0 bg-[url('/images/pages/heritage-building.jpg')] bg-cover bg-center opacity-35"></div>
+            <div
+                class="absolute inset-0 bg-cover bg-center opacity-35"
+                :style="{ backgroundImage: `url(${buildingImage})` }"
+            ></div>
             <div class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/45"></div>
 
             <div class="relative mx-auto max-w-350 px-6 py-24 lg:px-12 lg:py-28">

@@ -3,6 +3,12 @@ import { router } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 const props = defineProps({ subscribers: { type: Array, default: () => [] } })
 function toggle(x) { router.post('/admin/newsletter-subscribers/' + x.id + '/toggle') }
+function formatSubscribedAt(value) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date)
+}
 </script>
 <template>
   <AdminLayout>
@@ -27,7 +33,7 @@ function toggle(x) { router.post('/admin/newsletter-subscribers/' + x.id + '/tog
               <td class="p-4">{{ x.email }}</td>
               <td class="p-4"><button @click="toggle(x)" class="text-sm font-semibold">{{ x.is_active ? 'Active' :
                   'Inactive' }}</button></td>
-              <td class="p-4 text-slate-500">{{ x.created_at }}</td>
+              <td class="p-4 text-slate-500">{{ formatSubscribedAt(x.created_at) }}</td>
             </tr>
           </tbody>
         </table>

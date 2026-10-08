@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import SeoHead from '@/Components/SeoHead.vue'
+import insightsImage from '@/assets/hero/slide-02-market-insights.webp'
 
 defineProps({
     reports: {
@@ -33,7 +34,10 @@ function formatDate(value) {
             canonical-path="/research-centre"
         />
         <section class="relative overflow-hidden bg-heritage-deep text-white">
-            <div class="absolute inset-0 bg-[url('/images/hero/slide-02-market-insights.webp')] bg-cover bg-center opacity-35"></div>
+            <div
+                class="absolute inset-0 bg-cover bg-center opacity-35"
+                :style="{ backgroundImage: `url(${insightsImage})` }"
+            ></div>
             <div class="absolute inset-0 bg-linear-to-r from-heritage-deep via-heritage-deep/90 to-heritage-deep/40"></div>
 
             <div class="relative mx-auto max-w-350 px-6 py-24 lg:px-12">

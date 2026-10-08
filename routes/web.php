@@ -32,6 +32,8 @@ use App\Http\Controllers\Admin\EnquiryController;
 
 use App\Http\Controllers\Auth\LoginController;
 
+use App\Http\Controllers\NewsletterController;
+
 /*
     |--------------------------------------------------------------------------
     |Authentication
@@ -89,6 +91,10 @@ Route::get('/contact-us', [ContactController::class, 'index'])
 
 Route::post('/contact-us', [ContactController::class, 'store'])
     ->name('contact.store');
+
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
+    ->middleware('throttle:5,1')
+    ->name('newsletter.subscribe');
 
 
 /*
@@ -433,4 +439,12 @@ Route::prefix('admin')
 
         Route::post('/enquiries/{enquiry}', [EnquiryController::class, 'update'])
             ->name('admin.enquiries.update');
+
+               /*
+    |--------------------------------------------------------------------------
+    | Newsletter
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
+    ->name('newsletter.subscribe');
     });
