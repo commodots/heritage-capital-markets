@@ -54,7 +54,7 @@ const boardMemberFields = computed(() => Array.from({ length: 6 }, (_, index) =>
 function fieldLabel(key) {
     return key
         .replace(/^board_member_(\d+)_/, 'Member $1 ')
-        .replace(/^[a-z]+_/, '')
+        .replace(new RegExp(`^${props.groupKey}_`), '')
         .replace(/_/g, ' ')
         .replace(/\b\w/g, letter => letter.toUpperCase())
 }

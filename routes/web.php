@@ -78,6 +78,15 @@ Route::get('/corporate-governance', [PublicContentPageController::class, 'corpor
 Route::get('/fees-charges', [PublicContentPageController::class, 'feesCharges'])
     ->name('fees-charges');
 
+Route::get('/privacy-policy', [PublicContentPageController::class, 'privacyPolicy'])
+    ->name('privacy-policy');
+
+Route::get('/terms-of-use', [PublicContentPageController::class, 'termsOfUse'])
+    ->name('terms-of-use');
+
+Route::get('/risk-disclosure', [PublicContentPageController::class, 'riskDisclosure'])
+    ->name('risk-disclosure');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -263,11 +272,11 @@ Route::prefix('admin')
             ->name('admin.pages.destroy');
 
         Route::get('/page-content/{group}', [PublicPageContentController::class, 'edit'])
-            ->whereIn('group', ['board', 'governance', 'fees', 'resources'])
+            ->whereIn('group', ['board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
             ->name('admin.page-content.edit');
 
         Route::post('/page-content/{group}', [PublicPageContentController::class, 'update'])
-            ->whereIn('group', ['board', 'governance', 'fees', 'resources'])
+            ->whereIn('group', ['board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
             ->name('admin.page-content.update');
 
 

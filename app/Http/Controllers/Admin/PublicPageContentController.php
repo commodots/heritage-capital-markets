@@ -16,6 +16,9 @@ class PublicPageContentController extends Controller
         'governance' => 'CorporateGovernance',
         'fees' => 'FeesCharges',
         'resources' => 'Resources',
+        'privacy' => 'PrivacyPolicy',
+        'terms' => 'TermsOfUse',
+        'risk' => 'RiskDisclosure',
     ];
 
     public function edit(string $group)

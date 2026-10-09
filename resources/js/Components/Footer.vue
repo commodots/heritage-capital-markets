@@ -219,9 +219,9 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                 </div>
 
                 <div class="flex flex-wrap gap-5">
-                    <a href="#" class="hover:text-white">Privacy Policy</a>
-                    <a href="#" class="hover:text-white">Terms of Use</a>
-                    <a href="#" class="hover:text-white">Risk Disclosure</a>
+                    <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
+                    <a href="/terms-of-use" class="hover:text-white">Terms of Use</a>
+                    <a href="/risk-disclosure" class="hover:text-white">Risk Disclosure</a>
                     <a href="#" class="hover:text-white">Sitemap</a>
                 </div>
 

@@ -108,6 +108,9 @@ class PublicPageContentTest extends TestCase
             'governance' => 'Admin/PublicPageContent/CorporateGovernance',
             'fees' => 'Admin/PublicPageContent/FeesCharges',
             'resources' => 'Admin/PublicPageContent/Resources',
+            'privacy' => 'Admin/PublicPageContent/PrivacyPolicy',
+            'terms' => 'Admin/PublicPageContent/TermsOfUse',
+            'risk' => 'Admin/PublicPageContent/RiskDisclosure',
         ] as $group => $component) {
             $this->actingAs($admin)
                 ->get("/admin/page-content/{$group}")
@@ -141,6 +144,42 @@ class PublicPageContentTest extends TestCase
             'key' => 'board_title',
             'value' => 'Existing Board Title',
         ]);
+    }
+
+    public function test_legal_pages_can_be_edited_separately_and_render_their_content(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->post('/admin/page-content/privacy', [
+                'privacy_intro' => 'Our approved privacy statement.',
+                'privacy_section_1_title' => 'Information collected',
+                'privacy_section_1_body' => 'We collect information needed to respond to enquiries.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('site_settings', [
+            'key' => 'privacy_intro',
+            'value' => 'Our approved privacy statement.',
+        ]);
+
+        $this->get('/privacy-policy')
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('LegalPage')
+                ->where('pageKey', 'privacy')
+                ->where('content.privacy_intro', 'Our approved privacy statement.')
+                ->where('content.privacy_section_1_body', 'We collect information needed to respond to enquiries.'));
+
+        $this->get('/terms-of-use')
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('LegalPage')
+                ->where('pageKey', 'terms'));
+
+        $this->get('/risk-disclosure')
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('LegalPage')
+                ->where('pageKey', 'risk'));
     }
 
     public function test_public_resources_page_receives_editable_copy_and_market_data(): void

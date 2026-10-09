@@ -27,4 +27,36 @@ class PublicContentPageController extends Controller
             'content' => PublicPageContent::values(),
         ]);
     }
+
+    public function legal(string $group)
+    {
+        $pageGroup = PublicPageContent::group($group);
+
+        return Inertia::render('LegalPage', [
+            'pageKey' => $group,
+            'pagePath' => match ($group) {
+                'privacy' => '/privacy-policy',
+                'terms' => '/terms-of-use',
+                'risk' => '/risk-disclosure',
+                default => abort(404),
+            },
+            'content' => PublicPageContent::groupValues($group),
+            'pageTitle' => $pageGroup['title'],
+        ]);
+    }
+
+    public function privacyPolicy()
+    {
+        return $this->legal('privacy');
+    }
+
+    public function termsOfUse()
+    {
+        return $this->legal('terms');
+    }
+
+    public function riskDisclosure()
+    {
+        return $this->legal('risk');
+    }
 }

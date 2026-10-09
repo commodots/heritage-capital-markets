@@ -131,6 +131,14 @@ const logout = () => {
                         <a href="/admin/page-content/resources" class="admin-sub-item">Investor Resources</a>
                     </div>
 
+                    <p class="ml-8 mt-4 px-2 pb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
+                        Legal
+                    </p>
+                    <div class="ml-8 space-y-0.5 border-l border-white/10 pl-2">
+                        <a href="/admin/page-content/privacy" class="admin-sub-item">Privacy Policy</a>
+                        <a href="/admin/page-content/terms" class="admin-sub-item">Terms of Use</a>
+                        <a href="/admin/page-content/risk" class="admin-sub-item">Risk Disclosure</a>
+                    </div>
 
                     <a href="/admin/investment-solutions" class="admin-nav-item">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
