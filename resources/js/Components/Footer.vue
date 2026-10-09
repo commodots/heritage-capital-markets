@@ -106,8 +106,8 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
 
                     <div class="space-y-2 text-sm text-white/70">
                         <a href="/about-us" class="block hover:text-white">About Us</a>
-                        <a href="/about-us/board-management" class="block hover:text-white">Board & Management</a>
-                        <a href="/careers" class="block hover:text-white">Careers</a>
+                        <a href="/board-management" class="block hover:text-white">Board & Management</a>
+                        <a href="/board-management#careers" class="block hover:text-white">Careers</a>
                         <a href="/corporate-governance" class="block hover:text-white">Corporate Governance</a>
                     </div>
                 </div>
@@ -132,10 +132,10 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                     </h3>
 
                     <div class="space-y-2 text-sm text-white/70">
-                        <a href="/research-centre/market-overview" class="block hover:text-white">Market Overview</a>
-                        <a href="/research-centre/reports" class="block hover:text-white">Research Reports</a>
-                        <a href="/resources" class="block hover:text-white">News & Insights</a>
-                        <a href="#" class="block hover:text-white">Investor Education</a>
+                        <a href="/#market-overview" class="block hover:text-white">Market Overview</a>
+                        <a href="/research-centre" class="block hover:text-white">Research Reports</a>
+                        <a href="/resources-news" class="block hover:text-white">News & Insights</a>
+                        <a href="/resources#investor-education" class="block hover:text-white">Investor Education</a>
                     </div>
                 </div>
 
@@ -146,10 +146,10 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                     </h3>
 
                     <div class="space-y-2 text-sm text-white/70">
-                        <a href="#" class="block hover:text-white">Market Data</a>
-                        <a href="#" class="block hover:text-white">Downloads</a>
+                        <a href="/resources#market-data" class="block hover:text-white">Market Data</a>
+                        <a href="/resources/downloads" class="block hover:text-white">Downloads</a>
                         <a href="/resources/faqs" class="block hover:text-white">FAQs</a>
-                        <a href="#" class="block hover:text-white">Glossary</a>
+                        <a href="/resources#glossary" class="block hover:text-white">Glossary</a>
                     </div>
                 </div>
 

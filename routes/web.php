@@ -12,6 +12,7 @@ use App\Http\Controllers\InvestmentSolutionsController;
 use App\Http\Controllers\InvestmentSolutionController;
 use App\Http\Controllers\FaqController as PublicFaqController;
 use App\Http\Controllers\DownloadsController;
+use App\Http\Controllers\PublicResourcesController;
 use App\Http\Controllers\OpenAccountController;
 use App\Http\Controllers\SearchController;
 
@@ -65,6 +66,15 @@ Route::get('/', [HomeController::class, 'index'])
 
 Route::get('/about-us', [AboutController::class, 'index'])
     ->name('about');
+
+Route::get('/board-management', fn () => Inertia::render('BoardManagement'))
+    ->name('board-management');
+
+Route::get('/corporate-governance', fn () => Inertia::render('CorporateGovernance'))
+    ->name('corporate-governance');
+
+Route::get('/fees-charges', fn () => Inertia::render('FeesCharges'))
+    ->name('fees-charges');
 
 
 /*
@@ -136,6 +146,9 @@ Route::get('/resources/faqs', [PublicFaqController::class, 'index'])
 
 Route::get('/resources/downloads', [DownloadsController::class, 'index'])
     ->name('resources.downloads');
+
+Route::get('/resources', [PublicResourcesController::class, 'index'])
+    ->name('resources');
 
 
 /*

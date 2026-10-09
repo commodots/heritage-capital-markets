@@ -740,7 +740,7 @@ const milestones = [
                         </p>
 
                         <a
-                            href="#"
+                            href="/board-management"
                             class="btn-gold mt-5"
                         >
                             Meet Our Team
@@ -788,7 +788,7 @@ const milestones = [
                             </h3>
 
                             <a
-                                href="#"
+                                href="/board-management#careers"
                                 class="inline-flex w-fit items-center gap-2 rounded-sm bg-heritage-deep px-5 py-3 text-xs font-semibold text-white transition hover:bg-heritage-navy"
                             >
                                 View Careers
