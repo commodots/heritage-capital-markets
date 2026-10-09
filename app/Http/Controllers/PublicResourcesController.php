@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MarketIndex;
+use App\Support\PublicPageContent;
 use Inertia\Inertia;
 
 class PublicResourcesController extends Controller
@@ -17,6 +18,7 @@ class PublicResourcesController extends Controller
 
         return Inertia::render('Resources/Index', [
             'markets' => $markets,
+            'content' => PublicPageContent::values(),
         ]);
     }
 }

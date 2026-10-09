@@ -13,6 +13,7 @@ use App\Http\Controllers\InvestmentSolutionController;
 use App\Http\Controllers\FaqController as PublicFaqController;
 use App\Http\Controllers\DownloadsController;
 use App\Http\Controllers\PublicResourcesController;
+use App\Http\Controllers\PublicContentPageController;
 use App\Http\Controllers\OpenAccountController;
 use App\Http\Controllers\SearchController;
 
@@ -30,6 +31,7 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\EnquiryController;
+use App\Http\Controllers\Admin\PublicPageContentController;
 
 use App\Http\Controllers\Auth\LoginController;
 
@@ -67,13 +69,13 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/about-us', [AboutController::class, 'index'])
     ->name('about');
 
-Route::get('/board-management', fn () => Inertia::render('BoardManagement'))
+Route::get('/board-management', [PublicContentPageController::class, 'boardManagement'])
     ->name('board-management');
 
-Route::get('/corporate-governance', fn () => Inertia::render('CorporateGovernance'))
+Route::get('/corporate-governance', [PublicContentPageController::class, 'corporateGovernance'])
     ->name('corporate-governance');
 
-Route::get('/fees-charges', fn () => Inertia::render('FeesCharges'))
+Route::get('/fees-charges', [PublicContentPageController::class, 'feesCharges'])
     ->name('fees-charges');
 
 
@@ -259,6 +261,14 @@ Route::prefix('admin')
 
         Route::delete('/pages/{page}', [PageController::class, 'destroy'])
             ->name('admin.pages.destroy');
+
+        Route::get('/page-content/{group}', [PublicPageContentController::class, 'edit'])
+            ->whereIn('group', ['board', 'governance', 'fees', 'resources'])
+            ->name('admin.page-content.edit');
+
+        Route::post('/page-content/{group}', [PublicPageContentController::class, 'update'])
+            ->whereIn('group', ['board', 'governance', 'fees', 'resources'])
+            ->name('admin.page-content.update');
 
 
         /*

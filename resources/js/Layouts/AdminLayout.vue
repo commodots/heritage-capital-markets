@@ -124,6 +124,13 @@ const logout = () => {
                         Pages
                     </a>
 
+                    <div class="ml-8 mt-1 space-y-0.5 border-l border-white/10 pl-2">
+                        <a href="/admin/page-content/board" class="admin-sub-item">Board &amp; Management</a>
+                        <a href="/admin/page-content/governance" class="admin-sub-item">Corporate Governance</a>
+                        <a href="/admin/page-content/fees" class="admin-sub-item">Fees &amp; Charges</a>
+                        <a href="/admin/page-content/resources" class="admin-sub-item">Investor Resources</a>
+                    </div>
+
 
                     <a href="/admin/investment-solutions" class="admin-nav-item">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">

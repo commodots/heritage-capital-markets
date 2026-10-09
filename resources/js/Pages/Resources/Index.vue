@@ -7,35 +7,14 @@ defineProps({
         type: Array,
         default: () => [],
     },
+    content: {
+        type: Object,
+        default: () => ({}),
+    },
 })
-
-const learningTopics = [
-    {
-        title: 'Understanding investment risk',
-        text: 'Consider how market movements and the possibility of loss relate to your objectives and investment timeframe.',
-    },
-    {
-        title: 'Diversification',
-        text: 'Learn how spreading investments across different assets may help manage concentration risk.',
-    },
-    {
-        title: 'Setting investment goals',
-        text: 'Define your objectives, timeframe and liquidity needs before choosing an investment approach.',
-    },
-]
-
-const glossary = [
-    { term: 'Asset', definition: 'An item of value that may be owned or invested in.' },
-    { term: 'Diversification', definition: 'Spreading investments across different assets or markets.' },
-    { term: 'Equity', definition: 'An ownership interest in a company, commonly represented by shares.' },
-    { term: 'Fixed income', definition: 'An investment that generally pays interest under stated terms, such as a bond.' },
-    { term: 'Market index', definition: 'A measure that tracks the performance of a selected group of securities.' },
-    { term: 'Portfolio', definition: 'A collection of investments held by an individual or institution.' },
-]
 
 function formatDate(value) {
     if (!value) return 'Not provided'
-
     return new Date(value).toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'short',
@@ -47,17 +26,17 @@ function formatDate(value) {
 <template>
     <PublicLayout>
         <SeoHead
-            title="Investor Resources"
-            description="Explore market data, investor education and a glossary of common investment terms from Heritage Capital Markets."
+            :title="content.resources_title"
+            :description="content.resources_intro"
             canonical-path="/resources"
         />
 
         <section class="bg-heritage-deep py-24 text-white">
             <div class="container-heritage">
                 <p class="text-xs font-semibold uppercase tracking-[0.22em] text-heritage-gold">Resources</p>
-                <h1 class="mt-4 font-display text-4xl font-semibold md:text-6xl">Investor Resources</h1>
+                <h1 class="mt-4 font-display text-4xl font-semibold md:text-6xl">{{ content.resources_title }}</h1>
                 <p class="mt-6 max-w-2xl text-base leading-7 text-white/75">
-                    Market information and learning resources to help you build your understanding of investing.
+                    {{ content.resources_intro }}
                 </p>
                 <nav aria-label="On this page" class="mt-8 flex flex-wrap gap-4 text-sm font-semibold text-heritage-gold">
                     <a href="#market-data" class="underline underline-offset-4">Market Data</a>
@@ -70,11 +49,10 @@ function formatDate(value) {
         <section id="market-data" class="scroll-mt-24 bg-white py-16 md:py-20">
             <div class="container-heritage">
                 <div class="max-w-3xl">
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-heritage-gold">Market Data</p>
-                    <h2 class="mt-3 font-display text-3xl font-semibold text-heritage-navy md:text-4xl">Market indices</h2>
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-heritage-gold">{{ content.resources_market_eyebrow }}</p>
+                    <h2 class="mt-3 font-display text-3xl font-semibold text-heritage-navy md:text-4xl">{{ content.resources_market_title }}</h2>
                     <p class="mt-4 leading-7 text-heritage-muted">
-                        The latest market values maintained by Heritage Capital Markets. Figures may be delayed; check the
-                        date shown and confirm current information before making investment decisions.
+                        {{ content.resources_market_description }}
                     </p>
                 </div>
 
@@ -113,28 +91,28 @@ function formatDate(value) {
 
         <section id="investor-education" class="scroll-mt-24 bg-heritage-offwhite py-16 md:py-20">
             <div class="container-heritage">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-heritage-gold">Investor Education</p>
-                <h2 class="mt-3 font-display text-3xl font-semibold text-heritage-navy md:text-4xl">Build your investment knowledge</h2>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-heritage-gold">{{ content.resources_education_eyebrow }}</p>
+                <h2 class="mt-3 font-display text-3xl font-semibold text-heritage-navy md:text-4xl">{{ content.resources_education_title }}</h2>
                 <div class="mt-8 grid gap-5 md:grid-cols-3">
-                    <article v-for="topic in learningTopics" :key="topic.title" class="rounded border border-heritage-border bg-white p-6">
-                        <h3 class="font-display text-xl font-semibold text-heritage-navy">{{ topic.title }}</h3>
-                        <p class="mt-3 leading-7 text-heritage-muted">{{ topic.text }}</p>
+                    <article v-for="number in [1, 2, 3]" :key="number" class="rounded border border-heritage-border bg-white p-6">
+                        <h3 class="font-display text-xl font-semibold text-heritage-navy">{{ content[`resources_topic_${number}_title`] }}</h3>
+                        <p class="mt-3 leading-7 text-heritage-muted">{{ content[`resources_topic_${number}_body`] }}</p>
                     </article>
                 </div>
                 <p class="mt-6 text-sm leading-6 text-heritage-muted">
-                    This information is general education, not personal investment advice. Consider your circumstances and seek professional advice where appropriate.
+                    {{ content.resources_education_disclaimer }}
                 </p>
             </div>
         </section>
 
         <section id="glossary" class="scroll-mt-24 bg-white py-16 md:py-20">
             <div class="container-heritage">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-heritage-gold">Glossary</p>
-                <h2 class="mt-3 font-display text-3xl font-semibold text-heritage-navy md:text-4xl">Common investment terms</h2>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-heritage-gold">{{ content.resources_glossary_eyebrow }}</p>
+                <h2 class="mt-3 font-display text-3xl font-semibold text-heritage-navy md:text-4xl">{{ content.resources_glossary_title }}</h2>
                 <dl class="mt-8 grid gap-x-10 md:grid-cols-2">
-                    <div v-for="entry in glossary" :key="entry.term" class="border-b border-heritage-border py-5">
-                        <dt class="font-semibold text-heritage-navy">{{ entry.term }}</dt>
-                        <dd class="mt-2 leading-6 text-heritage-muted">{{ entry.definition }}</dd>
+                    <div v-for="number in [1, 2, 3, 4, 5, 6]" :key="number" class="border-b border-heritage-border py-5">
+                        <dt class="font-semibold text-heritage-navy">{{ content[`resources_glossary_${number}_term`] }}</dt>
+                        <dd class="mt-2 leading-6 text-heritage-muted">{{ content[`resources_glossary_${number}_definition`] }}</dd>
                     </div>
                 </dl>
             </div>
