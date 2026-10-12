@@ -22,6 +22,7 @@ class LoginController extends Controller
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()->withErrors([
                 'email' => 'The provided credentials are incorrect.',
+                'password' => 'The provided credentials are incorrect.',
             ]);
         }
 
@@ -30,6 +31,7 @@ class LoginController extends Controller
 
             return back()->withErrors([
                 'email' => 'You do not have administrator access.',
+                'password' => 'You do not have administrator access.',
             ]);
         }
 

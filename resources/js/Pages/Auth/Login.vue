@@ -10,6 +10,10 @@ const form = useForm({
 const submit = () => {
     form.post('/login')
 }
+
+const clearLoginErrors = () => {
+    form.clearErrors('email', 'password')
+}
 </script>
 
 <template>
@@ -37,6 +41,7 @@ const submit = () => {
 
                     <input
                         v-model="form.email"
+                        @input="clearLoginErrors"
                         type="email"
                         class="w-full rounded-lg border border-slate-300 px-4 py-3"
                         required
@@ -44,6 +49,7 @@ const submit = () => {
 
                     <div
                         v-if="form.errors.email"
+                        role="alert"
                         class="mt-1 text-sm text-red-600"
                     >
                         {{ form.errors.email }}
@@ -57,10 +63,19 @@ const submit = () => {
 
                     <input
                         v-model="form.password"
+                        @input="clearLoginErrors"
                         type="password"
                         class="w-full rounded-lg border border-slate-300 px-4 py-3"
                         required
                     />
+
+                    <div
+                        v-if="form.errors.password"
+                        role="alert"
+                        class="mt-1 text-sm text-red-600"
+                    >
+                        {{ form.errors.password }}
+                    </div>
                 </div>
 
                 <label class="flex items-center gap-2 text-sm">
