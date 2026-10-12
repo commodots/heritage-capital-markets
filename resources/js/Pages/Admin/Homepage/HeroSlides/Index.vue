@@ -197,7 +197,7 @@ const statusClass = (active) =>
             </nav>
 
             <div class="border-t border-white/10 p-5">
-                <a href="/admin" target="_blank" class="text-sm font-medium text-heritage-gold hover:text-heritage-gold-light">View Website ↗</a>
+                <a href="/" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-heritage-gold hover:text-heritage-gold-light">View Website ↗</a>
             </div>
         </aside>
 
@@ -209,7 +209,7 @@ const statusClass = (active) =>
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <Link href="/" target="_blank" class="hidden text-sm font-medium text-slate-600 sm:block">View Website ↗</Link>
+                    <a href="/" target="_blank" rel="noopener noreferrer" class="hidden text-sm font-medium text-slate-600 sm:block">View Website ↗</a>
                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-heritage-deep text-sm font-semibold text-white">A</div>
                 </div>
             </header>

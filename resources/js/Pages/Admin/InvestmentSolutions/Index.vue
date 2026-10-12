@@ -304,7 +304,7 @@ function flashMessage() {
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <a href="/" target="_blank"
+                    <a href="/" target="_blank" rel="noopener noreferrer"
                         class="hidden rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 sm:inline-flex">
                         View Website
                     </a>

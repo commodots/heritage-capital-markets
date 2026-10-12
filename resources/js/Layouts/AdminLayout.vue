@@ -268,7 +268,7 @@ const logout = () => {
             <!-- SIDEBAR FOOTER -->
             <div class="border-t border-white/10 p-4">
 
-                <a href="/admin" target="_blank"
+                <a href="/" target="_blank" rel="noopener noreferrer"
                     class="flex items-center gap-3 rounded-md px-3 py-3 text-xs text-white/60 transition hover:bg-white/5 hover:text-white">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M14 3h7v7" />
