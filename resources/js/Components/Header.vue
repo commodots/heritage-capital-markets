@@ -1,8 +1,25 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import heritageLogo from '@/assets/logo/heritage-logo.png'
 
+const page = usePage()
 const mobileOpen = ref(false)
+
+const currentPath = computed(() => {
+    const path = (page.url || '/').split('?')[0]
+
+    return path.replace(/\/+$/, '') || '/'
+})
+
+const isActive = (path) => currentPath.value === path
+
+const isSectionActive = (prefix) =>
+    currentPath.value === prefix ||
+    currentPath.value.startsWith(`${prefix}/`)
+
+const isResourcesActive = () =>
+    isSectionActive('/resources') || isSectionActive('/resources-news')
 
 const toggleMobile = () => {
     mobileOpen.value = !mobileOpen.value
@@ -33,28 +50,51 @@ const closeMobile = () => {
                 <!-- Home -->
                 <a
                     href="/"
-                    class="relative flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
+                    :class="[
+                        'relative flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold',
+                        isActive('/') ? 'text-heritage-gold' : ''
+                    ]"
+                    :aria-current="isActive('/') ? 'page' : undefined"
                 >
                     Home
-                    <span class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"></span>
+                    <span
+                        v-if="isActive('/')"
+                        class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"
+                    ></span>
                 </a>
 
                 <!-- About -->
                 <a
                     href="/about-us"
-                    class="flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
+                    :class="[
+                        'relative flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold',
+                        isActive('/about-us') ? 'text-heritage-gold' : ''
+                    ]"
+                    :aria-current="isActive('/about-us') ? 'page' : undefined"
                 >
                     About Us
+                    <span
+                        v-if="isActive('/about-us')"
+                        class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"
+                    ></span>
                 </a>
 
                 <!-- Investment Solutions -->
                 <div class="group relative">
 
                     <button
-                        class="flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
+                        :class="[
+                            'relative flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold',
+                            isSectionActive('/investment-solutions') ? 'text-heritage-gold' : ''
+                        ]"
+                        :aria-current="isSectionActive('/investment-solutions') ? 'location' : undefined"
                         type="button"
                     >
                         Investment Solutions
+                        <span
+                            v-if="isSectionActive('/investment-solutions')"
+                            class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"
+                        ></span>
 
                         <svg
                             class="h-3.5 w-3.5"
@@ -129,10 +169,18 @@ const closeMobile = () => {
                 <div class="group relative">
 
                     <button
-                        class="flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
+                        :class="[
+                            'relative flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold',
+                            isSectionActive('/research-centre') ? 'text-heritage-gold' : ''
+                        ]"
+                        :aria-current="isSectionActive('/research-centre') ? 'location' : undefined"
                         type="button"
                     >
                         Research Centre
+                        <span
+                            v-if="isSectionActive('/research-centre')"
+                            class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"
+                        ></span>
 
                         <svg
                             class="h-3.5 w-3.5"
@@ -160,14 +208,14 @@ const closeMobile = () => {
 
                         <!-- Keep these ready for the Research batch -->
                         <a
-                            href="/research-centre/"
+                            href="/#market-overview"
                             class="block px-5 py-2.5 text-sm hover:bg-gray-50 hover:text-heritage-gold"
                         >
                             Market Overview
                         </a>
 
                         <a
-                            href="/research-centre/"
+                            href="/research-centre"
                             class="block px-5 py-2.5 text-sm hover:bg-gray-50 hover:text-heritage-gold"
                         >
                             Research Reports
@@ -180,10 +228,18 @@ const closeMobile = () => {
                 <div class="group relative">
 
                     <button
-                        class="flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold"
+                        :class="[
+                            'relative flex h-18.5 items-center gap-1 whitespace-nowrap px-1 text-sm font-medium hover:text-heritage-gold',
+                            isResourcesActive() ? 'text-heritage-gold' : ''
+                        ]"
+                        :aria-current="isResourcesActive() ? 'location' : undefined"
                         type="button"
                     >
                         Resources
+                        <span
+                            v-if="isResourcesActive()"
+                            class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"
+                        ></span>
 
                         <svg
                             class="h-3.5 w-3.5"
@@ -230,9 +286,17 @@ const closeMobile = () => {
                 <!-- Contact -->
                 <a
                     href="/contact-us"
-                    class="flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold"
+                    :class="[
+                        'relative flex h-18.5 items-center whitespace-nowrap px-1 text-sm font-medium transition hover:text-heritage-gold',
+                        isActive('/contact-us') ? 'text-heritage-gold' : ''
+                    ]"
+                    :aria-current="isActive('/contact-us') ? 'page' : undefined"
                 >
                     Contact Us
+                    <span
+                        v-if="isActive('/contact-us')"
+                        class="absolute bottom-0 left-0 h-0.75 w-full bg-heritage-gold"
+                    ></span>
                 </a>
 
             </nav>
@@ -328,30 +392,44 @@ const closeMobile = () => {
                 <a
                     href="/"
                     @click="closeMobile"
-                    class="block rounded px-3 py-3 hover:bg-white/5"
+                    :class="[
+                        'block rounded px-3 py-3 hover:bg-white/5',
+                        isActive('/') ? 'text-heritage-gold' : ''
+                    ]"
+                    :aria-current="isActive('/') ? 'page' : undefined"
                 >
-                    Home
+                    <span :class="isActive('/') ? 'underline decoration-2 underline-offset-4' : ''">Home</span>
                 </a>
 
                 <a
                     href="/about-us"
                     @click="closeMobile"
-                    class="block rounded px-3 py-3 hover:bg-white/5"
+                    :class="[
+                        'block rounded px-3 py-3 hover:bg-white/5',
+                        isActive('/about-us') ? 'text-heritage-gold' : ''
+                    ]"
+                    :aria-current="isActive('/about-us') ? 'page' : undefined"
                 >
-                    About Us
+                    <span :class="isActive('/about-us') ? 'underline decoration-2 underline-offset-4' : ''">About Us</span>
                 </a>
 
                 <!-- Investment Solutions -->
                 <div class="border-t border-white/10 pt-2">
 
-                    <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-heritage-gold">
-                        Investment Solutions
+                    <div
+                        class="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
+                        :class="isSectionActive('/investment-solutions') ? 'text-heritage-gold' : 'text-white/70'"
+                    >
+                        <span :class="isSectionActive('/investment-solutions') ? 'underline decoration-2 underline-offset-4' : ''">Investment Solutions</span>
                     </div>
 
                     <a
                         href="/investment-solutions"
                         @click="closeMobile"
-                        class="block rounded px-3 py-2.5 hover:bg-white/5"
+                        :class="[
+                            'block rounded px-3 py-2.5 hover:bg-white/5',
+                            isActive('/investment-solutions') ? 'text-heritage-gold underline decoration-2 underline-offset-4' : ''
+                        ]"
                     >
                         All Investment Solutions
                     </a>
@@ -409,20 +487,27 @@ const closeMobile = () => {
                 <!-- Research Centre -->
                 <div class="border-t border-white/10 pt-2">
 
-                    <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-heritage-gold">
-                        Research Centre
+                    <div
+                        class="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
+                        :class="isSectionActive('/research-centre') ? 'text-heritage-gold' : 'text-white/70'"
+                    >
+                        <span :class="isSectionActive('/research-centre') ? 'underline decoration-2 underline-offset-4' : ''">Research Centre</span>
                     </div>
 
                     <a
                         href="/research-centre"
                         @click="closeMobile"
-                        class="block rounded px-3 py-2.5 hover:bg-white/5"
+                        :class="[
+                            'block rounded px-3 py-2.5 hover:bg-white/5',
+                            isSectionActive('/research-centre') ? 'text-heritage-gold underline decoration-2 underline-offset-4' : ''
+                        ]"
+                        :aria-current="isActive('/research-centre') ? 'page' : undefined"
                     >
                         Research Centre
                     </a>
 
                     <a
-                        href="/research-centre"
+                        href="/#market-overview"
                         @click="closeMobile"
                         class="block rounded px-3 py-2.5 hover:bg-white/5"
                     >
@@ -442,14 +527,20 @@ const closeMobile = () => {
                 <!-- Resources -->
                 <div class="border-t border-white/10 pt-2">
 
-                    <div class="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-heritage-gold">
-                        Resources
+                    <div
+                        class="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
+                        :class="isResourcesActive() ? 'text-heritage-gold' : 'text-white/70'"
+                    >
+                        <span :class="isResourcesActive() ? 'underline decoration-2 underline-offset-4' : ''">Resources</span>
                     </div>
 
                     <a
                         href="/resources-news"
                         @click="closeMobile"
-                        class="block rounded px-3 py-2.5 hover:bg-white/5"
+                        :class="[
+                            'block rounded px-3 py-2.5 hover:bg-white/5',
+                            isSectionActive('/resources-news') ? 'text-heritage-gold underline decoration-2 underline-offset-4' : ''
+                        ]"
                     >
                         News & Insights
                     </a>
@@ -457,7 +548,10 @@ const closeMobile = () => {
                     <a
                         href="/resources/downloads"
                         @click="closeMobile"
-                        class="block rounded px-3 py-2.5 hover:bg-white/5"
+                        :class="[
+                            'block rounded px-3 py-2.5 hover:bg-white/5',
+                            isActive('/resources/downloads') ? 'text-heritage-gold underline decoration-2 underline-offset-4' : ''
+                        ]"
                     >
                         Downloads
                     </a>
@@ -465,7 +559,10 @@ const closeMobile = () => {
                     <a
                         href="/resources/faqs"
                         @click="closeMobile"
-                        class="block rounded px-3 py-2.5 hover:bg-white/5"
+                        :class="[
+                            'block rounded px-3 py-2.5 hover:bg-white/5',
+                            isActive('/resources/faqs') ? 'text-heritage-gold underline decoration-2 underline-offset-4' : ''
+                        ]"
                     >
                         FAQs
                     </a>
@@ -476,7 +573,11 @@ const closeMobile = () => {
                 <a
                     href="/contact-us"
                     @click="closeMobile"
-                    class="block rounded px-3 py-3 hover:bg-white/5"
+                    :class="[
+                        'block rounded px-3 py-3 hover:bg-white/5',
+                        isActive('/contact-us') ? 'text-heritage-gold underline decoration-2 underline-offset-4' : ''
+                    ]"
+                    :aria-current="isActive('/contact-us') ? 'page' : undefined"
                 >
                     Contact Us
                 </a>
