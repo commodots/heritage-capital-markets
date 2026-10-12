@@ -1,11 +1,67 @@
 <script setup>
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import NewsletterSignup from '@/Components/NewsletterSignup.vue'
+
+const page = usePage()
+
+const siteSettings = computed(() => page.props.siteSettings || {})
+const companyName = computed(
+    () => siteSettings.value.company_name || 'Heritage Capital Markets Limited'
+)
+const phone = computed(() => siteSettings.value.phone || '')
+const email = computed(() => siteSettings.value.email || '')
+const address = computed(() => siteSettings.value.address || '')
+const abaAddress = computed(
+    () => siteSettings.value.address_aba || '45 Aba Road, Opp. First Bank,\nAba, Abia State.'
+)
+const footerText = computed(
+    () => siteSettings.value.footer_text ||
+        'Building wealth and creating value for our clients through trusted investment solutions.'
+)
+const phoneHref = computed(() => {
+    const value = phone.value.trim()
+
+    if (!/^\+?[\d\s().-]+$/.test(value)) {
+        return ''
+    }
+
+    const digits = value.replace(/\D/g, '')
+
+    if (digits.length < 7 || digits.length > 15) {
+        return ''
+    }
+
+    return `tel:${value.startsWith('+') ? '+' : ''}${digits}`
+})
+
+function safeHttpUrl(value) {
+    if (!value) {
+        return ''
+    }
+
+    try {
+        const url = new URL(value)
+
+        return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password
+            ? url.href
+            : ''
+    } catch {
+        return ''
+    }
+}
+
+const socialLinks = computed(() => ({
+    linkedin: safeHttpUrl(siteSettings.value.linkedin),
+    facebook: safeHttpUrl(siteSettings.value.facebook),
+    instagram: safeHttpUrl(siteSettings.value.instagram),
+}))
 </script>
 
 <template>
     <footer class="bg-heritage-deep text-white">
 
-        <NewsletterSignup compact />
+        <NewsletterSignup />
 
         <!-- CTA -->
         <section class="border-b border-white/10 bg-heritage-navy">
@@ -61,7 +117,7 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
 
                         <div>
                             <div class="font-display text-xl font-semibold">
-                                Heritage
+                                {{ companyName }}
                             </div>
 
                             <div class="text-[9px] font-semibold tracking-[0.18em] text-white/70">
@@ -72,25 +128,21 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                     </div>
 
                     <p class="mt-5 max-w-sm text-sm leading-6 text-white/65">
-                        Building wealth and creating value for our clients through trusted investment solutions.
+                        {{ footerText }}
                     </p>
 
                     <!-- Social -->
-                    <div class="mt-6 flex gap-3">
+                    <div v-if="socialLinks.linkedin || socialLinks.facebook || socialLinks.instagram" class="mt-6 flex gap-3">
 
-                        <a href="#" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
+                        <a v-if="socialLinks.linkedin" :href="socialLinks.linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
                             in
                         </a>
 
-                        <a href="#" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
-                            X
-                        </a>
-
-                        <a href="#" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
+                        <a v-if="socialLinks.facebook" :href="socialLinks.facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
                             f
                         </a>
 
-                        <a href="#" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
+                        <a v-if="socialLinks.instagram" :href="socialLinks.instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-xs hover:border-heritage-gold hover:text-heritage-gold">
                             ◎
                         </a>
 
@@ -167,14 +219,13 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
 
                         <div class="space-y-4 text-sm text-white/70">
 
-                            <div>
+                            <div v-if="address">
                                 <div class="font-semibold text-white">
-                                    Lagos (Head Office)
+                                    Head Office
                                 </div>
 
-                                <div>
-                                    1, Adeola Hopewell Street,<br>
-                                    Victoria Island, Lagos.
+                                <div class="whitespace-pre-line">
+                                    {{ address }}
                                 </div>
                             </div>
 
@@ -183,9 +234,8 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                                     Aba Office
                                 </div>
 
-                                <div>
-                                    45 Aba Road, Opp. First Bank,<br>
-                                    Aba, Abia State.
+                                <div class="whitespace-pre-line">
+                                    {{ abaAddress }}
                                 </div>
                             </div>
 
@@ -193,9 +243,15 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                     </div>
 
                     <div class="md:text-right">
+                        <div v-if="phoneHref" class="text-sm text-white/70">
+                            <a :href="phoneHref" class="hover:text-heritage-gold">{{ phone }}</a>
+                        </div>
+                        <div v-if="email" class="mt-2 text-sm text-white/70">
+                            <a :href="`mailto:${email}`" class="hover:text-heritage-gold">{{ email }}</a>
+                        </div>
                         <a
                             href="/contact-us"
-                            class="inline-flex items-center gap-2 text-sm font-semibold text-heritage-gold hover:text-heritage-gold-light"
+                            class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-heritage-gold hover:text-heritage-gold-light"
                         >
                             View all locations
                             <span>→</span>
@@ -214,7 +270,7 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
             <div class="mx-auto flex max-w-350 flex-col gap-3 px-5 py-5 text-xs text-white/55 md:flex-row md:items-center md:justify-between lg:px-8">
 
                 <div>
-                    © {{ new Date().getFullYear() }} Heritage Capital Markets Limited.
+                    © {{ new Date().getFullYear() }} {{ companyName }}.
                     All Rights Reserved.
                 </div>
 
@@ -222,7 +278,6 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue'
                     <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
                     <a href="/terms-of-use" class="hover:text-white">Terms of Use</a>
                     <a href="/risk-disclosure" class="hover:text-white">Risk Disclosure</a>
-                    <a href="#" class="hover:text-white">Sitemap</a>
                 </div>
 
                 <div>

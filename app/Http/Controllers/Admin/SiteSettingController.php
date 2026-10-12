@@ -22,6 +22,7 @@ class SiteSettingController extends Controller
             'phone'=>['nullable','string','max:100'],
             'email'=>['nullable','email','max:255'],
             'address'=>['nullable','string','max:1000'],
+            'address_aba'=>['nullable','string','max:1000'],
             'facebook'=>['nullable','string','max:500'],
             'linkedin'=>['nullable','string','max:500'],
             'instagram'=>['nullable','string','max:500'],
