@@ -332,7 +332,9 @@ const closeMobile = () => {
 
                 <!-- Investor Login -->
                 <a
-                    href="/investor-login"
+                    href="https://heritagecapital.xcloudintegra.com/LoginInnovationbedai.aspx?ReturnUrl=%2f"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     class="flex items-center gap-2 whitespace-nowrap rounded bg-heritage-gold px-4 py-2.5 text-sm font-semibold text-heritage-navy transition hover:bg-heritage-gold-light"
                 >
                     <svg
@@ -594,7 +596,9 @@ const closeMobile = () => {
                     </a>
 
                     <a
-                        href="/investor-login"
+                        href="https://heritagecapital.xcloudintegra.com/LoginInnovationbedai.aspx?ReturnUrl=%2f"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         @click="closeMobile"
                         class="rounded bg-heritage-gold px-4 py-3 text-center font-semibold text-heritage-navy"
                     >
