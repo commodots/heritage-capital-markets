@@ -87,6 +87,9 @@ Route::get('/terms-of-use', [PublicContentPageController::class, 'termsOfUse'])
 Route::get('/risk-disclosure', [PublicContentPageController::class, 'riskDisclosure'])
     ->name('risk-disclosure');
 
+Route::get('/investor-login', fn () => Inertia::render('InvestorLogin'))
+    ->name('investor-login');
+
 
 /*
 |--------------------------------------------------------------------------
