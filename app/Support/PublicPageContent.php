@@ -8,47 +8,34 @@ class PublicPageContent
 {
     public static function fields(): array
     {
+        $boardFields = [
+            'board_eyebrow' => ['Our People', 100, false],
+            'board_title' => ['Board & Management', 255, false],
+            'board_intro' => ['The people of Heritage bring together experience, market knowledge and a commitment to serving our clients.', 2000, true],
+            'board_leadership_eyebrow' => ['Leadership', 100, false],
+            'board_leadership_title' => ['Experience guided by integrity.', 255, false],
+            'board_leadership_body' => ['Our leadership is committed to responsible oversight, professional standards and a client-focused approach. We bring together people with the expertise to help clients navigate the capital markets.', 3000, true],
+            'board_profiles_note' => ['Information about individual board and management members will be published here as approved profiles become available.', 2000, true],
+        ];
+
+        // Dynamically generate fields for 12 board members
+        for ($i = 1; $i <= 12; $i++) {
+            $boardFields["board_member_{$i}_name"] = ['', 255, false];
+            $boardFields["board_member_{$i}_role"] = ['', 255, false];
+            $boardFields["board_member_{$i}_bio"] = ['', 50000, true];
+            $boardFields["board_member_{$i}_image"] = ['', 5120, false, 'image'];
+        }
+
+        $boardFields['board_careers_eyebrow'] = ['Careers', 100, false];
+        $boardFields['board_careers_title'] = ['Build your future with Heritage.', 255, false];
+        $boardFields['board_careers_body'] = ['We value people who bring curiosity, professionalism and a commitment to excellent client service. Contact our team to enquire about career opportunities.', 3000, true];
+        $boardFields['board_careers_button'] = ['Contact Us', 100, false];
+
         return [
             'board' => [
                 'title' => 'Board & Management',
                 'description' => 'Add member names and details below. Leave a name blank to keep that profile hidden.',
-                'fields' => [
-                    'board_eyebrow' => ['Our People', 100, false],
-                    'board_title' => ['Board & Management', 255, false],
-                    'board_intro' => ['The people of Heritage bring together experience, market knowledge and a commitment to serving our clients.', 2000, true],
-                    'board_leadership_eyebrow' => ['Leadership', 100, false],
-                    'board_leadership_title' => ['Experience guided by integrity.', 255, false],
-                    'board_leadership_body' => ['Our leadership is committed to responsible oversight, professional standards and a client-focused approach. We bring together people with the expertise to help clients navigate the capital markets.', 3000, true],
-                    'board_profiles_note' => ['Information about individual board and management members will be published here as approved profiles become available.', 2000, true],
-                    'board_member_1_name' => ['', 255, false],
-                    'board_member_1_role' => ['', 255, false],
-                    'board_member_1_bio' => ['', 1500, true],
-                    'board_member_1_image' => ['', 5120, false, 'image'],
-                    'board_member_2_name' => ['', 255, false],
-                    'board_member_2_role' => ['', 255, false],
-                    'board_member_2_bio' => ['', 1500, true],
-                    'board_member_2_image' => ['', 5120, false, 'image'],
-                    'board_member_3_name' => ['', 255, false],
-                    'board_member_3_role' => ['', 255, false],
-                    'board_member_3_bio' => ['', 1500, true],
-                    'board_member_3_image' => ['', 5120, false, 'image'],
-                    'board_member_4_name' => ['', 255, false],
-                    'board_member_4_role' => ['', 255, false],
-                    'board_member_4_bio' => ['', 1500, true],
-                    'board_member_4_image' => ['', 5120, false, 'image'],
-                    'board_member_5_name' => ['', 255, false],
-                    'board_member_5_role' => ['', 255, false],
-                    'board_member_5_bio' => ['', 1500, true],
-                    'board_member_5_image' => ['', 5120, false, 'image'],
-                    'board_member_6_name' => ['', 255, false],
-                    'board_member_6_role' => ['', 255, false],
-                    'board_member_6_bio' => ['', 1500, true],
-                    'board_member_6_image' => ['', 5120, false, 'image'],
-                    'board_careers_eyebrow' => ['Careers', 100, false],
-                    'board_careers_title' => ['Build your future with Heritage.', 255, false],
-                    'board_careers_body' => ['We value people who bring curiosity, professionalism and a commitment to excellent client service. Contact our team to enquire about career opportunities.', 3000, true],
-                    'board_careers_button' => ['Contact Us', 100, false],
-                ],
+                'fields' => $boardFields,
             ],
             'governance' => [
                 'title' => 'Corporate Governance',

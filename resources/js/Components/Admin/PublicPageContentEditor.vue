@@ -23,12 +23,22 @@ const imageKeys = Object.entries(props.group.fields)
     .filter(([, field]) => field[3] === 'image')
     .map(([key]) => key)
 const imageKeySet = new Set(imageKeys)
+
 const form = reactive(Object.fromEntries(
     Object.entries(props.settings).filter(([key]) => !imageKeySet.has(key))
 ))
 const imageFiles = ref({})
 const imagePreviews = ref({})
 const processing = ref(false)
+
+// Determine initial member count based on existing saved settings (defaulting to at least 6)
+const initialMemberCount = Math.max(
+    6,
+    ...Object.keys(props.settings)
+        .filter(k => k.startsWith('board_member_'))
+        .map(k => parseInt(k.split('_')[2]) || 0)
+)
+const activeMemberCount = ref(initialMemberCount)
 
 const boardFields = computed(() => Object.entries(props.group.fields ?? {}))
 const boardIntroFields = computed(() => boardFields.value.filter(([key]) =>
@@ -37,7 +47,8 @@ const boardIntroFields = computed(() => boardFields.value.filter(([key]) =>
 const boardCareerFields = computed(() => boardFields.value.filter(([key]) =>
     key.startsWith('board_careers_')
 ))
-const boardMemberFields = computed(() => Array.from({ length: 6 }, (_, index) => {
+
+const boardMemberFields = computed(() => Array.from({ length: activeMemberCount.value }, (_, index) => {
     const number = index + 1
 
     return {
@@ -45,11 +56,39 @@ const boardMemberFields = computed(() => Array.from({ length: 6 }, (_, index) =>
         fields: ['name', 'role', 'bio', 'image']
             .map(part => {
                 const key = `board_member_${number}_${part}`
-                return [key, props.group.fields?.[key]]
-            })
-            .filter(([, field]) => field),
+                // Fallback field definition for dynamically added members beyond 6
+                const fieldDef = props.group.fields?.[key] ?? [
+                    `${part}`,
+                    true,
+                    part === 'bio',
+                    part === 'image' ? 'image' : 'text'
+                ]
+                return [key, fieldDef]
+            }),
     }
 }))
+
+function addMember() {
+    if (activeMemberCount.value < 12) {
+        activeMemberCount.value++
+    }
+}
+
+function removeMember(number) {
+    // Clear form data for this member
+    ['name', 'role', 'bio'].forEach(part => {
+        const key = `board_member_${number}_${part}`
+        if (form[key] !== undefined) {
+            form[key] = ''
+        }
+    })
+    const imageKey = `board_member_${number}_image`
+    delete imageFiles.value[imageKey]
+    if (imagePreviews.value[imageKey]?.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreviews.value[imageKey])
+    }
+    delete imagePreviews.value[imageKey]
+}
 
 function fieldLabel(key) {
     return key
@@ -93,7 +132,7 @@ function submit() {
                 )
             )
             Object.values(imagePreviews.value).forEach(preview => {
-                if (preview.startsWith('blob:')) URL.revokeObjectURL(preview)
+                if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview)
             })
             imageFiles.value = {}
             imagePreviews.value = {}
@@ -137,7 +176,9 @@ function submit() {
                         {{ group.description || 'Market index values are edited separately under Market Indices.' }}
                     </p>
                 </div>
+
                 <div v-if="groupKey === 'board'" class="space-y-8 p-6">
+                    <!-- Page Intro Section -->
                     <div class="grid gap-5 md:grid-cols-2">
                         <div
                             v-for="[key, field] in boardIntroFields"
@@ -162,30 +203,54 @@ function submit() {
                         </div>
                     </div>
 
+                    <!-- Board & Management Members Section -->
                     <section class="border-t border-heritage-border pt-6">
-                        <div>
-                            <h3 class="font-display text-lg font-semibold text-heritage-navy">Board &amp; Management Members</h3>
-                            <p class="mt-1 text-sm text-heritage-muted">Add each member’s name, role, biography, and photo. Leave the name blank to hide that profile.</p>
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h3 class="font-display text-lg font-semibold text-heritage-navy">Board &amp; Management Members</h3>
+                                <p class="mt-1 text-sm text-heritage-muted">Add each member’s name, role, biography, and photo. Leave the name blank to hide that profile from the website.</p>
+                            </div>
+                            <button
+                                v-if="activeMemberCount < 12"
+                                type="button"
+                                @click="addMember"
+                                class="inline-flex items-center gap-1.5 rounded border border-heritage-border bg-white px-4 py-2 text-xs font-semibold text-heritage-navy transition hover:bg-heritage-offwhite"
+                            >
+                                + Add Member Profile
+                            </button>
                         </div>
+
                         <div class="mt-5 grid gap-5 xl:grid-cols-2">
                             <article
                                 v-for="member in boardMemberFields"
                                 :key="member.number"
                                 class="grid gap-5 rounded-lg border border-heritage-border bg-heritage-offwhite/40 p-5 sm:grid-cols-2"
                             >
-                                <h4 class="sm:col-span-2 text-sm font-semibold text-heritage-navy">Member {{ member.number }}</h4>
+                                <div class="sm:col-span-2 flex items-center justify-between border-b border-heritage-border/60 pb-3">
+                                    <h4 class="text-sm font-semibold text-heritage-navy">Member {{ member.number }}</h4>
+                                    <button
+                                        type="button"
+                                        @click="removeMember(member.number)"
+                                        class="text-xs text-red-600 hover:underline"
+                                    >
+                                        Clear Member
+                                    </button>
+                                </div>
+
                                 <div
                                     v-for="[key, field] in member.fields"
                                     :key="key"
                                     :class="field[2] || field[3] === 'image' ? 'sm:col-span-2' : ''"
                                 >
                                     <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">{{ fieldLabel(key) }}</label>
+                                    
+                                    <!-- Image Upload Field -->
                                     <div v-if="field[3] === 'image'" class="space-y-3">
                                         <img
                                             v-if="imagePreviews[key] || props.settings[key]"
                                             :src="imagePreviews[key] || imageUrl(props.settings[key])"
                                             :alt="`${fieldLabel(key)} preview`"
-                                            class="h-36 w-32 rounded border border-heritage-border object-cover"
+                                            class="h-44 w-36 rounded border border-heritage-border object-cover object-top"
                                         />
                                         <p v-else class="text-sm text-heritage-muted">No photo uploaded.</p>
                                         <input
@@ -197,13 +262,18 @@ function submit() {
                                         />
                                         <p class="text-xs text-heritage-muted">JPG, JPEG, PNG or WebP; maximum 5 MB.</p>
                                     </div>
+
+                                    <!-- Bio Textarea Field -->
                                     <textarea
                                         v-else-if="field[2]"
                                         :id="key"
                                         v-model="form[key]"
-                                        rows="3"
+                                        rows="4"
+                                        placeholder="Enter board member biography..."
                                         class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
                                     ></textarea>
+
+                                    <!-- Standard Input Field (Name, Role) -->
                                     <input
                                         v-else
                                         :id="key"
@@ -216,6 +286,7 @@ function submit() {
                         </div>
                     </section>
 
+                    <!-- Careers Section Fields -->
                     <div class="grid gap-5 border-t border-heritage-border pt-6 md:grid-cols-2">
                         <div
                             v-for="[key, field] in boardCareerFields"
@@ -240,6 +311,8 @@ function submit() {
                         </div>
                     </div>
                 </div>
+
+                <!-- Fallback General Groups -->
                 <div v-else class="grid gap-5 p-6 md:grid-cols-2">
                     <div v-for="(field, key) in group.fields" :key="key" :class="field[2] ? 'md:col-span-2' : ''">
                         <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">
@@ -262,6 +335,7 @@ function submit() {
                     </div>
                 </div>
             </section>
+
             <div class="flex justify-end">
                 <button
                     type="submit"

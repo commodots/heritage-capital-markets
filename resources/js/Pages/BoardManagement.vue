@@ -1,10 +1,18 @@
 <script setup>
+import { ref } from 'vue'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import SeoHead from '@/Components/SeoHead.vue'
 import teamImage from '@/assets/about/heritage-team.jpg'
 import receptionImage from '@/assets/about/heritage-reception.jpg'
 
 const memberNumbers = [1, 2, 3, 4, 5, 6]
+
+// Track which member bios are currently expanded
+const expandedBios = ref({})
+
+const toggleBio = (number) => {
+    expandedBios.value[number] = !expandedBios.value[number]
+}
 
 defineProps({
     content: {
@@ -59,30 +67,41 @@ defineProps({
                     <template v-for="number in memberNumbers" :key="number">
                         <article
                             v-if="content[`board_member_${number}_name`]"
-                            class="rounded border border-heritage-border bg-white p-6"
+                            class="rounded border border-heritage-border bg-white p-6 flex flex-col justify-between"
                         >
-                            <img
-                                v-if="content[`board_member_${number}_image`]"
-                                :src="content[`board_member_${number}_image`].startsWith('/') ? content[`board_member_${number}_image`] : `/storage/${content[`board_member_${number}_image`]}`"
-                                :alt="content[`board_member_${number}_name`]"
-                                class="mb-5 h-64 w-full rounded object-cover"
-                            />
-                            <div
-                                v-else
-                                class="mb-5 flex h-64 items-center justify-center rounded bg-heritage-offwhite font-display text-5xl text-heritage-gold"
-                                aria-hidden="true"
-                            >
-                                {{ content[`board_member_${number}_name`].charAt(0) }}
+                            <div>
+                                <img
+                                    v-if="content[`board_member_${number}_image`]"
+                                    :src="content[`board_member_${number}_image`].startsWith('/') ? content[`board_member_${number}_image`] : `/storage/${content[`board_member_${number}_image`]}`"
+                                    :alt="content[`board_member_${number}_name`]"
+                                    class="mb-5 h-64 w-full rounded object-cover object-top sm:h-72 lg:h-80 max-w-full transform-gpu"
+                                />
+                                <div
+                                    v-else
+                                    class="mb-5 flex h-64 items-center justify-center rounded bg-heritage-offwhite font-display text-5xl text-heritage-gold"
+                                    aria-hidden="true"
+                                >
+                                    {{ content[`board_member_${number}_name`].charAt(0) }}
+                                </div>
+                                <h3 class="font-display text-xl font-semibold text-heritage-navy">
+                                    {{ content[`board_member_${number}_name`] }}
+                                </h3>
+                                <p v-if="content[`board_member_${number}_role`]" class="mt-1 text-sm font-semibold text-heritage-gold">
+                                    {{ content[`board_member_${number}_role`] }}
+                                </p>
+                                
+                                <div v-if="content[`board_member_${number}_bio`]">
+                                    <p class="mt-4 leading-7 text-heritage-muted" :class="{ 'line-clamp-3': !expandedBios[number] }">
+                                        {{ content[`board_member_${number}_bio`] }}
+                                    </p>
+                                    <button
+                                        @click="toggleBio(number)"
+                                        class="mt-2 text-sm font-semibold text-heritage-gold hover:underline focus:outline-none"
+                                    >
+                                        {{ expandedBios[number] ? 'See less' : 'See more' }}
+                                    </button>
+                                </div>
                             </div>
-                            <h3 class="font-display text-xl font-semibold text-heritage-navy">
-                                {{ content[`board_member_${number}_name`] }}
-                            </h3>
-                            <p v-if="content[`board_member_${number}_role`]" class="mt-1 text-sm font-semibold text-heritage-gold">
-                                {{ content[`board_member_${number}_role`] }}
-                            </p>
-                            <p v-if="content[`board_member_${number}_bio`]" class="mt-4 leading-7 text-heritage-muted">
-                                {{ content[`board_member_${number}_bio`] }}
-                            </p>
                         </article>
                     </template>
                 </div>
