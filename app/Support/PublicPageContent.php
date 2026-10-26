@@ -23,7 +23,7 @@ class PublicPageContent
             $boardFields["board_member_{$i}_name"] = ['', 255, false];
             $boardFields["board_member_{$i}_role"] = ['', 255, false];
             $boardFields["board_member_{$i}_bio"] = ['', 50000, true];
-            $boardFields["board_member_{$i}_image"] = ['', 5120, false, 'image'];
+            $boardFields["board_member_{$i}_image"] = ['', 10240, false, 'image'];
         }
 
         $boardFields['board_careers_eyebrow'] = ['Careers', 100, false];
@@ -216,7 +216,7 @@ class PublicPageContent
 
         foreach ($group['fields'] as $key => $field) {
             $rules[$key] = ($field[3] ?? null) === 'image'
-                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120']
+                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240']
                 : ['nullable', 'string', 'max:' . $field[1]];
         }
 

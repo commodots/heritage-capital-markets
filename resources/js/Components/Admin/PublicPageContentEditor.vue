@@ -1,37 +1,33 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 
 const props = defineProps({
-    groupKey: {
-        type: String,
-        required: true,
-    },
-    group: {
-        type: Object,
-        required: true,
-    },
-    settings: {
-        type: Object,
-        default: () => ({}),
-    },
+    groupKey: { type: String, required: true },
+    group: { type: Object, required: true },
+    settings: { type: Object, default: () => ({}) },
 })
 
+const page = usePage()
 const groups = computed(() => ({ [props.groupKey]: props.group }))
 const imageKeys = Object.entries(props.group.fields)
     .filter(([, field]) => field[3] === 'image')
     .map(([key]) => key)
 const imageKeySet = new Set(imageKeys)
 
+// Initialize form with all settings
 const form = reactive(Object.fromEntries(
     Object.entries(props.settings).filter(([key]) => !imageKeySet.has(key))
 ))
+
+// Track processing states and files per member or section
+const processingMembers = ref({})
+const processingIntro = ref(false)
 const imageFiles = ref({})
 const imagePreviews = ref({})
-const processing = ref(false)
 
-// Determine initial member count based on existing saved settings (defaulting to at least 6)
+// Determine initial member count (up to 12)
 const initialMemberCount = Math.max(
     6,
     ...Object.keys(props.settings)
@@ -50,37 +46,26 @@ const boardCareerFields = computed(() => boardFields.value.filter(([key]) =>
 
 const boardMemberFields = computed(() => Array.from({ length: activeMemberCount.value }, (_, index) => {
     const number = index + 1
-
     return {
         number,
-        fields: ['name', 'role', 'bio', 'image']
-            .map(part => {
-                const key = `board_member_${number}_${part}`
-                // Fallback field definition for dynamically added members beyond 6
-                const fieldDef = props.group.fields?.[key] ?? [
-                    `${part}`,
-                    true,
-                    part === 'bio',
-                    part === 'image' ? 'image' : 'text'
-                ]
-                return [key, fieldDef]
-            }),
+        fields: ['name', 'role', 'bio', 'image'].map(part => {
+            const key = `board_member_${number}_${part}`
+            const fieldDef = props.group.fields?.[key] ?? [
+                part, true, part === 'bio', part === 'image' ? 'image' : 'text'
+            ]
+            return [key, fieldDef]
+        }),
     }
 }))
 
 function addMember() {
-    if (activeMemberCount.value < 12) {
-        activeMemberCount.value++
-    }
+    if (activeMemberCount.value < 12) activeMemberCount.value++
 }
 
 function removeMember(number) {
-    // Clear form data for this member
     ['name', 'role', 'bio'].forEach(part => {
         const key = `board_member_${number}_${part}`
-        if (form[key] !== undefined) {
-            form[key] = ''
-        }
+        if (form[key] !== undefined) form[key] = ''
     })
     const imageKey = `board_member_${number}_image`
     delete imageFiles.value[imageKey]
@@ -100,7 +85,8 @@ function fieldLabel(key) {
 
 function imageUrl(path) {
     if (!path) return ''
-    return path.startsWith('/') ? path : `/storage/${path}`
+    const cleanPath = path.replace(/\.(jpg|jpeg|png|webp)\.(jpg|jpeg|png|webp)$/i, '.$1')
+    return cleanPath.startsWith('/') ? cleanPath : `/storage/${cleanPath}`
 }
 
 function selectImage(key, event) {
@@ -115,31 +101,44 @@ function selectImage(key, event) {
     imagePreviews.value[key] = URL.createObjectURL(file)
 }
 
-function submit() {
-    processing.value = true
+// Save an individual board member profile independently
+function saveMember(number) {
+    processingMembers.value[number] = true
 
-    router.post(`/admin/page-content/${props.groupKey}`, {
-        ...form,
-        ...imageFiles.value,
-    }, {
+    const payload = {}
+    
+    for (const part of ['name', 'role', 'bio']) {
+        const key = `board_member_${number}_${part}`
+        payload[key] = form[key] ?? ''
+    }
+
+    const imageKey = `board_member_${number}_image`
+    if (imageFiles.value[imageKey]) {
+        payload[imageKey] = imageFiles.value[imageKey]
+    }
+
+    router.post(`/admin/page-content/${props.groupKey}`, payload, {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
-            Object.assign(
-                form,
-                Object.fromEntries(
-                    Object.entries(props.settings).filter(([key]) => !imageKeySet.has(key))
-                )
-            )
-            Object.values(imagePreviews.value).forEach(preview => {
-                if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview)
-            })
-            imageFiles.value = {}
-            imagePreviews.value = {}
+            delete imageFiles.value[imageKey]
+            if (imagePreviews.value[imageKey]?.startsWith('blob:')) {
+                URL.revokeObjectURL(imagePreviews.value[imageKey])
+            }
+            delete imagePreviews.value[imageKey]
         },
         onFinish: () => {
-            processing.value = false
+            processingMembers.value[number] = false
         },
+    })
+}
+
+// General submit for intro/careers/other groups
+function submitGeneral() {
+    processingIntro.value = true
+    router.post(`/admin/page-content/${props.groupKey}`, form, {
+        preserveScroll: true,
+        onFinish: () => { processingIntro.value = false },
     })
 }
 </script>
@@ -153,53 +152,36 @@ function submit() {
                     <h1 class="mt-1 font-display text-3xl text-heritage-navy">{{ group.title }}</h1>
                     <p class="mt-1 text-sm text-heritage-muted">Edit the content shown on the {{ group.title }} public page.</p>
                 </div>
-                <button
-                    type="button"
-                    :disabled="processing"
-                    @click="submit"
-                    class="rounded bg-heritage-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-heritage-deep disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                    {{ processing ? 'Saving...' : 'Save Changes' }}
+                <button type="button" :disabled="processingIntro" @click="submitGeneral"
+                    class="rounded bg-heritage-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-heritage-deep disabled:cursor-not-allowed disabled:opacity-60">
+                    {{ processingIntro ? 'Saving Intro...' : 'Save Intro & General Sections' }}
                 </button>
             </div>
         </div>
 
-        <form @submit.prevent="submit" class="space-y-6 p-6 lg:p-8">
-            <section
-                v-for="(group, groupKey) in groups"
-                :key="groupKey"
-                class="overflow-hidden rounded-xl border border-heritage-border bg-white"
-            >
+        <form @submit.prevent="submitGeneral" class="space-y-6 p-6 lg:p-8">
+            <section v-for="(grp, groupKey) in groups" :key="groupKey"
+                class="overflow-hidden rounded-xl border border-heritage-border bg-white">
                 <div class="border-b border-heritage-border px-6 py-5">
                     <h2 class="font-display text-xl font-semibold text-heritage-navy">Page Content</h2>
-                    <p v-if="group.description || groupKey === 'resources'" class="mt-1 text-sm text-heritage-muted">
-                        {{ group.description || 'Market index values are edited separately under Market Indices.' }}
+                    <p v-if="grp.description || groupKey === 'resources'" class="mt-1 text-sm text-heritage-muted">
+                        {{ grp.description || 'Market index values are edited separately under Market Indices.' }}
                     </p>
                 </div>
 
                 <div v-if="groupKey === 'board'" class="space-y-8 p-6">
                     <!-- Page Intro Section -->
                     <div class="grid gap-5 md:grid-cols-2">
-                        <div
-                            v-for="[key, field] in boardIntroFields"
-                            :key="key"
-                            :class="field[2] ? 'md:col-span-2' : ''"
-                        >
+                        <div v-for="[key, field] in boardIntroFields" :key="key"
+                            :class="field[2] ? 'md:col-span-2' : ''">
                             <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">{{ fieldLabel(key) }}</label>
-                            <textarea
-                                v-if="field[2]"
-                                :id="key"
-                                v-model="form[key]"
-                                rows="3"
-                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                            ></textarea>
-                            <input
-                                v-else
-                                :id="key"
-                                v-model="form[key]"
-                                type="text"
-                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                            />
+                            <textarea v-if="field[2]" :id="key" v-model="form[key]" rows="3"
+                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
+                            <input v-else :id="key" v-model="form[key]" type="text"
+                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+                            <p v-if="page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
+                                {{ page.props.errors[key] }}
+                            </p>
                         </div>
                     </div>
 
@@ -208,79 +190,65 @@ function submit() {
                         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h3 class="font-display text-lg font-semibold text-heritage-navy">Board &amp; Management Members</h3>
-                                <p class="mt-1 text-sm text-heritage-muted">Add each member’s name, role, biography, and photo. Leave the name blank to hide that profile from the website.</p>
+                                <p class="mt-1 text-sm text-heritage-muted">Add each member’s name, role, biography, and photo. Each member can be saved individually.</p>
                             </div>
-                            <button
-                                v-if="activeMemberCount < 12"
-                                type="button"
-                                @click="addMember"
-                                class="inline-flex items-center gap-1.5 rounded border border-heritage-border bg-white px-4 py-2 text-xs font-semibold text-heritage-navy transition hover:bg-heritage-offwhite"
-                            >
+                            <button v-if="activeMemberCount < 12" type="button" @click="addMember"
+                                class="inline-flex items-center gap-1.5 rounded border border-heritage-border bg-white px-4 py-2 text-xs font-semibold text-heritage-navy transition hover:bg-heritage-offwhite">
                                 + Add Member Profile
                             </button>
                         </div>
 
                         <div class="mt-5 grid gap-5 xl:grid-cols-2">
-                            <article
-                                v-for="member in boardMemberFields"
-                                :key="member.number"
-                                class="grid gap-5 rounded-lg border border-heritage-border bg-heritage-offwhite/40 p-5 sm:grid-cols-2"
-                            >
+                            <article v-for="member in boardMemberFields" :key="member.number"
+                                class="grid gap-5 rounded-lg border border-heritage-border bg-heritage-offwhite/40 p-5 sm:grid-cols-2">
                                 <div class="sm:col-span-2 flex items-center justify-between border-b border-heritage-border/60 pb-3">
                                     <h4 class="text-sm font-semibold text-heritage-navy">Member {{ member.number }}</h4>
-                                    <button
-                                        type="button"
-                                        @click="removeMember(member.number)"
-                                        class="text-xs text-red-600 hover:underline"
-                                    >
-                                        Clear Member
-                                    </button>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" @click="removeMember(member.number)"
+                                            class="text-xs text-red-600 hover:underline">
+                                            Clear Fields
+                                        </button>
+                                        <button type="button" :disabled="processingMembers[member.number]"
+                                            @click="saveMember(member.number)"
+                                            class="rounded bg-heritage-navy px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-heritage-deep disabled:opacity-50">
+                                            {{ processingMembers[member.number] ? 'Saving...' : `Save Member ${member.number}` }}
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div
-                                    v-for="[key, field] in member.fields"
-                                    :key="key"
-                                    :class="field[2] || field[3] === 'image' ? 'sm:col-span-2' : ''"
-                                >
+                                <div v-for="[key, field] in member.fields" :key="key"
+                                    :class="field[2] || field[3] === 'image' ? 'sm:col-span-2' : ''">
                                     <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">{{ fieldLabel(key) }}</label>
-                                    
+
                                     <!-- Image Upload Field -->
                                     <div v-if="field[3] === 'image'" class="space-y-3">
-                                        <img
-                                            v-if="imagePreviews[key] || props.settings[key]"
+                                        <img v-if="imagePreviews[key] || props.settings[key]"
                                             :src="imagePreviews[key] || imageUrl(props.settings[key])"
                                             :alt="`${fieldLabel(key)} preview`"
-                                            class="h-44 w-36 rounded border border-heritage-border object-cover object-top"
-                                        />
+                                            class="h-44 w-36 rounded border border-heritage-border object-cover object-top" />
                                         <p v-else class="text-sm text-heritage-muted">No photo uploaded.</p>
-                                        <input
-                                            :id="key"
-                                            type="file"
+                                        <input :id="key" type="file"
                                             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                                             @change="selectImage(key, $event)"
-                                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition file:mr-4 file:rounded file:border-0 file:bg-white file:px-3 file:py-2 file:font-semibold file:text-heritage-navy focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                                        />
-                                        <p class="text-xs text-heritage-muted">JPG, JPEG, PNG or WebP; maximum 5 MB.</p>
+                                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition file:mr-4 file:rounded file:border-0 file:bg-white file:px-3 file:py-2 file:font-semibold file:text-heritage-navy focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+                                        <p class="text-xs text-heritage-muted">JPG, JPEG, PNG or WebP; maximum 10 MB.</p>
+                                        <p v-if="page.props.errors[key]" class="text-xs font-medium text-red-600">
+                                            {{ page.props.errors[key] }}
+                                        </p>
                                     </div>
 
                                     <!-- Bio Textarea Field -->
-                                    <textarea
-                                        v-else-if="field[2]"
-                                        :id="key"
-                                        v-model="form[key]"
-                                        rows="4"
+                                    <textarea v-else-if="field[2]" :id="key" v-model="form[key]" rows="4"
                                         placeholder="Enter board member biography..."
-                                        class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                                    ></textarea>
+                                        class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
 
                                     <!-- Standard Input Field (Name, Role) -->
-                                    <input
-                                        v-else
-                                        :id="key"
-                                        v-model="form[key]"
-                                        type="text"
-                                        class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                                    />
+                                    <input v-else :id="key" v-model="form[key]" type="text"
+                                        class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+
+                                    <p v-if="!field[3] === 'image' && page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
+                                        {{ page.props.errors[key] }}
+                                    </p>
                                 </div>
                             </article>
                         </div>
@@ -288,63 +256,36 @@ function submit() {
 
                     <!-- Careers Section Fields -->
                     <div class="grid gap-5 border-t border-heritage-border pt-6 md:grid-cols-2">
-                        <div
-                            v-for="[key, field] in boardCareerFields"
-                            :key="key"
-                            :class="field[2] ? 'md:col-span-2' : ''"
-                        >
+                        <div v-for="[key, field] in boardCareerFields" :key="key"
+                            :class="field[2] ? 'md:col-span-2' : ''">
                             <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">{{ fieldLabel(key) }}</label>
-                            <textarea
-                                v-if="field[2]"
-                                :id="key"
-                                v-model="form[key]"
-                                rows="3"
-                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                            ></textarea>
-                            <input
-                                v-else
-                                :id="key"
-                                v-model="form[key]"
-                                type="text"
-                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                            />
+                            <textarea v-if="field[2]" :id="key" v-model="form[key]" rows="3"
+                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
+                            <input v-else :id="key" v-model="form[key]" type="text"
+                                class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+                            <p v-if="page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
+                                {{ page.props.errors[key] }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Fallback General Groups -->
                 <div v-else class="grid gap-5 p-6 md:grid-cols-2">
-                    <div v-for="(field, key) in group.fields" :key="key" :class="field[2] ? 'md:col-span-2' : ''">
+                    <div v-for="(field, key) in grp.fields" :key="key" :class="field[2] ? 'md:col-span-2' : ''">
                         <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">
                             {{ fieldLabel(key) }}
                         </label>
-                        <textarea
-                            v-if="field[2]"
-                            :id="key"
-                            v-model="form[key]"
-                            rows="3"
-                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                        ></textarea>
-                        <input
-                            v-else
-                            :id="key"
-                            v-model="form[key]"
-                            type="text"
-                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"
-                        />
+                        <textarea v-if="field[2]" :id="key" v-model="form[key]" rows="3"
+                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
+                        <input v-else :id="key" v-model="form[key]" type="text"
+                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+                        <p v-if="page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
+                            {{ page.props.errors[key] }}
+                        </p>
                     </div>
                 </div>
             </section>
-
-            <div class="flex justify-end">
-                <button
-                    type="submit"
-                    :disabled="processing"
-                    class="rounded bg-heritage-gold px-6 py-3 text-sm font-semibold text-heritage-deep transition hover:bg-heritage-gold-light disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                    {{ processing ? 'Saving...' : 'Save Changes' }}
-                </button>
-            </div>
         </form>
     </AdminLayout>
 </template>

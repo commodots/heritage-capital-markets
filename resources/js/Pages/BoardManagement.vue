@@ -5,13 +5,20 @@ import SeoHead from '@/Components/SeoHead.vue'
 import teamImage from '@/assets/about/heritage-team.jpg'
 import receptionImage from '@/assets/about/heritage-reception.jpg'
 
-const memberNumbers = [1, 2, 3, 4, 5, 6]
 
-// Track which member bios are currently expanded
+const memberNumbers = Array.from({ length: 12 }, (_, i) => i + 1)
+
+
 const expandedBios = ref({})
 
 const toggleBio = (number) => {
     expandedBios.value[number] = !expandedBios.value[number]
+}
+
+function imageUrl(path) {
+    if (!path) return ''
+    const cleanPath = path.replace(/\.(jpg|jpeg|png|webp)\.(jpg|jpeg|png|webp)$/i, '.$1')
+    return cleanPath.startsWith('/') ? cleanPath : `/storage/${cleanPath}`
 }
 
 defineProps({

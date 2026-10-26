@@ -32,37 +32,52 @@ class PublicPageContentController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $group)
-    {
-        $pageGroup = PublicPageContent::group($group);
-        $validated = $request->validate(PublicPageContent::validationRules($group));
-        $currentValues = PublicPageContent::groupValues($group);
+  public function update(Request $request, string $group)
+{
+    $pageGroup = PublicPageContent::group($group);
+    
+    
+    $incomingKeys = array_keys($request->all());
+    $allRules = PublicPageContent::validationRules($group);
+    $rules = collect($allRules)->only($incomingKeys)->toArray();
 
-        $replacedImages = [];
-        foreach ($pageGroup['fields'] as $key => $field) {
-            if (($field[3] ?? null) !== 'image' || ! $request->hasFile($key)) {
-                continue;
-            }
+    $validated = $request->validate($rules);
+    $currentValues = PublicPageContent::groupValues($group);
 
-            $validated[$key] = $request->file($key)->store("public-page-content/{$group}", 'public');
-            if ($currentValues[$key] ?? null) {
-                $replacedImages[] = $currentValues[$key];
+    $replacedImages = [];
+
+    
+    foreach ($validated as $key => $value) {
+        $field = $pageGroup['fields'][$key] ?? null;
+        
+        if ($field && ($field[3] ?? null) === 'image') {
+            if ($request->hasFile($key)) {
+                $validated[$key] = $request->file($key)->store("public-page-content/{$group}", 'public');
+                if ($currentValues[$key] ?? null) {
+                    $replacedImages[] = $currentValues[$key];
+                }
+            } else {
+                
+                $validated[$key] = $currentValues[$key] ?? null;
             }
         }
+    }
 
-        foreach ($pageGroup['fields'] as $key => $field) {
+    foreach ($validated as $key => $value) {
+        if (array_key_exists($key, $pageGroup['fields'])) {
             SiteSetting::updateOrCreate(
                 ['key' => $key],
-                ['value' => $validated[$key] ?? $currentValues[$key]]
+                ['value' => $value ?? '']
             );
         }
-
-        foreach (array_unique($replacedImages) as $image) {
-            if (Storage::disk('public')->exists($image)) {
-                Storage::disk('public')->delete($image);
-            }
-        }
-
-        return back()->with('success', 'Public page content updated successfully.');
     }
+
+    foreach (array_unique($replacedImages) as $image) {
+        if (Storage::disk('public')->exists($image)) {
+            Storage::disk('public')->delete($image);
+        }
+    }
+
+    return back()->with('success', 'Public page content updated successfully.');
+}
 }

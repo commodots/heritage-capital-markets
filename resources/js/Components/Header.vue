@@ -325,7 +325,7 @@ const closeMobile = () => {
                 <!-- Open Account -->
                 <a
                     href="/open-account"
-                    class="whitespace-nowrap rounded border border-heritage-gold px-4 py-2.5 text-sm font-semibold transition hover:bg-heritage-gold hover:text-heritage-navy"
+                    class="whitespace-nowrap rounded border border-heritage-gold px-3 py-2.5 text-sm font-semibold transition hover:bg-heritage-gold hover:text-heritage-navy"
                 >
                     Open an Account
                 </a>
@@ -333,7 +333,7 @@ const closeMobile = () => {
                 <!-- Investor Login -->
                 <a
                     href="/investor-login"
-                    class="flex items-center gap-2 whitespace-nowrap rounded bg-heritage-gold px-4 py-2.5 text-sm font-semibold text-heritage-navy transition hover:bg-heritage-gold-light"
+                    class="flex items-center gap-2 whitespace-nowrap rounded bg-heritage-gold px-3 py-2.5 text-sm font-semibold text-heritage-navy transition hover:bg-heritage-gold-light"
                 >
                     <svg
                         class="h-4 w-4"
@@ -347,6 +347,14 @@ const closeMobile = () => {
                     </svg>
 
                     Investor Login
+                </a>
+                <!-- Admin Login -->
+                <a
+                    href="/admin" target="_blank" rel="noopener noreferrer"
+                    class="whitespace-nowrap rounded border border-heritage-gold px-1.5 py-2.5 text-xs font-semibold transition hover:bg-heritage-gold hover:text-heritage-navy"
+                >
+
+                  Admin
                 </a>
 
             </div>
@@ -583,7 +591,7 @@ const closeMobile = () => {
                 </a>
 
                 <!-- Actions -->
-                <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
 
                     <a
                         href="/open-account"
@@ -599,6 +607,14 @@ const closeMobile = () => {
                         class="rounded bg-heritage-gold px-4 py-3 text-center font-semibold text-heritage-navy"
                     >
                         Investor Login
+                    </a>
+
+                    <a
+                        href="/admin" target="_blank" rel="noopener noreferrer"
+                        @click="closeMobile"
+                        class="rounded border border-heritage-gold px-4 py-3 text-center font-semibold"
+                    >
+                        Admin Login
                     </a>
 
                 </div>

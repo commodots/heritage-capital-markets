@@ -65,24 +65,16 @@ function url(item) {
                 <p class="mt-1 text-sm text-slate-500">Upload and manage website images.</p>
             </div>
 
-            <form
-                class="mb-8 rounded-lg border border-slate-200 bg-white p-6"
-                @submit.prevent="submit"
-            >
+            <form class="mb-8 rounded-lg border border-slate-200 bg-white p-6" @submit.prevent="submit">
                 <label for="media-file" class="mb-2 block text-sm font-medium text-slate-700">
                     Choose an image
                 </label>
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
                     <div class="min-w-0 flex-1">
-                        <input
-                            id="media-file"
-                            ref="fileInput"
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                            required
+                        <input id="media-file" ref="fileInput" type="file"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required
                             class="block w-full rounded border border-slate-300 p-3 text-sm text-slate-700 file:mr-4 file:rounded file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-medium"
-                            @change="form.file = $event.target.files?.[0] || null"
-                        >
+                            @change="form.file = $event.target.files?.[0] || null">
                         <p class="mt-2 text-xs text-slate-500">Allowed: JPG, JPEG, PNG, WebP. Maximum size: 5 MB.</p>
                         <p v-if="form.errors.file" class="mt-2 text-sm text-red-600">{{ form.errors.file }}</p>
                     </div>
@@ -93,19 +85,12 @@ function url(item) {
             </form>
 
             <div v-if="media.length" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                <article
-                    v-for="item in media"
-                    :key="item.id"
-                    class="overflow-hidden rounded-lg border border-slate-200 bg-white"
-                >
+                <article v-for="item in media" :key="item.id"
+                    class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                     <a :href="url(item)" target="_blank" rel="noopener noreferrer" class="block">
                         <div class="flex h-48 items-center justify-center bg-slate-50">
-                            <img
-                                :src="url(item)"
-                                :alt="item.alt_text || fileName(item)"
-                                class="h-full w-full object-cover"
-                                loading="lazy"
-                            >
+                            <img :src="url(item)" :alt="item.alt_text || fileName(item)"
+                                class="h-full w-full object-cover" loading="lazy">
                         </div>
                     </a>
                     <div class="p-4">
@@ -123,11 +108,8 @@ function url(item) {
                             </div>
                         </dl>
                         <div class="mt-4 flex justify-end border-t border-slate-100 pt-3">
-                            <button
-                                type="button"
-                                class="text-sm font-medium text-red-600 hover:underline"
-                                @click="remove(item)"
-                            >
+                            <button type="button" class="text-sm font-medium text-red-600 hover:underline"
+                                @click="remove(item)">
                                 Delete image
                             </button>
                         </div>
