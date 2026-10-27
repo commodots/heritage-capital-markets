@@ -36,9 +36,91 @@ const fieldLabels = {
   surname: 'Surname', first_name: 'First Name', other_names: 'Other Names', gender: 'Gender', date_of_birth: 'Date of Birth', mother_maiden_name: 'Mother’s Maiden Name', telephone: 'Telephone', email: 'Email Address', occupation: 'Occupation', nationality: 'Nationality', state_of_origin: 'State of Origin', lga: 'LGA', id_type: 'ID Type', id_number: 'ID Number', id_expiry: 'ID Expiry Date', residential_address: 'Residential Address', contact_address: 'Contact Address', next_of_kin_name: 'Next of Kin Name', next_of_kin_relationship: 'Relationship', next_of_kin_telephone: 'Next of Kin Telephone', next_of_kin_occupation: 'Next of Kin Occupation', bank_name: 'Bank Name', bank_account_number: 'Bank Account Number', bank_account_name: 'Bank Account Name', account_type: 'Bank Account Type', bvn: 'BVN (if applicable)', chn: 'CHN (if applicable)', company_name: 'Registered Company Name', rc_number: 'CAC Registration Number', nature_of_business: 'Nature of Business', joint_account_name: 'Joint Account Name', second_applicant_name: 'Second Applicant Full Name', minor_name: 'Minor’s Full Name', guardian_name: 'Parent/Guardian Full Name', guardian_relationship: 'Relationship to Minor', estate_name: 'Estate/Deceased Full Name', executor_name: 'Administrator/Executor Full Name', probate_reference: 'Probate/Letters of Administration Reference', additional_information: 'Additional Information'
 }
 const fileFields = ['passport_photo', 'identity_document', 'utility_bill', 'birth_certificate', 'signature']
-function setFile(key, event) { form[key] = event.target.files?.[0] ?? null }
+const fieldErrors = ref({})
+
+const stepRequired = {
+  1: {
+    individual: ['surname', 'first_name', 'date_of_birth', 'telephone', 'email', 'id_number'],
+    corporate: ['company_name', 'rc_number', 'telephone', 'email'],
+    joint: ['joint_account_name', 'second_applicant_name', 'surname', 'first_name', 'telephone', 'email'],
+    minor: ['minor_name', 'guardian_name', 'date_of_birth', 'telephone', 'email'],
+    estate: ['estate_name', 'executor_name', 'telephone', 'email'],
+  },
+  2: {
+    individual: ['next_of_kin_name', 'next_of_kin_telephone', 'residential_address'],
+    corporate: [],
+    joint: ['next_of_kin_name', 'next_of_kin_telephone', 'residential_address'],
+    minor: ['guardian_relationship', 'residential_address'],
+    estate: ['probate_reference', 'residential_address'],
+  },
+  3: {
+    all: ['bank_name', 'bank_account_number', 'bank_account_name'],
+  },
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value || '')
+}
+
+function clearFieldError(key) {
+  if (fieldErrors.value[key]) {
+    delete fieldErrors.value[key]
+  }
+}
+
+function validateStep(stepNum) {
+  fieldErrors.value = {}
+  const type = props.accountType
+  const required = []
+
+  if (stepNum === 1) required.push(...(stepRequired[1][type] || []))
+  else if (stepNum === 2) required.push(...(stepRequired[2][type] || []))
+  else if (stepNum === 3) required.push(...(stepRequired[3].all || []))
+
+  let valid = true
+  for (const key of required) {
+    const value = form[key]
+    const isEmpty = value === null || value === undefined || value === ''
+    if (key === 'email' && value && !isValidEmail(value)) {
+      fieldErrors.value[key] = 'Please enter a valid email address.'
+      valid = false
+    } else if (isEmpty) {
+      fieldErrors.value[key] = `${(fieldLabels[key] || key).replaceAll('_', ' ')} is required.`
+      valid = false
+    }
+  }
+  return valid
+}
+
+function validateAllRequired() {
+  const type = props.accountType
+  let valid = true
+  for (const stepNum of [1, 2, 3]) {
+    const fields = stepNum === 3 ? stepRequired[3].all : (stepRequired[stepNum][type] || [])
+    for (const key of fields) {
+      const value = form[key]
+      const isEmpty = value === null || value === undefined || value === ''
+      if (key === 'email' && value && !isValidEmail(value)) {
+        fieldErrors.value[key] = 'Please enter a valid email address.'
+        valid = false
+      } else if (isEmpty) {
+        fieldErrors.value[key] = `${(fieldLabels[key] || key).replaceAll('_', ' ')} is required.`
+        valid = false
+      }
+    }
+  }
+  return valid
+}
+
+function setFile(key, event) {
+  form[key] = event.target.files?.[0] ?? null
+  clearFieldError(key)
+}
+
 function saveStep(nextStep) {
   errorMessage.value = ''
+  if (!validateStep(step.value)) return
+
   const payload = new FormData()
   payload.append('step', String(step.value))
   if (applicationId.value) payload.append('application_id', String(applicationId.value))
@@ -55,8 +137,18 @@ function saveStep(nextStep) {
     }, onError: errors => { errorMessage.value = Object.values(errors)[0] || 'Please check the form and try again.' }
   })
 }
+
 function submitApplication() {
   if (!applicationId.value) { errorMessage.value = 'Save your application before submitting.'; return }
+  if (!form.declaration_accepted) {
+    fieldErrors.value.declaration_accepted = 'You must accept the declaration to submit.'
+    errorMessage.value = 'Please accept the declaration.'
+    return
+  }
+  if (!validateAllRequired()) {
+    errorMessage.value = 'Please complete the required fields before submitting.'
+    return
+  }
   router.post(`/open-account/${props.accountType}/submit`, { application_id: applicationId.value, declaration_accepted: form.declaration_accepted ? 1 : 0 }, { onError: errors => { errorMessage.value = Object.values(errors)[0] || 'Please accept the declaration.' } })
 }
 </script>
@@ -96,22 +188,27 @@ function submitApplication() {
             <template v-for="key in visibleSections.slice(0, 14)" :key="key">
               <label v-if="fieldLabels[key]" class="block"><span class="text-sm font-semibold text-heritage-navy">{{
                   fieldLabels[key] }}</span>
-                <select v-if="key === 'gender'" v-model="form[key]" class="mt-2 w-full border border-slate-300 px-3 py-3">
+                <select v-if="key === 'gender'" v-model="form[key]" class="mt-2 w-full border px-3 py-3 focus:border-heritage-gold focus:outline-none" :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)">
                   <option value="">Select gender</option>
                   <option>Female</option>
                   <option>Male</option>
                   <option>Prefer not to say</option>
                 </select>
+                <span v-if="fieldErrors[key] && key === 'gender'" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
                 <select v-else-if="key === 'id_type'" v-model="form[key]"
-                  class="mt-2 w-full border border-slate-300 px-3 py-3">
+                  class="mt-2 w-full border px-3 py-3 focus:border-heritage-gold focus:outline-none" :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)">
                   <option>NIN</option>
                   <option>International Passport</option>
                   <option>Driver’s Licence</option>
                   <option>Voter’s Card</option>
                 </select>
+                <span v-if="fieldErrors[key] && key === 'id_type'" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
                 <input v-else v-model="form[key]"
+                  @input="clearFieldError(key)"
                   :type="key === 'email' ? 'email' : (key.includes('date') || key === 'id_expiry' ? 'date' : 'text')"
-                  class="mt-2 w-full border border-slate-300 px-3 py-3 focus:border-heritage-gold focus:outline-none" />
+                  class="mt-2 w-full border px-3 py-3 focus:border-heritage-gold focus:outline-none"
+                  :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" />
+                  <span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
               </label>
             </template>
           </div>
@@ -119,7 +216,7 @@ function submitApplication() {
             <template v-for="key in visibleSections.slice(14, 24)" :key="key"><label v-if="fieldLabels[key]"
                 class="block"><span class="text-sm font-semibold text-heritage-navy">{{ fieldLabels[key] }}</span><input
                   v-model="form[key]" :type="key === 'email' ? 'email' : 'text'"
-                  class="mt-2 w-full border border-slate-300 px-3 py-3" /></label></template>
+                  class="mt-2 w-full border px-3 py-3" :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" /><span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span></label></template>
           </div>
           <div v-else-if="step === 3" class="mt-6 grid gap-5 md:grid-cols-2">
             <template
@@ -127,8 +224,8 @@ function submitApplication() {
               :key="key"><label v-if="fieldLabels[key]" class="block md:col-span-1"><span
                   class="text-sm font-semibold text-heritage-navy">{{ fieldLabels[key] }}</span><textarea
                   v-if="key === 'additional_information'" v-model="form[key]" rows="4"
-                  class="mt-2 w-full border border-slate-300 px-3 py-3"></textarea><input v-else v-model="form[key]"
-                  class="mt-2 w-full border border-slate-300 px-3 py-3" /></label></template>
+                  class="mt-2 w-full border px-3 py-3" :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)"></textarea><span v-if="fieldErrors[key] && key === 'additional_information'" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span><input v-else v-model="form[key]"
+                  class="mt-2 w-full border px-3 py-3" :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" /><span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span></label></template>
           </div>
           <div v-else class="mt-6 space-y-5">
             <p class="text-sm text-slate-600">Upload applicable supporting documents. Files are limited to PDF, JPG and
@@ -138,12 +235,12 @@ function submitApplication() {
               v-for="item in [{ key: 'passport_photo', label: 'Passport Photograph' }, { key: 'identity_document', label: 'Means of Identification' }, { key: 'utility_bill', label: 'Recent Utility Bill' }, { key: 'birth_certificate', label: 'Birth Certificate (if applicable)' }, { key: 'signature', label: 'Signature' }]"
               :key="item.key" class="block"><span class="text-sm font-semibold text-heritage-navy">{{ item.label
                 }}</span><input type="file" accept=".pdf,.jpg,.jpeg,.png"
-                class="mt-2 block w-full border border-slate-300 p-3 text-sm"
-                @change="setFile(item.key, $event)" /></label>
+                class="mt-2 block w-full border p-3 text-sm" :class="fieldErrors[item.key] ? 'border-red-500' : 'border-slate-300'"
+                @change="setFile(item.key, $event)" /><span v-if="fieldErrors[item.key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[item.key] }}</span></label>
             <label class="flex gap-3 text-sm leading-6 text-slate-700"><input v-model="form.declaration_accepted"
-                type="checkbox" class="mt-1" />I confirm that the information supplied is accurate and consent to
+                type="checkbox" class="mt-1" @input="clearFieldError('declaration_accepted')" />I confirm that the information supplied is accurate and consent to
               Heritage Capital Markets
-              processing it for account-opening review.</label>
+              processing it for account-opening review.</label><span v-if="fieldErrors.declaration_accepted" class="mt-1 block text-xs text-red-600">{{ fieldErrors.declaration_accepted }}</span>
           </div>
           <div class="mt-8 flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-6">
             <button v-if="step > 1" type="button" class="border border-slate-300 px-5 py-3 text-sm font-semibold"

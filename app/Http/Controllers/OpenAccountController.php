@@ -26,16 +26,20 @@ class OpenAccountController extends Controller
         $accountType = $validated['account_type'];
         unset($validated['account_type']);
 
-        Enquiry::create([
+        $validated['message'] = $validated['message'] ?? "No additional details provided.";
+
+        $enquiry = Enquiry::create([
             ...$validated,
             'subject' => 'Open an Account Request - ' . $accountType,
             'source' => 'open-account',
             'status' => 'new',
         ]);
 
-        return back()->with(
-            'success',
-            'Thank you. Your account request has been received. Our team will contact you with the next steps.'
-        );
+        $reference = 'HCM-' . strtoupper(substr(md5($enquiry->id . time()), 0, 8));
+
+        return Inertia::render('AccountOpening/Submitted', [
+        'reference' => $reference,
+        'accountType' => $accountType,
+    ]);
     }
 }

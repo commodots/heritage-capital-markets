@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import SeoHead from '@/Components/SeoHead.vue'
@@ -11,7 +12,24 @@ const form = useForm({
     message: '',
 })
 
+const errors = ref({})
+
+function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value || '')
+}
+
+function validate() {
+    errors.value = {}
+    if (!form.name?.trim()) errors.value.name = 'Full name is required.'
+    if (!form.email?.trim()) errors.value.email = 'Email address is required.'
+    else if (!isValidEmail(form.email)) errors.value.email = 'Please enter a valid email address.'
+    if (!form.phone?.trim()) errors.value.phone = 'Phone number is required.'
+    if (!form.account_type?.trim()) errors.value.account_type = 'Please select an account type.'
+    return Object.keys(errors.value).length === 0
+}
+
 function submit() {
+    if (!validate()) return
     form.post('/open-account')
 }
 </script>
@@ -47,28 +65,30 @@ function submit() {
                         <div class="mt-8 grid gap-5 md:grid-cols-2">
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Full Name *</span>
-                                <input v-model="form.name" type="text" class="mt-2 w-full border border-slate-300 px-4 py-3 outline-none focus:border-heritage-gold" required />
-                                <span v-if="form.errors.name" class="mt-1 block text-xs text-red-600">{{ form.errors.name }}</span>
+                                <input v-model="form.name" type="text" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.name ? 'border-red-500' : 'border-slate-300'" />
+                                <span v-if="errors.name" class="mt-1 block text-xs text-red-600">{{ errors.name }}</span>
                             </label>
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Email *</span>
-                                <input v-model="form.email" type="email" class="mt-2 w-full border border-slate-300 px-4 py-3 outline-none focus:border-heritage-gold" required />
-                                <span v-if="form.errors.email" class="mt-1 block text-xs text-red-600">{{ form.errors.email }}</span>
+                                <input v-model="form.email" type="email" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.email ? 'border-red-500' : 'border-slate-300'" />
+                                <span v-if="errors.email" class="mt-1 block text-xs text-red-600">{{ errors.email }}</span>
                             </label>
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Phone *</span>
-                                <input v-model="form.phone" type="tel" class="mt-2 w-full border border-slate-300 px-4 py-3 outline-none focus:border-heritage-gold" required />
+                                <input v-model="form.phone" type="tel" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.phone ? 'border-red-500' : 'border-slate-300'" />
+                                <span v-if="errors.phone" class="mt-1 block text-xs text-red-600">{{ errors.phone }}</span>
                             </label>
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Account Type *</span>
-                                <select v-model="form.account_type" class="mt-2 w-full border border-slate-300 px-4 py-3 outline-none focus:border-heritage-gold">
+                                <select v-model="form.account_type" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.account_type ? 'border-red-500' : 'border-slate-300'">
                                     <option>Individual / Personal</option>
                                     <option>Corporate / Institutional</option>
                                     <option>Professional / High Net Worth</option>
                                 </select>
+                                <span v-if="errors.account_type" class="mt-1 block text-xs text-red-600">{{ errors.account_type }}</span>
                             </label>
                         </div>
 
@@ -99,6 +119,33 @@ function submit() {
                         </div>
                     </aside>
                 </div>
+
+                <div class="mt-16 border-t border-slate-200 pt-12">
+    <p class="text-sm font-semibold uppercase tracking-[0.18em] mb-6">Or start a full application</p>
+    <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+        <a href="/open-account/individual"  class='block border border-slate-200 rounded-xl p-6 text-center hover:border-heritage-gold hover:bg-amber-50 transition'>
+            <span class='block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2'>Individual / Personal</span>
+            <span class='block text-heritage-navy'>Individual Account</span>
+        </a>
+        <a href="/open-account/corporate" class='block border-slate-200 rounded-xl p-6 text-center hover:border-heritage-gold hover:bg-amber-50 transition'>
+            <span class='block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2'>Corporate / Institutional</span>
+            <span class='block font-semibold text-heritage-navy'>Corporate Account</span>
+        </a>
+        <a href="/open-account/joint" class='block border border-slate-200 rounded-xl p-6 text-center hover:border-heritage-gold hover:bg-amber-50 transition'>
+            <span class='block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2'>Joint</span>
+            <span class='block font-semibold text-heritage-navy'>Joint Account</span>
+        </a>
+        <a href="/open-account/minor" class='block border border-slate-200 rounded-xl p-6 text-center hover:border-heritage-gold hover:bg-amber-50 transition'>
+            <span class='block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2'>Minor / Child</span>
+            <span class='block font-semibold text-heritage-navy'>Minor Account</span>
+        </a>
+        <a href="/open-account/estate" class='block border border-slate-200 rounded-xl p-6 text-center hover:border-heritage-gold hover:bg-amber-50 transition'>
+            <span class='block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2'>Estate / Trust</span>
+            <span class='block font-semibold text-heritage-navy'>Estate Account</span>
+        </a>
+    </div>
+    <p class='mt-6 text-xs text-slate-500 text-center'>Prefer to be contacted first? Use the request form above and our team will reach out.</p>
+</div>
             </div>
         </section>
     </PublicLayout>

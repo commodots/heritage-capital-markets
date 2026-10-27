@@ -105,7 +105,20 @@ class AccountApplicationController extends Controller
             ->firstOrFail();
         abort_unless(session()->get('account_application_'.$app->id) === $app->reference, 403);
 
-        // Full type-specific required field validation must be finalised against HCML's approved forms.
+        // Type-specific required-field validation (per HCML-approved KYC requirements).
+        $formData = $app->form_data ?? [];
+        $missing = [];
+        foreach ($this->requiredFields($type) as $field) {
+            if (blank($formData[$field] ?? null)) {
+                $missing[] = $field;
+            }
+        }
+        if (!empty($missing)) {
+            throw ValidationException::withMessages([
+                'form_data' => 'Please complete the required fields: ' . implode(', ', $missing),
+            ]);
+        }
+
         $app->status = 'submitted';
         $app->submitted_at = now();
         $app->save();
@@ -114,5 +127,36 @@ class AccountApplicationController extends Controller
             'reference' => $app->reference,
             'accountType' => $type,
         ]);
+    }
+
+    /**
+     * Required text fields per account type. Document upload requirements are
+     * enforced separately at the KYC document-review stage.
+     */
+    private function requiredFields(string $type): array
+    {
+        $common = [
+            'telephone', 'email', 'residential_address',
+            'bank_name', 'bank_account_number', 'bank_account_name',
+        ];
+
+        return match ($type) {
+            'individual' => array_merge($common, [
+                'surname', 'first_name', 'date_of_birth', 'nationality',
+                'id_type', 'id_number', 'id_expiry',
+            ]),
+            'corporate' => array_merge($common, [
+                'company_name', 'rc_number', 'nature_of_business',
+            ]),
+            'joint' => array_merge($common, [
+                'joint_account_name', 'second_applicant_name', 'surname', 'first_name',
+            ]),
+            'minor' => array_merge($common, [
+                'minor_name', 'guardian_name', 'guardian_relationship', 'date_of_birth',
+            ]),
+            'estate' => array_merge($common, [
+                'estate_name', 'executor_name', 'probate_reference',
+            ]),
+        };
     }
 }

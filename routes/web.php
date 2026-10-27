@@ -15,6 +15,7 @@ use App\Http\Controllers\DownloadsController;
 use App\Http\Controllers\PublicResourcesController;
 use App\Http\Controllers\PublicContentPageController;
 use App\Http\Controllers\OpenAccountController;
+use App\Http\Controllers\AccountApplicationController;
 use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\Admin\DashboardController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\EnquiryController;
+use App\Http\Controllers\Admin\AccountApplicationAdminController;
 use App\Http\Controllers\Admin\PublicPageContentController;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -186,6 +188,27 @@ Route::get('/open-account', [OpenAccountController::class, 'index'])
 
 Route::post('/open-account', [OpenAccountController::class, 'store'])
     ->name('open-account.store');
+
+
+/*
+|--------------------------------------------------------------------------
+| Account Opening Applications
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/open-account/{type}', [AccountApplicationController::class, 'start'])
+    ->whereIn('type', ['individual', 'corporate', 'joint', 'minor', 'estate'])
+    ->name('account-application.start');
+
+Route::post('/open-account/{type}/save-step', [AccountApplicationController::class, 'saveStep'])
+    ->whereIn('type', ['individual', 'corporate', 'joint', 'minor', 'estate'])
+    ->middleware('throttle:20,1')
+    ->name('account-application.save-step');
+
+Route::post('/open-account/{type}/submit', [AccountApplicationController::class, 'submit'])
+    ->whereIn('type', ['individual', 'corporate', 'joint', 'minor', 'estate'])
+    ->middleware('throttle:5,1')
+    ->name('account-application.submit');
 
 
 /*
@@ -482,4 +505,23 @@ Route::prefix('admin')
     */
     Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Account Applications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/account-applications', [AccountApplicationAdminController::class, 'index'])
+        ->name('admin.account-applications');
+
+    Route::get('/account-applications/{application}', [AccountApplicationAdminController::class, 'show'])
+        ->name('admin.account-applications.show');
+
+    Route::post('/account-applications/{application}', [AccountApplicationAdminController::class, 'update'])
+        ->name('admin.account-applications.update');
+
+    Route::get('/account-applications/{application}/documents/{document}', [AccountApplicationAdminController::class, 'download'])
+        ->name('admin.account-applications.documents.download');
     });
