@@ -47,7 +47,7 @@ const credibilityItems = [
 
 const stats = [
     {
-        value: '30+',
+        value: '20+',
         label: 'Years of',
         label2: 'Experience',
         icon: 'badge',

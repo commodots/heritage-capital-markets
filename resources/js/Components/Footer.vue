@@ -278,6 +278,7 @@ const socialLinks = computed(() => ({
                     <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
                     <a href="/terms-of-use" class="hover:text-white">Terms of Use</a>
                     <a href="/risk-disclosure" class="hover:text-white">Risk Disclosure</a>
+                    <a href="/admin" target="_blank" rel="noopener noreferrer" class="hover:text-white">Admin Login</a>
                 </div>
 
                 <div>

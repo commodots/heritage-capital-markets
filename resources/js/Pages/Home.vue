@@ -291,7 +291,7 @@ const researchItems = [
 
                         <div>
                             <h3 class="font-display text-base font-semibold lg:text-lg">
-                                30+ Years
+                                20+ Years
                             </h3>
 
                             <p class="mt-0.5 text-xs text-white/60">
@@ -626,7 +626,7 @@ const researchItems = [
                     <!-- Stat 1 -->
                     <div class="border-b border-heritage-border px-5 py-5 text-center md:border-b-0 md:border-r">
                         <div class="font-display text-3xl text-heritage-navy">
-                            {{ setting('homepage_stat_1_value', '30+') }}
+                            {{ setting('homepage_stat_1_value', '20+') }}
                         </div>
 
                         <div class="mt-1 text-[10px] uppercase tracking-wider text-heritage-muted">

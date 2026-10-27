@@ -27,7 +27,7 @@ const form = reactive({
         'We combine deep market knowledge, disciplined execution and a client-first approach to help investors make informed financial decisions.'
     ),
 
-    homepage_stat_1_value: setting('homepage_stat_1_value', '30+'),
+    homepage_stat_1_value: setting('homepage_stat_1_value', '20+'),
     homepage_stat_1_label: setting('homepage_stat_1_label', 'Years Experience'),
 
     homepage_stat_2_value: setting('homepage_stat_2_value', '100+'),

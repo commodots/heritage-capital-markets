@@ -184,7 +184,7 @@ class HeritageContentSeeder extends Seeder
             'homepage_why_title' => 'Built on Trust. Driven by Insight.',
             'homepage_why_description' => 'At Heritage Capital Markets, we combine market knowledge, professional expertise and a client-focused approach to help individuals and institutions make informed financial decisions.',
 
-            'homepage_stat_1_value' => '30+',
+            'homepage_stat_1_value' => '20+',
             'homepage_stat_1_label' => 'Years Experience',
 
             'homepage_stat_2_value' => '100+',

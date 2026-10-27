@@ -348,14 +348,7 @@ const closeMobile = () => {
 
                     Investor Login
                 </a>
-                <!-- Admin Login -->
-                <a
-                    href="/admin" target="_blank" rel="noopener noreferrer"
-                    class="whitespace-nowrap rounded border border-heritage-gold px-1.5 py-2.5 text-xs font-semibold transition hover:bg-heritage-gold hover:text-heritage-navy"
-                >
-
-                  Admin
-                </a>
+               
 
             </div>
 
@@ -607,14 +600,6 @@ const closeMobile = () => {
                         class="rounded bg-heritage-gold px-4 py-3 text-center font-semibold text-heritage-navy"
                     >
                         Investor Login
-                    </a>
-
-                    <a
-                        href="/admin" target="_blank" rel="noopener noreferrer"
-                        @click="closeMobile"
-                        class="rounded border border-heritage-gold px-4 py-3 text-center font-semibold"
-                    >
-                        Admin Login
                     </a>
 
                 </div>
