@@ -16,9 +16,17 @@ class AccountApplicationController extends Controller
     {
         abort_unless(in_array($type, self::TYPES, true), 404);
 
+        $application = $this->currentDraft($type);
+
         return Inertia::render('AccountOpening/Start', [
             'accountType' => $type,
             'accountTypes' => self::TYPES,
+            'accountApplication' => $application ? [
+                'id' => $application->id,
+                'reference' => $application->reference,
+                'current_step' => $application->current_step,
+                'form_data' => $application->form_data ?? [],
+            ] : null,
         ]);
     }
 
@@ -32,7 +40,12 @@ class AccountApplicationController extends Controller
             throw ValidationException::withMessages(['step' => 'Invalid application step.']);
         }
 
-        $request->merge(['form_data' => is_string($request->input('form_data')) ? json_decode($request->input('form_data'), true) : $request->input('form_data')]);
+        $request->merge([
+            'form_data' => is_string($request->input('form_data'))
+                ? json_decode($request->input('form_data'), true)
+                : $request->input('form_data'),
+        ]);
+
         $data = $request->validate([
             'application_id' => ['nullable', 'integer', 'exists:account_applications,id'],
             'step' => ['required', 'integer', 'between:1,4'],
@@ -42,13 +55,15 @@ class AccountApplicationController extends Controller
             'documents.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
 
+        $formData = $data['form_data'];
+        $this->validateFormData($formData);
+
         $app = null;
         if (!empty($data['application_id'])) {
             $app = AccountApplication::whereKey($data['application_id'])
                 ->where('account_type', $type)
                 ->where('status', 'draft')
                 ->firstOrFail();
-            // Do not let a browser submit an application ID belonging to another session/user.
             abort_unless(session()->get('account_application_'.$app->id) === $app->reference, 403);
         }
 
@@ -62,7 +77,7 @@ class AccountApplicationController extends Controller
         }
 
         $existingData = $app->form_data ?? [];
-        $app->form_data = array_replace_recursive($existingData, $data['form_data']);
+        $app->form_data = array_replace_recursive($existingData, $formData);
         $storedDocuments = $app->documents ?? [];
 
         foreach ($request->file('documents', []) as $key => $file) {
@@ -71,24 +86,32 @@ class AccountApplicationController extends Controller
             }
         }
         $app->documents = $storedDocuments;
-        $app->current_step = max($app->current_step, $step);
+        $app->current_step = max($app->current_step, min(4, $step + 1));
 
-        // Pull only display/contact fields from personal details; do not log identity data.
         $form = $app->form_data;
         $app->applicant_name = trim(implode(' ', array_filter([
             $form['surname'] ?? '', $form['first_name'] ?? '', $form['other_names'] ?? '',
-        ]))) ?: ($form['company_name'] ?? $form['estate_name'] ?? $form['joint_account_name'] ?? null);
+        ]))) ?: (
+            $form['company_name']
+            ?? $form['estate_name']
+            ?? $form['joint_account_name']
+            ?? $form['minor_name']
+            ?? null
+        );
         $app->email = $form['email'] ?? null;
         $app->phone = $form['telephone'] ?? $form['phone'] ?? null;
         $app->save();
 
         session()->put('account_application_'.$app->id, $app->reference);
+        session()->put('account_application_current_'.$type, $app->id);
 
-        return back()->with('accountApplication', [
-            'id' => $app->id,
-            'reference' => $app->reference,
-            'currentStep' => $app->current_step,
-        ])->with('success', 'Your progress has been saved securely.');
+        return back()
+            ->with('success', 'Your progress has been saved securely.')
+            ->with('accountApplication', [
+                'id' => $app->id,
+                'reference' => $app->reference,
+                'current_step' => $app->current_step,
+            ]);
     }
 
     public function submit(Request $request, string $type)
@@ -97,6 +120,8 @@ class AccountApplicationController extends Controller
         $data = $request->validate([
             'application_id' => ['required', 'integer', 'exists:account_applications,id'],
             'declaration_accepted' => ['accepted'],
+            'documents' => ['nullable', 'array'],
+            'documents.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
 
         $app = AccountApplication::whereKey($data['application_id'])
@@ -118,14 +143,28 @@ class AccountApplicationController extends Controller
                 'form_data' => 'Please complete the required fields: ' . implode(', ', $missing),
             ]);
         }
+        $this->validateFormData($formData);
 
+        $documents = $app->documents ?? [];
+        foreach ($request->file('documents', []) as $key => $file) {
+            if ($file) {
+                $documents[$key] = $file->store('account-applications/'.$app->reference, 'local');
+            }
+        }
+
+        $app->documents = $documents;
         $app->status = 'submitted';
         $app->submitted_at = now();
         $app->save();
 
-        return Inertia::render('AccountOpening/Submitted', [
+        session()->forget([
+            'account_application_'.$app->id,
+            'account_application_current_'.$type,
+        ]);
+
+        return redirect()->route('open-account.success', [
+            'type' => $type,
             'reference' => $app->reference,
-            'accountType' => $type,
         ]);
     }
 
@@ -158,5 +197,63 @@ class AccountApplicationController extends Controller
                 'estate_name', 'executor_name', 'probate_reference',
             ]),
         };
+    }
+
+    private function currentDraft(string $type): ?AccountApplication
+    {
+        $id = session()->get('account_application_current_'.$type);
+        if (!$id) {
+            return null;
+        }
+
+        $application = AccountApplication::query()
+            ->whereKey($id)
+            ->where('account_type', $type)
+            ->where('status', 'draft')
+            ->first();
+
+        if (!$application || session()->get('account_application_'.$application->id) !== $application->reference) {
+            return null;
+        }
+
+        return $application;
+    }
+
+    private function validateFormData(array $formData): void
+    {
+        $optionalRules = [
+            'email' => ['email', 'max:190'],
+            'telephone' => ['string', 'max:50'],
+            'phone' => ['string', 'max:50'],
+            'date_of_birth' => ['date'],
+            'id_expiry' => ['date'],
+            'bvn' => ['digits:11'],
+            'bank_account_number' => ['digits:10'],
+        ];
+        $rules = [];
+
+        foreach ($optionalRules as $field => $fieldRules) {
+            if (filled($formData[$field] ?? null)) {
+                $rules[$field] = $fieldRules;
+            }
+        }
+
+        if (($formData['id_type'] ?? null) === 'NIN' && filled($formData['id_number'] ?? null)) {
+            $rules['id_number'] = ['digits:11'];
+        }
+
+        if ($rules) {
+            validator($formData, $rules)->validate();
+        }
+    }
+
+    public function success(Request $request, string $type)
+    {
+        abort_unless(in_array($type, self::TYPES, true), 404);
+
+        return Inertia::render('AccountOpening/Submitted', [
+            'reference' => $request->query('reference'),
+            'accountType' => $type,
+        ]);
     }
 }

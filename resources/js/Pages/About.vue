@@ -59,7 +59,7 @@ const stats = [
         icon: 'users',
     },
     {
-        value: '₦850B+',
+        value: '₦50B+',
         label: 'Assets Under',
         label2: 'Management',
         icon: 'chart',

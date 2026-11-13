@@ -210,7 +210,8 @@ Route::post('/open-account/{type}/submit', [AccountApplicationController::class,
     ->middleware('throttle:5,1')
     ->name('account-application.submit');
 
-
+Route::get('/open-account/{type}/submitted', [AccountApplicationController::class, 'success'])
+    ->name('open-account.success');
 /*
 |--------------------------------------------------------------------------
 | Test 404

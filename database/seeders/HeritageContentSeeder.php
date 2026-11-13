@@ -190,7 +190,7 @@ class HeritageContentSeeder extends Seeder
             'homepage_stat_2_value' => '100+',
             'homepage_stat_2_label' => 'Clients Served',
 
-            'homepage_stat_3_value' => '₦850B+',
+            'homepage_stat_3_value' => '₦50B+',
             'homepage_stat_3_label' => 'Assets Under Management',
 
             'homepage_stat_4_value' => '120+',

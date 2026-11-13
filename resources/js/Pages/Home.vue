@@ -656,7 +656,7 @@ const researchItems = [
                     <!-- Stat 3 -->
                     <div class="border-b border-heritage-border px-5 py-5 text-center md:border-b-0 md:border-r">
                         <div class="font-display text-3xl text-heritage-navy">
-                            {{ setting('homepage_stat_3_value', '₦850B+') }}
+                            {{ setting('homepage_stat_3_value', '₦50B+') }}
                         </div>
 
                         <div class="mt-1 text-[10px] uppercase tracking-wider text-heritage-muted">

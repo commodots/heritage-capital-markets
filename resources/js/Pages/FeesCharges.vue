@@ -34,9 +34,7 @@ defineProps({
                 <p class="mt-5 leading-7 text-heritage-muted">
                     {{ content.fees_section_body }}
                 </p>
-                <a href="/contact-us" class="mt-7 inline-flex items-center gap-2 rounded bg-heritage-gold px-6 py-3 font-semibold text-heritage-deep transition hover:bg-heritage-gold-light">
-                    {{ content.fees_contact_button }} <span aria-hidden="true">→</span>
-                </a>
+                
             </div>
         </section>
     </PublicLayout>

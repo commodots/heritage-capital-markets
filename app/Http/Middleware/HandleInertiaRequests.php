@@ -16,6 +16,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'status' => $request->session()->get('status'),
             ],
+            'accountApplication' => fn () => $request->session()->get('accountApplication'),
             'siteSettings' => fn () => SiteSetting::query()
                 ->whereIn('key', [
                     'company_name',

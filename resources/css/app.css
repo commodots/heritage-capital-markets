@@ -2,6 +2,14 @@
 
 @import "tailwindcss";
 
+@font-face{
+    font-family: 'Palatino Linotype';
+    src: url('/public/fonts/PalatinoLinotype-Roman.woff2') format('woff2');
+    font-weight:400;
+    font-style:normal;
+    font-display:swap;
+}
+
 @theme {
     --color-heritage-navy: #061A33;
     --color-heritage-deep: #031426;
@@ -12,8 +20,8 @@
     --color-heritage-muted: #64748B;
     --color-heritage-border: #DCE2E8;
 
-    --font-display: "Playfair Display", serif;
-    --font-sans: "DM Sans", sans-serif;
+    --font-display: "Palatino Linotype", serif;
+    --font-sans: "Palatino Linotype", sans-serif;
 }
 
 html {
