@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
+import AdminSidebar from '@/Components/AdminSidebar.vue'
 
 const props = defineProps({
     indices: {
@@ -11,6 +12,7 @@ const props = defineProps({
 
 const page = usePage()
 
+const sidebarOpen = ref(false)
 const showModal = ref(false)
 const editingIndex = ref(null)
 
@@ -162,159 +164,29 @@ function flashMessage() {
 
     <div class="min-h-screen bg-slate-100">
 
-        <!-- Sidebar -->
-        <aside
-            class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-heritage-navy text-white lg:flex"
-        >
-            <div class="flex h-20 items-center border-b border-white/10 px-6">
-                <div
-                    class="flex h-10 w-10 items-center justify-center rounded-lg bg-heritage-gold text-xl font-bold text-heritage-navy"
-                >
-                    H
-                </div>
-
-                <div class="ml-3">
-                    <div class="text-sm font-bold tracking-wide">
-                        HERITAGE
-                    </div>
-
-                    <div class="text-[10px] uppercase tracking-[0.2em] text-white/50">
-                        Capital Markets
-                    </div>
-                </div>
-            </div>
-
-            <nav class="flex-1 space-y-1 px-3 py-6">
-
-                <a
-                    href="/admin"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
-                >
-                    <span class="text-lg">⌂</span>
-                    Dashboard
-                </a>
-
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
-                    Homepage
-                </div>
-
-                <a
-                    href="/admin/homepage/hero-slides"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
-                >
-                    <span class="text-lg">▣</span>
-                    Hero Slides
-                </a>
-
-                <a
-                    href="/admin/investment-solutions"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
-                >
-                    <span class="text-lg">◆</span>
-                    Investment Solutions
-                </a>
-
-                <a
-                    href="/admin/market-indices"
-                    class="flex items-center gap-3 rounded-lg bg-heritage-gold px-4 py-3 text-sm font-semibold text-heritage-navy"
-                >
-                    <span class="text-lg">↗</span>
-                    Market Indices
-                </a>
-
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
-                    Content
-                </div>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">▤</span>
-                    Pages
-                </a>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">▥</span>
-                    Research & Reports
-                </a>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">◈</span>
-                    News & Articles
-                </a>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">?</span>
-                    FAQs
-                </a>
-
-                <div class="px-4 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
-                    Administration
-                </div>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">▧</span>
-                    Media Library
-                </a>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">✉</span>
-                    Enquiries
-                </a>
-
-                <a
-                    href="#"
-                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/40"
-                >
-                    <span class="text-lg">⚙</span>
-                    Site Settings
-                </a>
-            </nav>
-
-            <div class="border-t border-white/10 p-4">
-                <div class="rounded-lg bg-white/5 p-4">
-                    <div class="text-xs text-white/40">
-                        Heritage CMS
-                    </div>
-
-                    <div class="mt-1 text-sm font-medium">
-                        Administrator
-                    </div>
-                </div>
-            </div>
-        </aside>
+        <AdminSidebar :open="sidebarOpen" @close="sidebarOpen = false" />
 
         <!-- Main -->
-        <main class="lg:pl-64">
+        <main class="lg:pl-64.5">
 
             <!-- Header -->
             <header
                 class="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur sm:px-8"
             >
-                <div>
-                    <div class="text-xs font-semibold uppercase tracking-[0.18em] text-heritage-gold">
-                        Homepage Management
+                <div class="flex items-center gap-3">
+                    <button type="button" class="rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden" aria-label="Open admin navigation" @click="sidebarOpen = true">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <div>
+                        <div class="text-xs font-semibold uppercase tracking-[0.18em] text-heritage-gold">
+                            Homepage Management
+                        </div>
+                        <h1 class="mt-1 text-xl font-bold text-heritage-navy sm:text-2xl">
+                            Market Indices
+                        </h1>
                     </div>
-
-                    <h1 class="mt-1 text-xl font-bold text-heritage-navy sm:text-2xl">
-                        Market Indices
-                    </h1>
                 </div>
 
                 <div class="flex items-center gap-3">

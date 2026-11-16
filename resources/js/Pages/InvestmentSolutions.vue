@@ -400,7 +400,7 @@ const journey = [
                             <a
                                 :href="
                                     solution.button_url ||
-                                    `/${solution.slug}`
+                                    `/investment-solutions/${solution.slug}`
                                 "
                                 class="mt-auto pt-4 text-xs font-semibold text-heritage-gold transition hover:text-heritage-navy"
                             >

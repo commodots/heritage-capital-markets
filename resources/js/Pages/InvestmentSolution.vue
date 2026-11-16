@@ -209,7 +209,7 @@ const journey = [
 
                 <div class="mt-8 grid gap-4 md:grid-cols-3">
                     <Link v-for="item in relatedSolutions" :key="item.id"
-                          :href="item.button_url || `/${item.slug}`"
+                          :href="item.button_url || `/investment-solutions/${item.slug}`"
                           class="group overflow-hidden rounded-lg border border-heritage-border bg-white transition hover:-translate-y-1 hover:shadow-lg">
                         <div class="h-36 overflow-hidden bg-heritage-navy">
                             <img v-if="item.featured_image" :src="assetUrl(item.featured_image)"

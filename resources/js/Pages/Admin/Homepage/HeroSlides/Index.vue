@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
+import { Head, useForm, usePage } from '@inertiajs/vue3'
+import AdminSidebar from '@/Components/AdminSidebar.vue'
 
 const props = defineProps({
     slides: {
@@ -11,6 +12,7 @@ const props = defineProps({
 
 const page = usePage()
 
+const sidebarOpen = ref(false)
 const showForm = ref(false)
 const editingSlide = ref(null)
 const deleteTarget = ref(null)
@@ -139,73 +141,20 @@ const statusClass = (active) =>
     <Head title="Hero Slides | Admin" />
 
     <div class="min-h-screen bg-slate-50 text-heritage-text">
-        <!-- Sidebar -->
-        <aside class="fixed inset-y-0 left-0 z-40 hidden w-64.5 flex-col bg-heritage-deep text-white lg:flex">
-            <div class="flex h-20.5 items-center border-b border-white/10 px-6">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center bg-heritage-gold font-display text-2xl font-semibold text-heritage-deep">
-                    H
-                </div>
-                <div class="ml-3 leading-none">
-                    <div class="font-display text-xl font-semibold">Heritage</div>
-                    <div class="mt-1 text-[9px] font-semibold tracking-[0.16em] text-white/65">CAPITAL MARKETS</div>
-                    <div class="mt-2 text-[9px] uppercase tracking-[0.16em] text-white/40">Admin Panel</div>
-                </div>
-            </div>
-
-            <nav class="flex-1 overflow-y-auto px-3 py-4">
-                <Link href="/admin" class="mb-5 flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-white/75 transition hover:bg-white/5 hover:text-white">
-                    <span>⌂</span>
-                    Dashboard
-                </Link>
-
-                <div class="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Content Management</div>
-
-                <div class="mt-3 space-y-1">
-                    <div class="rounded-md bg-white/10">
-                        <div class="flex items-center gap-3 border-l-4 border-heritage-gold px-3 py-2 text-sm text-white">
-                            <span>▣</span>
-                            Homepage
-                        </div>
-                        <div class="ml-7 border-l border-white/10 pl-3 pb-2">
-                            <Link href="/admin/homepage/hero-slides" class="block py-1.5 text-sm font-medium text-heritage-gold">Hero Slides</Link>
-                            <Link href="/admin/homepage/market-indices" class="block py-1.5 text-sm text-white/60 hover:text-white">Market Indices</Link>
-                            <Link href="/admin/homepage/investment-solutions" class="block py-1.5 text-sm text-white/60 hover:text-white">Investment Solutions</Link>
-                            <Link href="/admin/homepage/settings" class="block py-1.5 text-sm text-white/60 hover:text-white">Homepage Settings</Link>
-                        </div>
-                    </div>
-
-                    <Link href="/admin/pages" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Pages</Link>
-                    <Link href="/admin/investment-solutions" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Investment Solutions</Link>
-                    <Link href="/admin/research-reports" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Research &amp; Reports</Link>
-                    <Link href="/admin/articles" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">News &amp; Articles</Link>
-                    <Link href="/admin/events" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Events</Link>
-                    <Link href="/admin/faqs" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">FAQs</Link>
-                    <Link href="/admin/media" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Media Library</Link>
-                </div>
-
-                <div class="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Communication</div>
-                <div class="mt-3 space-y-1">
-                    <Link href="/admin/enquiries" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Enquiries</Link>
-                    <Link href="/admin/newsletter-subscribers" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Newsletter Subscribers</Link>
-                </div>
-
-                <div class="mt-7 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Settings</div>
-                <div class="mt-3 space-y-1">
-                    <Link href="/admin/settings" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Site Settings</Link>
-                    <Link href="/admin/users" class="block rounded-md px-3 py-2 text-sm text-white/75 hover:bg-white/5 hover:text-white">Users</Link>
-                </div>
-            </nav>
-
-            <div class="border-t border-white/10 p-5">
-                <a href="/" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-heritage-gold hover:text-heritage-gold-light">View Website ↗</a>
-            </div>
-        </aside>
+        <AdminSidebar :open="sidebarOpen" @close="sidebarOpen = false" />
 
         <div class="lg:pl-64.5">
             <header class="sticky top-0 z-30 flex h-20.5 items-center justify-between border-b border-slate-200 bg-white/95 px-6 backdrop-blur lg:px-8">
-                <div>
-                    <div class="text-xs text-slate-400">Homepage Management</div>
-                    <h1 class="font-display text-xl font-semibold text-heritage-navy">Hero Slides</h1>
+                <div class="flex items-center gap-3">
+                    <button type="button" class="rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden" aria-label="Open admin navigation" @click="sidebarOpen = true">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <div>
+                        <div class="text-xs text-slate-400">Homepage Management</div>
+                        <h1 class="font-display text-xl font-semibold text-heritage-navy">Hero Slides</h1>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-4">

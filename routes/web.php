@@ -14,6 +14,7 @@ use App\Http\Controllers\FaqController as PublicFaqController;
 use App\Http\Controllers\DownloadsController;
 use App\Http\Controllers\PublicResourcesController;
 use App\Http\Controllers\PublicContentPageController;
+use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\OpenAccountController;
 use App\Http\Controllers\AccountApplicationController;
 use App\Http\Controllers\SearchController;
@@ -144,6 +145,9 @@ Route::get('/resources-news/{slug}', [ResourcesNewsController::class, 'show'])
 
 Route::get('/research-centre', [ResearchCentreController::class, 'index'])
     ->name('research-centre');
+
+Route::redirect('/research-centre/market-overview', '/#market-overview');
+Route::redirect('/research-centre/reports', '/research-centre');
 
 Route::get(
     '/research-centre/reports/{researchReport}',
@@ -526,3 +530,6 @@ Route::prefix('admin')
     Route::get('/account-applications/{application}/documents/{document}', [AccountApplicationAdminController::class, 'download'])
         ->name('admin.account-applications.documents.download');
     });
+
+Route::get('/{slug}', [PublicPageController::class, 'show'])
+    ->name('public-page.show');

@@ -153,7 +153,7 @@ const researchItems = [
         title: 'Research That Goes Deeper.',
         text: 'Explore analysis and perspectives across key market and investment areas.',
         image: coinsTreeImage,
-        href: '/research-centre/reports',
+        href: '/research-centre',
     },
     {
         category: 'Market Perspective',
@@ -260,8 +260,8 @@ const researchItems = [
                 <button v-for="(_, index) in heroSlides" :key="index" type="button"
                     :aria-label="`Go to slide ${index + 1}`" @click="goToSlide(index)"
                     class="h-1.5 rounded-full transition-all duration-300" :class="currentSlide === index
-                            ? 'w-9 bg-heritage-gold'
-                            : 'w-4 bg-white/40 hover:bg-white/70'
+                        ? 'w-9 bg-heritage-gold'
+                        : 'w-4 bg-white/40 hover:bg-white/70'
                         "></button>
             </div>
 
@@ -422,8 +422,8 @@ const researchItems = [
                             </div>
 
                             <div class="text-[10px] font-semibold" :class="market.is_positive
-                                    ? 'text-green-600'
-                                    : 'text-red-500'
+                                ? 'text-green-600'
+                                : 'text-red-500'
                                 ">
                                 <span class="mr-1">
                                     {{ market.is_positive ? '▲' : '▼' }}
@@ -508,7 +508,7 @@ const researchItems = [
 
                                 <a :href="item.button_url ||
                                     (item.slug
-                                        ? `/${item.slug}`
+                                        ? `/investment-solutions/${item.slug}`
                                         : '/investment-solutions')
                                     "
                                     class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-heritage-gold">
@@ -817,7 +817,7 @@ const researchItems = [
                 <!-- Research Links -->
                 <div class="mt-8 grid gap-3 md:grid-cols-3">
 
-                    <a href="/research-centre/market-overview"
+                    <a href="/#market-overview"
                         class="flex items-center justify-between rounded border border-heritage-border bg-white px-5 py-4 text-sm font-medium text-heritage-navy transition hover:border-heritage-gold">
                         <span>
                             Today's Market
@@ -829,7 +829,7 @@ const researchItems = [
                     </a>
 
 
-                    <a href="/research-centre/reports"
+                    <a href="/research-centre"
                         class="flex items-center justify-between rounded border border-heritage-border bg-white px-5 py-4 text-sm font-medium text-heritage-navy transition hover:border-heritage-gold">
                         <span>
                             Reports & Analysis
@@ -858,11 +858,11 @@ const researchItems = [
 
         </section>
 
-*
-          <!-- =========================================================
+        *
+        <!-- =========================================================
              ABOUT HERITAGE
-        ========================================================== --> 
-        
+        ========================================================== -->
+
         <section class="bg-white">
 
             <div class="mx-auto max-w-350 px-6 py-14 lg:px-12">
