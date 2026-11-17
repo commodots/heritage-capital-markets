@@ -90,7 +90,9 @@ Route::get('/terms-of-use', [PublicContentPageController::class, 'termsOfUse'])
 Route::get('/risk-disclosure', [PublicContentPageController::class, 'riskDisclosure'])
     ->name('risk-disclosure');
 
-Route::get('/investor-login', fn () => Inertia::render('InvestorLogin'))
+Route::get('/investor-login', fn () => Inertia::render('InvestorLogin', [
+    'content' => \App\Support\PublicPageContent::groupValues('investor-login'),
+]))
     ->name('investor-login');
 
 
@@ -303,11 +305,11 @@ Route::prefix('admin')
             ->name('admin.pages.destroy');
 
         Route::get('/page-content/{group}', [PublicPageContentController::class, 'edit'])
-            ->whereIn('group', ['board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
+            ->whereIn('group', ['about', 'investment-solutions', 'investment-details', 'investor-login', 'board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
             ->name('admin.page-content.edit');
 
         Route::post('/page-content/{group}', [PublicPageContentController::class, 'update'])
-            ->whereIn('group', ['board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
+            ->whereIn('group', ['about', 'investment-solutions', 'investment-details', 'investor-login', 'board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
             ->name('admin.page-content.update');
 
 

@@ -122,6 +122,10 @@ function closeSidebar() {
                     Pages
                 </a>
                 <div class="ml-8 mt-1 space-y-0.5 border-l border-white/10 pl-2">
+                    <a href="/admin/page-content/about" :class="['admin-sub-item', subItemClass('/admin/page-content/about')]">About Us</a>
+                    <a href="/admin/page-content/investment-solutions" :class="['admin-sub-item', subItemClass('/admin/page-content/investment-solutions')]">Investment Solutions Page</a>
+                    <a href="/admin/page-content/investment-details" :class="['admin-sub-item', subItemClass('/admin/page-content/investment-details')]">Solution Details</a>
+                    <a href="/admin/page-content/investor-login" :class="['admin-sub-item', subItemClass('/admin/page-content/investor-login')]">Investor Login</a>
                     <a href="/admin/page-content/board" :class="['admin-sub-item', subItemClass('/admin/page-content/board')]">Board &amp; Management</a>
                     <a href="/admin/page-content/governance" :class="['admin-sub-item', subItemClass('/admin/page-content/governance')]">Corporate Governance</a>
                     <a href="/admin/page-content/fees" :class="['admin-sub-item', subItemClass('/admin/page-content/fees')]">Fees &amp; Charges</a>

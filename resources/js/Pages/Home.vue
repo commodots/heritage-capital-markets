@@ -102,67 +102,52 @@ function stopCarousel() {
 onMounted(startCarousel)
 onBeforeUnmount(stopCarousel)
 
-/*
-|--------------------------------------------------------------------------
-| Why Heritage Benefits
-|--------------------------------------------------------------------------
-| These are intentionally retained as structured frontend content for now.
-| They can later be moved into a dedicated homepage_benefits table.
-|--------------------------------------------------------------------------
-*/
-const benefits = [
+const benefits = computed(() => [
     {
-        title: 'Proven Experience',
-        text: 'Decades of experience in Nigeria’s capital markets and a deep understanding of evolving market conditions.',
+        title: setting('homepage_benefit_1_title', 'Proven Experience'),
+        text: setting('homepage_benefit_1_text', 'Decades of experience in Nigeria’s capital markets and a deep understanding of evolving market conditions.'),
         icon: 'star',
     },
     {
-        title: 'Client Focused',
-        text: 'We put your objectives, preferences and long-term financial goals at the centre of every engagement.',
+        title: setting('homepage_benefit_2_title', 'Client Focused'),
+        text: setting('homepage_benefit_2_text', 'We put your objectives, preferences and long-term financial goals at the centre of every engagement.'),
         icon: 'users',
     },
     {
-        title: 'Market Expertise',
-        text: 'Research-driven insights and market intelligence support informed investment decisions.',
+        title: setting('homepage_benefit_3_title', 'Market Expertise'),
+        text: setting('homepage_benefit_3_text', 'Research-driven insights and market intelligence support informed investment decisions.'),
         icon: 'chart',
     },
     {
-        title: 'Trust & Transparency',
-        text: 'Clear communication, disciplined processes and a strong commitment to professional standards.',
+        title: setting('homepage_benefit_4_title', 'Trust & Transparency'),
+        text: setting('homepage_benefit_4_text', 'Clear communication, disciplined processes and a strong commitment to professional standards.'),
         icon: 'shield',
     },
-]
+])
 
-/*
-|--------------------------------------------------------------------------
-| Research / Insights
-|--------------------------------------------------------------------------
-| Static presentation content for now.
-|--------------------------------------------------------------------------
-*/
-const researchItems = [
+const researchItems = computed(() => [
     {
-        category: 'Market Insights',
-        title: 'Understanding the Markets. Identifying the Opportunities.',
-        text: 'Access timely market perspectives and informed analysis.',
+        category: setting('homepage_research_1_category', 'Market Insights'),
+        title: setting('homepage_research_1_title', 'Understanding the Markets. Identifying the Opportunities.'),
+        text: setting('homepage_research_1_text', 'Access timely market perspectives and informed analysis.'),
         image: insightsImage,
         href: '/research-centre',
     },
     {
-        category: 'Special Report',
-        title: 'Research That Goes Deeper.',
-        text: 'Explore analysis and perspectives across key market and investment areas.',
+        category: setting('homepage_research_2_category', 'Special Report'),
+        title: setting('homepage_research_2_title', 'Research That Goes Deeper.'),
+        text: setting('homepage_research_2_text', 'Explore analysis and perspectives across key market and investment areas.'),
         image: coinsTreeImage,
         href: '/research-centre',
     },
     {
-        category: 'Market Perspective',
-        title: 'Stay Ahead of the Conversation.',
-        text: 'Discover news, commentary and insights from our research team.',
+        category: setting('homepage_research_3_category', 'Market Perspective'),
+        title: setting('homepage_research_3_title', 'Stay Ahead of the Conversation.'),
+        text: setting('homepage_research_3_text', 'Discover news, commentary and insights from our research team.'),
         image: futureImage,
         href: '/resources-news',
     },
-]
+])
 </script>
 
 <template>
@@ -291,11 +276,11 @@ const researchItems = [
 
                         <div>
                             <h3 class="font-display text-base font-semibold lg:text-lg">
-                                20+ Years
+                                {{ setting('homepage_highlight_1_title', '20+ Years') }}
                             </h3>
 
                             <p class="mt-0.5 text-xs text-white/60">
-                                Market Experience
+                                {{ setting('homepage_highlight_1_text', 'Market Experience') }}
                             </p>
                         </div>
 
@@ -318,11 +303,11 @@ const researchItems = [
 
                         <div>
                             <h3 class="font-display text-base font-semibold lg:text-lg">
-                                Client Focused
+                                {{ setting('homepage_highlight_2_title', 'Client Focused') }}
                             </h3>
 
                             <p class="mt-0.5 text-xs text-white/60">
-                                Solutions Built Around You
+                                {{ setting('homepage_highlight_2_text', 'Solutions Built Around You') }}
                             </p>
                         </div>
 
@@ -345,11 +330,11 @@ const researchItems = [
 
                         <div>
                             <h3 class="font-display text-base font-semibold lg:text-lg">
-                                SEC Regulated
+                                {{ setting('homepage_highlight_3_title', 'SEC Regulated') }}
                             </h3>
 
                             <p class="mt-0.5 text-xs text-white/60">
-                                Professional Standards
+                                {{ setting('homepage_highlight_3_text', 'Professional Standards') }}
                             </p>
                         </div>
 
@@ -369,11 +354,11 @@ const researchItems = [
 
                         <div>
                             <h3 class="font-display text-base font-semibold lg:text-lg">
-                                Research Driven
+                                {{ setting('homepage_highlight_4_title', 'Research Driven') }}
                             </h3>
 
                             <p class="mt-0.5 text-xs text-white/60">
-                                Insights That Matter
+                                {{ setting('homepage_highlight_4_text', 'Insights That Matter') }}
                             </p>
                         </div>
 
@@ -398,11 +383,11 @@ const researchItems = [
                     <div>
 
                         <div class="text-[10px] font-semibold uppercase tracking-[0.2em] text-heritage-gold">
-                            Market Overview
+                            {{ setting('homepage_market_eyebrow', 'Market Overview') }}
                         </div>
 
                         <h2 class="mt-1 font-display text-2xl text-heritage-navy">
-                            Today's Markets
+                            {{ setting('homepage_market_title', "Today's Markets") }}
                         </h2>
 
                     </div>
@@ -456,23 +441,21 @@ const researchItems = [
                     <div>
 
                         <div class="text-[10px] font-semibold uppercase tracking-[0.2em] text-heritage-gold">
-                            Invest With Confidence
+                            {{ setting('homepage_solutions_eyebrow', 'Invest With Confidence') }}
                         </div>
 
                         <h2 class="mt-3 font-display text-4xl leading-tight text-heritage-navy">
-                            Solutions for Today.<br />
-                            A Stronger Tomorrow.
+                            {{ setting('homepage_solutions_title_line_1', 'Solutions for Today.') }}<br />
+                            {{ setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.') }}
                         </h2>
 
                         <p class="mt-4 text-sm leading-6 text-heritage-muted">
-                            From wealth management to capital markets advisory,
-                            we provide tailored solutions to help you grow,
-                            protect and manage your wealth.
+                            {{ setting('homepage_solutions_description', 'From wealth management to capital markets advisory, we provide tailored solutions to help you grow, protect and manage your wealth.') }}
                         </p>
 
                         <a href="/investment-solutions"
                             class="mt-6 inline-flex items-center gap-2 rounded bg-heritage-gold px-5 py-2.5 text-sm font-semibold text-heritage-deep transition hover:bg-heritage-gold-light">
-                            Discover Our Solutions
+                            {{ setting('homepage_solutions_button', 'Discover Our Solutions') }}
                             <span>→</span>
                         </a>
 
@@ -702,20 +685,20 @@ const researchItems = [
                     <div>
 
                         <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">
-                            Research & Insights
+                            {{ setting('homepage_research_eyebrow', 'Research & Insights') }}
                         </div>
 
                         <h2 class="mt-2 font-display text-4xl leading-tight text-heritage-navy sm:text-5xl">
-                            Knowledge That Moves
+                            {{ setting('homepage_research_title_line_1', 'Knowledge That Moves') }}
                             <br />
-                            With the Market.
+                            {{ setting('homepage_research_title_line_2', 'With the Market.') }}
                         </h2>
 
                     </div>
 
                     <a href="/research-centre"
                         class="inline-flex items-center gap-2 text-sm font-semibold text-heritage-navy transition hover:text-heritage-gold">
-                        Explore Research
+                        {{ setting('homepage_research_button', 'Explore Research') }}
 
                         <span class="text-heritage-gold">
                             →

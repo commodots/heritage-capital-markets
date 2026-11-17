@@ -13,6 +13,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    content: {
+        type: Object,
+        default: () => ({}),
+    },
 });
 
 const seoTitle = computed(() => props.page.meta_title || props.page.title || 'About Heritage')
@@ -22,91 +26,104 @@ const seoDescription = computed(() =>
     || 'Learn about Heritage Capital Markets, our experience in Nigeria’s capital markets, and our client-focused approach.'
 )
 
-const credibilityItems = [
+const contentText = (key, fallback = '') => props.content?.[key] ?? fallback
+
+function publicImage(path, fallback) {
+    if (!path) return fallback
+    if (path.startsWith('public-page-content/')) return `/storage/${path}`
+    return path.startsWith('/') ? path : `/${path}`
+}
+
+const heroImage = computed(() => publicImage(contentText('about_image_hero'), buildingImage))
+const receptionPhoto = computed(() => publicImage(contentText('about_image_reception'), receptionImage))
+const journeyPhoto = computed(() => publicImage(contentText('about_image_journey'), journeyImage))
+const teamPhoto = computed(() => publicImage(contentText('about_image_team'), teamImage))
+
+const credibilityItems = computed(() => [
     {
-        title: 'Established Presence',
-        text: 'Decades of experience in Nigeria’s capital markets.',
+        title: contentText('about_credibility_1_title', 'Established Presence'),
+        text: contentText('about_credibility_1_body', 'Decades of experience in Nigeria’s capital markets.'),
         icon: 'crown',
     },
     {
-        title: 'Client Focused',
-        text: 'Serving individuals, corporates and institutional clients.',
+        title: contentText('about_credibility_2_title', 'Client Focused'),
+        text: contentText('about_credibility_2_body', 'Serving individuals, corporates and institutional clients.'),
         icon: 'users',
     },
     {
-        title: 'Investment Expertise',
-        text: 'Comprehensive solutions across multiple asset classes.',
+        title: contentText('about_credibility_3_title', 'Investment Expertise'),
+        text: contentText('about_credibility_3_body', 'Comprehensive solutions across multiple asset classes.'),
         icon: 'chart',
     },
     {
-        title: 'SEC Regulated',
-        text: 'Licensed and regulated by the Securities and Exchange Commission.',
+        title: contentText('about_credibility_4_title', 'SEC Regulated'),
+        text: contentText('about_credibility_4_body', 'Licensed and regulated by the Securities and Exchange Commission.'),
         icon: 'shield',
     },
-];
+])
 
-const stats = [
+const stats = computed(() => [
     {
-        value: '20+',
-        label: 'Years of',
-        label2: 'Experience',
+        value: contentText('about_stat_1_value', '20+'),
+        label: contentText('about_stat_1_label', 'Years of'),
+        label2: contentText('about_stat_1_label_2', 'Experience'),
         icon: 'badge',
     },
     {
-        value: '100+',
-        label: 'Clients',
-        label2: 'Served',
+        value: contentText('about_stat_2_value', '100+'),
+        label: contentText('about_stat_2_label', 'Clients'),
+        label2: contentText('about_stat_2_label_2', 'Served'),
         icon: 'users',
     },
     {
-        value: '₦50B+',
-        label: 'Assets Under',
-        label2: 'Management',
+        value: contentText('about_stat_3_value', '₦50B+'),
+        label: contentText('about_stat_3_label', 'Assets Under'),
+        label2: contentText('about_stat_3_label_2', 'Management'),
         icon: 'chart',
     },
     {
-        value: '120+',
-        label: 'Dedicated',
-        label2: 'Professionals',
+        value: contentText('about_stat_4_value', '120+'),
+        label: contentText('about_stat_4_label', 'Dedicated'),
+        label2: contentText('about_stat_4_label_2', 'Professionals'),
         icon: 'users',
     },
-];
+])
 
-const values = [
-    'Integrity',
-    'Excellence',
-    'Client Focus',
-    'Innovation',
-    'Teamwork',
-];
+const values = computed(() => [
+    contentText('about_value_1', 'Integrity'),
+    contentText('about_value_2', 'Excellence'),
+    contentText('about_value_3', 'Client Focus'),
+    contentText('about_value_4', 'Innovation'),
+    contentText('about_value_5', 'Teamwork'),
+])
 
-const milestones = [
+const milestones = computed(() => [
     {
-        year: '1990s',
-        title: 'Our foundation',
-        text: 'Our foundation and early growth',
+        year: contentText('about_milestone_1_year', '1990s'),
+        title: contentText('about_milestone_1_title', 'Our foundation'),
+        text: contentText('about_milestone_1_body', 'Our foundation and early growth'),
     },
     {
-        year: '2000s',
-        title: 'Expanded our',
-        text: 'Expanded our product offerings',
+        year: contentText('about_milestone_2_year', '2000s'),
+        title: contentText('about_milestone_2_title', 'Expanded our'),
+        text: contentText('about_milestone_2_body', 'Expanded our product offerings'),
     },
     {
-        year: '2010s',
-        title: 'Strengthened',
-        text: 'Strengthened market presence',
+        year: contentText('about_milestone_3_year', '2010s'),
+        title: contentText('about_milestone_3_title', 'Strengthened'),
+        text: contentText('about_milestone_3_body', 'Strengthened market presence'),
     },
     {
-        year: '2020s',
-        title: 'Greater innovation',
-        text: 'Greater innovation and digital transformation',
+        year: contentText('about_milestone_4_year', '2020s'),
+        title: contentText('about_milestone_4_title', 'Greater innovation'),
+        text: contentText('about_milestone_4_body', 'Greater innovation and digital transformation'),
     },
     {
-        year: 'Today',
-        title: 'A stronger future',
-        text: 'A stronger future for our clients',
+        year: contentText('about_milestone_5_year', 'Today'),
+        title: contentText('about_milestone_5_title', 'A stronger future'),
+        text: contentText('about_milestone_5_body', 'A stronger future for our clients'),
     },
-];
+])
 </script>
 
 <template>
@@ -124,8 +141,8 @@ const milestones = [
 
             <!-- Building -->
             <img
-                :src="buildingImage"
-                alt="Heritage Capital Markets"
+                :src="heroImage"
+                :alt="contentText('about_image_hero_alt', 'Heritage Capital Markets')"
                 class="absolute inset-0 h-full w-full object-cover object-center"
             />
 
@@ -158,21 +175,18 @@ const milestones = [
                     <div class="max-w-150 pb-16 pt-12 lg:pb-20">
 
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-heritage-gold">
-                            Our Heritage. Your Advantage.
+                            {{ contentText('about_hero_eyebrow', 'Our Heritage. Your Advantage.') }}
                         </p>
 
                         <h1 class="mt-3 font-display text-[42px] font-medium leading-[1.02] text-white sm:text-[52px] lg:text-[58px]">
-                            A Legacy of Trust.
+                            {{ contentText('about_hero_title_line_1', 'A Legacy of Trust.') }}
                             <span class="block text-heritage-gold">
-                                A Future of Possibilities.
+                                {{ contentText('about_hero_title_line_2', 'A Future of Possibilities.') }}
                             </span>
                         </h1>
 
                         <p class="mt-5 max-w-127.5 text-sm leading-6 text-white/90 sm:text-[15px]">
-                            For over three decades, Heritage Capital Markets Limited
-                            has been a trusted partner in Nigeria’s capital markets,
-                            delivering innovative investment solutions and exceptional
-                            value to our clients.
+                            {{ contentText('about_hero_description', 'For over three decades, Heritage Capital Markets Limited has been a trusted partner in Nigeria’s capital markets, delivering innovative investment solutions and exceptional value to our clients.') }}
                         </p>
 
                         <div class="mt-6 flex flex-wrap gap-3">
@@ -181,7 +195,7 @@ const milestones = [
                                 href="#our-story"
                                 class="btn-gold"
                             >
-                                Our Story
+                                {{ contentText('about_hero_primary_button', 'Our Story') }}
                                 <span>→</span>
                             </a>
 
@@ -189,7 +203,7 @@ const milestones = [
                                 href="/contact-us"
                                 class="inline-flex items-center gap-2 rounded-sm border border-heritage-gold px-5 py-3 text-sm font-semibold text-white transition hover:bg-heritage-gold/10"
                             >
-                                Talk to an Expert
+                                {{ contentText('about_hero_secondary_button', 'Talk to an Expert') }}
                                 <svg
                                     class="h-4 w-4"
                                     viewBox="0 0 24 24"
@@ -207,10 +221,10 @@ const milestones = [
                     <!-- Hero side labels -->
                     <div class="hidden self-start justify-self-end pt-12 text-right lg:block">
                         <div class="space-y-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-heritage-navy">
-                            <div>People</div>
-                            <div>Expertise</div>
-                            <div>Integrity</div>
-                            <div>Impact</div>
+                            <div>{{ contentText('about_hero_side_label_1', 'People') }}</div>
+                            <div>{{ contentText('about_hero_side_label_2', 'Expertise') }}</div>
+                            <div>{{ contentText('about_hero_side_label_3', 'Integrity') }}</div>
+                            <div>{{ contentText('about_hero_side_label_4', 'Impact') }}</div>
                         </div>
                     </div>
 
@@ -232,8 +246,8 @@ const milestones = [
                     </svg>
 
                     <div>
-                        <div class="font-medium">The Heritage Place</div>
-                        <div class="text-white/70">Lagos, Nigeria</div>
+                        <div class="font-medium">{{ contentText('about_location_name', 'The Heritage Place') }}</div>
+                        <div class="text-white/70">{{ contentText('about_location_city', 'Lagos, Nigeria') }}</div>
                     </div>
                 </div>
             </div>
@@ -350,29 +364,23 @@ const milestones = [
                     <div class="relative z-10">
 
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-heritage-gold">
-                            About Heritage
+                            {{ contentText('about_story_eyebrow', 'About Heritage') }}
                         </p>
 
                         <h2 class="mt-3 font-display text-4xl font-semibold leading-[1.05] text-heritage-navy sm:text-5xl">
-                            More Than a Firm.
+                            {{ contentText('about_story_title_line_1', 'More Than a Firm.') }}
                             <span class="block">
-                                A Lasting Impact.
+                                {{ contentText('about_story_title_line_2', 'A Lasting Impact.') }}
                             </span>
                         </h2>
 
                         <div class="mt-5 space-y-4 text-sm leading-6 text-heritage-muted">
                             <p>
-                                Founded with a clear purpose, Heritage Capital Markets Limited
-                                has consistently focused on providing reliable, innovative and
-                                client-centric investment solutions. We combine deep market
-                                knowledge with global best practices to help our clients grow,
-                                protect and manage their wealth across all market conditions.
+                                {{ contentText('about_story_paragraph_1', 'Founded with a clear purpose, Heritage Capital Markets Limited has consistently focused on providing reliable, innovative and client-centric investment solutions. We combine deep market knowledge with global best practices to help our clients grow, protect and manage their wealth across all market conditions.') }}
                             </p>
 
                             <p>
-                                Our commitment to integrity, professionalism and excellence
-                                continues to drive our reputation as a leading capital markets
-                                firm in Nigeria.
+                                {{ contentText('about_story_paragraph_2', 'Our commitment to integrity, professionalism and excellence continues to drive our reputation as a leading capital markets firm in Nigeria.') }}
                             </p>
                         </div>
 
@@ -380,7 +388,7 @@ const milestones = [
                             href="#our-story"
                             class="btn-gold mt-6"
                         >
-                            Learn More About Our Story
+                            {{ contentText('about_story_button', 'Learn More About Our Story') }}
                             <span>→</span>
                         </a>
 
@@ -392,14 +400,13 @@ const milestones = [
 
                             <div>
                                 <p class="font-display text-sm italic leading-6 text-heritage-navy">
-                                    Our success is built on the trust of our clients,
-                                    our people and the enduring values that guide us.
+                                    {{ contentText('about_story_quote', 'Our success is built on the trust of our clients, our people and the enduring values that guide us.') }}
                                 </p>
 
                                 <div class="mt-4 flex items-center gap-3">
                                     <span class="h-px w-5 bg-heritage-gold"></span>
                                     <span class="text-[11px] font-medium text-heritage-navy">
-                                        Management Team
+                                        {{ contentText('about_story_quote_byline', 'Management Team') }}
                                     </span>
                                 </div>
                             </div>
@@ -413,8 +420,8 @@ const milestones = [
 
                         <div class="overflow-hidden rounded-md">
                             <img
-                                :src="receptionImage"
-                                alt="The Heritage Place reception"
+                                :src="receptionPhoto"
+                                :alt="contentText('about_image_reception_alt', 'The Heritage Place reception')"
                                 class="h-107.5 w-full object-cover object-center transition duration-700 hover:scale-[1.02]"
                             />
                         </div>
@@ -423,7 +430,7 @@ const milestones = [
 
                             <div class="mb-3 flex items-center gap-2">
                                 <h3 class="font-display text-lg font-semibold text-heritage-navy">
-                                    At a Glance
+                                    {{ contentText('about_stats_title', 'At a Glance') }}
                                 </h3>
 
                                 <span class="mt-2 h-px w-5 bg-heritage-gold"></span>
@@ -500,9 +507,9 @@ const milestones = [
 
                         <!-- Image label -->
                         <div class="absolute bottom-0 right-0 hidden rounded-tl-md bg-heritage-deep/90 px-4 py-3 text-[10px] text-white sm:block">
-                            A Professional Environment<br />
+                            {{ contentText('about_image_label', 'A Professional Environment') }}<br />
                             <span class="text-white/65">
-                                Designed for Your Success
+                                {{ contentText('about_image_label_subtitle', 'Designed for Your Success') }}
                             </span>
                         </div>
 
@@ -541,13 +548,11 @@ const milestones = [
 
                         <div>
                             <h3 class="font-display text-lg font-semibold text-heritage-navy">
-                                Our Mission
+                                {{ contentText('about_mission_title', 'Our Mission') }}
                             </h3>
 
                             <p class="mt-2 text-xs leading-5 text-heritage-muted">
-                                To create sustainable value for our clients through
-                                innovative investment solutions, expert guidance and
-                                unwavering commitment to excellence.
+                                {{ contentText('about_mission_body', 'To create sustainable value for our clients through innovative investment solutions, expert guidance and unwavering commitment to excellence.') }}
                             </p>
                         </div>
 
@@ -572,13 +577,11 @@ const milestones = [
 
                         <div>
                             <h3 class="font-display text-lg font-semibold text-heritage-navy">
-                                Our Vision
+                                {{ contentText('about_vision_title', 'Our Vision') }}
                             </h3>
 
                             <p class="mt-2 text-xs leading-5 text-heritage-muted">
-                                To be the most trusted and respected investment firm
-                                in Africa, recognized for our integrity, expertise and
-                                client-focused solutions.
+                                {{ contentText('about_vision_body', 'To be the most trusted and respected investment firm in Africa, recognized for our integrity, expertise and client-focused solutions.') }}
                             </p>
                         </div>
 
@@ -602,7 +605,7 @@ const milestones = [
 
                         <div>
                             <h3 class="font-display text-lg font-semibold text-heritage-navy">
-                                Our Core Values
+                                {{ contentText('about_values_title', 'Our Core Values') }}
                             </h3>
 
                             <ul class="mt-2 space-y-1 text-xs text-heritage-muted">
@@ -631,7 +634,7 @@ const milestones = [
         <section class="relative overflow-hidden py-16 lg:py-20">
 
             <img
-                :src="journeyImage"
+                :src="journeyPhoto"
                 alt=""
                 class="absolute inset-0 h-full w-full object-cover object-center"
             />
@@ -644,23 +647,22 @@ const milestones = [
 
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-heritage-gold">
-                            Our Journey
+                            {{ contentText('about_journey_eyebrow', 'Our Journey') }}
                         </p>
 
                         <h2 class="mt-2 font-display text-3xl text-white">
-                            Key Milestones
+                            {{ contentText('about_journey_title', 'Key Milestones') }}
                         </h2>
 
                         <p class="mt-3 text-xs leading-5 text-white/65">
-                            A journey of growth, innovation and impact in Nigeria’s
-                            capital markets.
+                            {{ contentText('about_journey_description', 'A journey of growth, innovation and impact in Nigeria’s capital markets.') }}
                         </p>
 
                         <a
                             href="#our-story"
                             class="btn-gold mt-5"
                         >
-                            Explore Our History
+                            {{ contentText('about_journey_button', 'Explore Our History') }}
                             <span>→</span>
                         </a>
                     </div>
@@ -723,27 +725,25 @@ const milestones = [
                     <div>
 
                         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-heritage-gold">
-                            Our People
+                            {{ contentText('about_people_eyebrow', 'Our People') }}
                         </p>
 
                         <h2 class="mt-2 font-display text-3xl font-semibold leading-tight text-heritage-navy">
-                            Driven by Expertise.
+                            {{ contentText('about_people_title_line_1', 'Driven by Expertise.') }}
                             <span class="block">
-                                Focused on You.
+                                {{ contentText('about_people_title_line_2', 'Focused on You.') }}
                             </span>
                         </h2>
 
                         <p class="mt-4 text-xs leading-5 text-heritage-muted">
-                            Our team of experienced professionals brings deep market
-                            knowledge, analytical rigor and a client-focused mindset
-                            to every engagement.
+                            {{ contentText('about_people_body', 'Our team of experienced professionals brings deep market knowledge, analytical rigor and a client-focused mindset to every engagement.') }}
                         </p>
 
                         <a
                             href="/board-management"
                             class="btn-gold mt-5"
                         >
-                            Meet Our Team
+                            {{ contentText('about_people_button', 'Meet Our Team') }}
                             <span>→</span>
                         </a>
 
@@ -753,13 +753,13 @@ const milestones = [
                     <!-- Team image -->
                     <div class="relative overflow-hidden rounded-md">
                         <img
-                            :src="teamImage"
-                            alt="Heritage Capital Markets team"
+                            :src="teamPhoto"
+                            :alt="contentText('about_image_team_alt', 'Heritage Capital Markets team')"
                             class="h-62.5 w-full object-cover"
                         />
 
                         <div class="absolute bottom-0 left-0 right-0 bg-heritage-deep/80 px-4 py-3 text-[10px] text-white">
-                            Collaboration. Insight. Better Outcomes.
+                            {{ contentText('about_people_image_caption', 'Collaboration. Insight. Better Outcomes.') }}
                         </div>
                     </div>
 
@@ -769,7 +769,7 @@ const milestones = [
 
                         <div class="absolute inset-0 opacity-10">
                             <img
-                                :src="receptionImage"
+                                :src="receptionPhoto"
                                 alt=""
                                 class="h-full w-full object-cover"
                             />
@@ -778,12 +778,12 @@ const milestones = [
                         <div class="relative flex h-full flex-col justify-between p-7">
 
                             <h3 class="max-w-45 font-display text-2xl font-semibold leading-tight text-heritage-deep">
-                                Join a Team
+                                {{ contentText('about_careers_title_line_1', 'Join a Team') }}
                                 <span class="block">
-                                    That Makes
+                                    {{ contentText('about_careers_title_line_2', 'That Makes') }}
                                 </span>
                                 <span class="block">
-                                    a Difference.
+                                    {{ contentText('about_careers_title_line_3', 'a Difference.') }}
                                 </span>
                             </h3>
 
@@ -791,7 +791,7 @@ const milestones = [
                                 href="/board-management#careers"
                                 class="inline-flex w-fit items-center gap-2 rounded-sm bg-heritage-deep px-5 py-3 text-xs font-semibold text-white transition hover:bg-heritage-navy"
                             >
-                                View Careers
+                                {{ contentText('about_careers_button', 'View Careers') }}
                                 <span>→</span>
                             </a>
 

@@ -8,7 +8,13 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    content: {
+        type: Object,
+        default: () => ({}),
+    },
 })
+
+const contentText = (key, fallback = '') => props.content?.[key] ?? fallback
 
 const solutionCards = computed(() => {
     return [...props.solutions]
@@ -32,58 +38,58 @@ function assetUrl(path) {
         : `/${path}`
 }
 
-const benefits = [
+const benefits = computed(() => [
     {
-        title: 'Client-Centric Approach',
-        text: 'Your goals are our priority.',
+        title: contentText('solutions_listing_benefit_1_title', 'Client-Centric Approach'),
+        text: contentText('solutions_listing_benefit_1_body', 'Your goals are our priority.'),
         icon: 'target',
     },
     {
-        title: 'Risk Managed',
-        text: 'Disciplined investment process.',
+        title: contentText('solutions_listing_benefit_2_title', 'Risk Managed'),
+        text: contentText('solutions_listing_benefit_2_body', 'Disciplined investment process.'),
         icon: 'shield',
     },
     {
-        title: 'Data Driven',
-        text: 'Insights for smarter decisions.',
+        title: contentText('solutions_listing_benefit_3_title', 'Data Driven'),
+        text: contentText('solutions_listing_benefit_3_body', 'Insights for smarter decisions.'),
         icon: 'chart',
     },
     {
-        title: 'Trusted Partner',
-        text: "Decades of trust in Nigeria's capital markets.",
+        title: contentText('solutions_listing_benefit_4_title', 'Trusted Partner'),
+        text: contentText('solutions_listing_benefit_4_body', "Decades of trust in Nigeria's capital markets."),
         icon: 'handshake',
     },
-]
+])
 
-const journey = [
+const journey = computed(() => [
     {
         number: '01',
-        title: 'Understand',
-        text: 'We learn about your goals and risk appetite.',
+        title: contentText('solutions_listing_journey_1_title', 'Understand'),
+        text: contentText('solutions_listing_journey_1_body', 'We learn about your goals and risk appetite.'),
     },
     {
         number: '02',
-        title: 'Design',
-        text: 'We create a tailored investment strategy.',
+        title: contentText('solutions_listing_journey_2_title', 'Design'),
+        text: contentText('solutions_listing_journey_2_body', 'We create a tailored investment strategy.'),
     },
     {
         number: '03',
-        title: 'Implement',
-        text: 'We execute with discipline and precision.',
+        title: contentText('solutions_listing_journey_3_title', 'Implement'),
+        text: contentText('solutions_listing_journey_3_body', 'We execute with discipline and precision.'),
     },
     {
         number: '04',
-        title: 'Grow',
-        text: 'We monitor and adjust to keep you on track.',
+        title: contentText('solutions_listing_journey_4_title', 'Grow'),
+        text: contentText('solutions_listing_journey_4_body', 'We monitor and adjust to keep you on track.'),
     },
-]
+])
 </script>
 
 <template>
     <PublicLayout>
         <SeoHead
-            title="Investment Solutions"
-            description="Explore Heritage Capital Markets' investment and capital market solutions, designed around client objectives and investment priorities."
+            :title="contentText('solutions_listing_meta_title', 'Investment Solutions')"
+            :description="contentText('solutions_listing_meta_description', 'Explore Heritage Capital Markets’ investment and capital market solutions, designed around client objectives and investment priorities.')"
             canonical-path="/investment-solutions"
         />
 
@@ -152,18 +158,18 @@ const journey = [
                     <div
                         class="text-[10px] font-semibold uppercase tracking-[0.25em] text-heritage-gold"
                     >
-                        Investment Solutions
+                        {{ contentText('solutions_listing_hero_eyebrow', 'Investment Solutions') }}
                     </div>
 
 
                     <h1
                         class="mt-3 font-display text-4xl leading-[1.08] text-white sm:text-5xl lg:text-6xl"
                     >
-                        Tailored Solutions
+                        {{ contentText('solutions_listing_hero_title_line_1', 'Tailored Solutions') }}
                         <br />
-                        for Your
+                        {{ contentText('solutions_listing_hero_title_line_2', 'for Your') }}
                         <span class="text-heritage-gold">
-                            Financial Goals.
+                            {{ contentText('solutions_listing_hero_title_accent', 'Financial Goals.') }}
                         </span>
                     </h1>
 
@@ -171,9 +177,7 @@ const journey = [
                     <p
                         class="mt-5 max-w-xl text-base leading-7 text-white/85 lg:text-lg"
                     >
-                        Access a comprehensive range of investment solutions
-                        designed to help you grow, protect and manage your
-                        wealth through every stage of your financial journey.
+                        {{ contentText('solutions_listing_hero_description', 'Access a comprehensive range of investment solutions designed to help you grow, protect and manage your wealth through every stage of your financial journey.') }}
                     </p>
 
 
@@ -185,7 +189,7 @@ const journey = [
                             href="/open-account"
                             class="inline-flex items-center justify-center gap-3 rounded bg-heritage-gold px-6 py-3 text-sm font-semibold text-heritage-deep transition hover:bg-heritage-gold-light"
                         >
-                            Open an Account
+                            {{ contentText('solutions_listing_hero_primary_button', 'Open an Account') }}
                             <span>→</span>
                         </a>
 
@@ -194,7 +198,7 @@ const journey = [
                             href="/contact-us"
                             class="inline-flex items-center justify-center gap-3 rounded border border-heritage-gold px-6 py-3 text-sm font-semibold text-white transition hover:bg-heritage-gold/10"
                         >
-                            Talk to an Expert
+                            {{ contentText('solutions_listing_hero_secondary_button', 'Talk to an Expert') }}
                             <span>⌕</span>
                         </a>
 
@@ -211,10 +215,10 @@ const journey = [
                     <div
                         class="space-y-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80"
                     >
-                        <div>Insights</div>
-                        <div>Expertise</div>
-                        <div>Opportunity</div>
-                        <div>Real Results</div>
+                        <div>{{ contentText('solutions_listing_hero_side_label_1', 'Insights') }}</div>
+                        <div>{{ contentText('solutions_listing_hero_side_label_2', 'Expertise') }}</div>
+                        <div>{{ contentText('solutions_listing_hero_side_label_3', 'Opportunity') }}</div>
+                        <div>{{ contentText('solutions_listing_hero_side_label_4', 'Real Results') }}</div>
                     </div>
 
                 </div>
@@ -318,13 +322,13 @@ const journey = [
                         <div
                             class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold"
                         >
-                            Our Solutions
+                            {{ contentText('solutions_listing_cards_eyebrow', 'Our Solutions') }}
                         </div>
 
                         <h2
                             class="mt-2 font-display text-3xl leading-tight text-heritage-navy sm:text-4xl"
                         >
-                            Comprehensive Investment Solutions
+                            {{ contentText('solutions_listing_cards_title', 'Comprehensive Investment Solutions') }}
                         </h2>
 
                     </div>
@@ -333,9 +337,7 @@ const journey = [
                     <p
                         class="max-w-md text-sm leading-6 text-heritage-muted"
                     >
-                        From traditional investments to alternative assets,
-                        our solutions are designed to meet the needs of
-                        individual, corporate and institutional clients.
+                        {{ contentText('solutions_listing_cards_description', 'From traditional investments to alternative assets, our solutions are designed to meet the needs of individual, corporate and institutional clients.') }}
                     </p>
 
                 </div>
@@ -438,15 +440,15 @@ const journey = [
                         <div
                             class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold"
                         >
-                            Your Investment Journey
+                            {{ contentText('solutions_listing_journey_eyebrow', 'Your Investment Journey') }}
                         </div>
 
                         <h2
                             class="mt-2 font-display text-3xl leading-tight text-heritage-navy"
                         >
-                            A Clear Path
+                            {{ contentText('solutions_listing_journey_title_line_1', 'A Clear Path') }}
                             <br />
-                            to Your Goals
+                            {{ contentText('solutions_listing_journey_title_line_2', 'to Your Goals') }}
                         </h2>
 
                     </div>

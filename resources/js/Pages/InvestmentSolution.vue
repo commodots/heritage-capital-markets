@@ -7,7 +7,10 @@ import SeoHead from '@/Components/SeoHead.vue'
 const props = defineProps({
     solution: { type: Object, required: true },
     relatedSolutions: { type: Array, default: () => [] },
+    content: { type: Object, default: () => ({}) },
 })
+
+const contentText = (key, fallback = '') => props.content?.[key] ?? fallback
 
 function assetUrl(path) {
     if (!path) return ''
@@ -23,55 +26,21 @@ const pageDescription = computed(() =>
 )
 const canonicalPath = computed(() => `/investment-solutions/${encodeURIComponent(props.solution.slug)}`)
 
-const benefits = computed(() => {
-    const map = {
-        'portfolio-management': [
-            ['Personalised Strategy', 'Investment strategies aligned with your objectives, risk appetite and investment horizon.'],
-            ['Professional Oversight', 'Ongoing professional management and monitoring of your portfolio.'],
-            ['Risk Discipline', 'A structured approach to diversification, risk management and portfolio review.'],
-        ],
-        'investment-advisory': [
-            ['Independent Insight', 'Research-supported perspectives to help you evaluate investment opportunities.'],
-            ['Goal Focused', 'Advice structured around your financial objectives and investment priorities.'],
-            ['Market Intelligence', 'Professional interpretation of relevant market developments and opportunities.'],
-        ],
-        'brokerage-dealing': [
-            ['Market Access', 'Professional access to relevant capital market instruments.'],
-            ['Efficient Execution', 'Disciplined execution of transactions based on client instructions and objectives.'],
-            ['Professional Support', 'A responsive dealing team supporting your market transactions.'],
-        ],
-        'fixed-income-investments': [
-            ['Income Opportunities', 'Access to suitable fixed income opportunities based on prevailing market conditions.'],
-            ['Investment Choice', 'Consideration of different tenures and fixed income instruments.'],
-            ['Risk Awareness', 'Clear consideration of tenure, liquidity, yield and relevant risks.'],
-        ],
-        'alternative-investments': [
-            ['Diversification', 'Explore investment opportunities beyond traditional asset classes.'],
-            ['Opportunity Access', 'Identify alternative opportunities suitable for your objectives.'],
-            ['Professional Assessment', 'Structured consideration of suitability, risk and investment horizon.'],
-        ],
-        'financial-planning': [
-            ['Clear Objectives', 'Bring your financial priorities and longer-term goals into focus.'],
-            ['Structured Planning', 'Develop a practical framework for managing wealth and investments.'],
-            ['Long-Term Perspective', 'Build a plan designed around changing needs and future priorities.'],
-        ],
+const benefits = computed(() => Array.from({ length: 3 }, (_, index) => {
+    const number = index + 1
+    const key = `solution_detail_${props.solution.slug}_benefit_${number}`
+    return {
+        title: contentText(`${key}_title`, 'Tailored Approach'),
+        text: contentText(`${key}_body`, 'Solutions designed around your financial objectives and circumstances.'),
     }
+}))
 
-    const items = map[props.solution.slug] ?? [
-        ['Tailored Approach', 'Solutions designed around your financial objectives and circumstances.'],
-        ['Professional Expertise', 'Experienced professionals providing informed investment guidance.'],
-        ['Ongoing Support', 'Continued attention to your investment priorities and changing needs.'],
-    ]
-
-    return items.map(([title, text]) => ({ title, text }))
-})
-
-const journey = [
-    { number: '01', title: 'Understand', text: 'We understand your objectives, circumstances and risk appetite.' },
-    { number: '02', title: 'Recommend', text: 'We develop an approach aligned with your investment priorities.' },
-    { number: '03', title: 'Implement', text: 'We put the agreed strategy or transaction into action.' },
-    { number: '04', title: 'Review', text: 'We maintain an ongoing focus on your investment objectives.' },
-]
+const journey = computed(() => [
+    { number: '01', title: contentText('solution_detail_journey_1_title', 'Understand'), text: contentText('solution_detail_journey_1_body', 'We understand your objectives, circumstances and risk appetite.') },
+    { number: '02', title: contentText('solution_detail_journey_2_title', 'Recommend'), text: contentText('solution_detail_journey_2_body', 'We develop an approach aligned with your investment priorities.') },
+    { number: '03', title: contentText('solution_detail_journey_3_title', 'Implement'), text: contentText('solution_detail_journey_3_body', 'We put the agreed strategy or transaction into action.') },
+    { number: '04', title: contentText('solution_detail_journey_4_title', 'Review'), text: contentText('solution_detail_journey_4_body', 'We maintain an ongoing focus on your investment objectives.') },
+])
 </script>
 
 <template>
@@ -100,7 +69,7 @@ const journey = [
 
                 <div class="max-w-3xl">
                     <div class="text-[10px] font-semibold uppercase tracking-[0.25em] text-heritage-gold">
-                        Investment Solutions
+                        {{ contentText('solution_detail_hero_eyebrow', 'Investment Solutions') }}
                     </div>
                     <h1 class="mt-4 font-display text-4xl leading-[1.08] text-white sm:text-5xl lg:text-6xl">
                         {{ solution.title }}
@@ -112,11 +81,11 @@ const journey = [
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                         <Link href="/contact-us"
                               class="inline-flex items-center justify-center gap-3 rounded bg-heritage-gold px-6 py-3 text-sm font-semibold text-heritage-deep hover:bg-heritage-gold-light">
-                            Talk to an Expert <span>→</span>
+                            {{ contentText('solution_detail_talk_button', 'Talk to an Expert') }} <span>→</span>
                         </Link>
                         <Link href="/investment-solutions"
                               class="inline-flex items-center justify-center rounded border border-heritage-gold px-6 py-3 text-sm font-semibold text-white hover:bg-heritage-gold/10">
-                            All Solutions
+                            {{ contentText('solution_detail_all_button', 'All Solutions') }}
                         </Link>
                     </div>
                 </div>
@@ -127,21 +96,21 @@ const journey = [
             <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-20">
                 <div class="grid gap-10 lg:grid-cols-[1.15fr_.85fr]">
                     <div>
-                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Overview</div>
+                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ contentText('solution_detail_overview_eyebrow', 'Overview') }}</div>
                         <h2 class="mt-3 font-display text-3xl leading-tight text-heritage-navy sm:text-4xl">
-                            A solution designed around your objectives
+                                    {{ contentText('solution_detail_overview_title', 'A solution designed around your objectives') }}
                         </h2>
                         <div class="mt-6 max-w-3xl text-base leading-8 text-heritage-muted" v-html="solution.description"></div>
                     </div>
 
                     <div class="rounded-xl bg-heritage-offwhite p-7 lg:p-8">
-                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Why Heritage</div>
-                        <h3 class="mt-3 font-display text-2xl text-heritage-navy">Professional insight. Client focus.</h3>
+                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ contentText('solution_detail_why_eyebrow', 'Why Heritage') }}</div>
+                        <h3 class="mt-3 font-display text-2xl text-heritage-navy">{{ contentText('solution_detail_why_title', 'Professional insight. Client focus.') }}</h3>
                         <p class="mt-4 text-sm leading-7 text-heritage-muted">
-                            Our approach combines professional expertise, market insight and a clear understanding of client objectives.
+                            {{ contentText('solution_detail_why_body', 'Our approach combines professional expertise, market insight and a clear understanding of client objectives.') }}
                         </p>
                         <Link href="/contact-us" class="mt-6 inline-flex text-sm font-semibold text-heritage-navy hover:text-heritage-gold">
-                            Speak with our team →
+                            {{ contentText('solution_detail_why_link', 'Speak with our team') }} →
                         </Link>
                     </div>
                 </div>
@@ -151,9 +120,9 @@ const journey = [
         <section class="bg-[#F7F5EF]">
             <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-18">
                 <div class="max-w-2xl">
-                    <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">What You Can Expect</div>
+                    <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ contentText('solution_detail_benefits_eyebrow', 'What You Can Expect') }}</div>
                     <h2 class="mt-3 font-display text-3xl text-heritage-navy sm:text-4xl">
-                        Built around your financial priorities
+                        {{ contentText('solution_detail_benefits_title', 'Built around your financial priorities') }}
                     </h2>
                 </div>
 
@@ -174,9 +143,9 @@ const journey = [
             <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-18">
                 <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
                     <div>
-                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Our Approach</div>
+                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ contentText('solution_detail_journey_eyebrow', 'Our Approach') }}</div>
                         <h2 class="mt-3 font-display text-3xl leading-tight text-heritage-navy sm:text-4xl">
-                            A clear path from strategy to action
+                            {{ contentText('solution_detail_journey_title', 'A clear path from strategy to action') }}
                         </h2>
                     </div>
 
@@ -199,11 +168,11 @@ const journey = [
             <div class="mx-auto max-w-300 px-6 py-14 lg:px-12">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">Explore More</div>
-                        <h2 class="mt-2 font-display text-3xl text-heritage-navy">Other Investment Solutions</h2>
+                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ contentText('solution_detail_related_eyebrow', 'Explore More') }}</div>
+                        <h2 class="mt-2 font-display text-3xl text-heritage-navy">{{ contentText('solution_detail_related_title', 'Other Investment Solutions') }}</h2>
                     </div>
                     <Link href="/investment-solutions" class="text-sm font-semibold text-heritage-navy hover:text-heritage-gold">
-                        View All Solutions →
+                        {{ contentText('solution_detail_related_link', 'View All Solutions') }} →
                     </Link>
                 </div>
 

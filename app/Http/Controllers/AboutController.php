@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
+use App\Support\PublicPageContent;
 use Inertia\Inertia;
 
 class AboutController extends Controller
@@ -16,6 +17,7 @@ class AboutController extends Controller
 
         return Inertia::render('About', [
             'page' => $page,
+            'content' => PublicPageContent::groupValues('about'),
         ]);
     }
 }

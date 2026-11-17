@@ -12,6 +12,10 @@ use Inertia\Inertia;
 class PublicPageContentController extends Controller
 {
     private const COMPONENTS = [
+        'about' => 'Generic',
+        'investment-solutions' => 'Generic',
+        'investment-details' => 'Generic',
+        'investor-login' => 'Generic',
         'board' => 'BoardManagement',
         'governance' => 'CorporateGovernance',
         'fees' => 'FeesCharges',

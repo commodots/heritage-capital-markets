@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\InvestmentSolution;
+use App\Support\PublicPageContent;
 use Inertia\Inertia;
 
 class InvestmentSolutionController extends Controller
@@ -25,6 +26,7 @@ class InvestmentSolutionController extends Controller
         return Inertia::render('InvestmentSolution', [
             'solution' => $solution,
             'relatedSolutions' => $relatedSolutions,
+            'content' => PublicPageContent::groupValues('investment-details'),
         ]);
     }
 }

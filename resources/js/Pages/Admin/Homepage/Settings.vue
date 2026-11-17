@@ -16,7 +16,7 @@ const setting = (key, fallback = '') => {
     return props.settings?.[key] ?? fallback
 }
 
-const form = reactive({
+const formState = {
     homepage_why_eyebrow: setting('homepage_why_eyebrow', 'WHY HERITAGE'),
     homepage_why_title: setting(
         'homepage_why_title',
@@ -65,7 +65,58 @@ const form = reactive({
         'homepage_about_button',
         'Discover Our Story'
     ),
-})
+    homepage_solutions_eyebrow: setting('homepage_solutions_eyebrow', 'Invest With Confidence'),
+    homepage_solutions_title_line_1: setting('homepage_solutions_title_line_1', 'Solutions for Today.'),
+    homepage_solutions_title_line_2: setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.'),
+    homepage_solutions_description: setting(
+        'homepage_solutions_description',
+        'From wealth management to capital markets advisory, we provide tailored solutions to help you grow, protect and manage your wealth.'
+    ),
+    homepage_solutions_button: setting('homepage_solutions_button', 'Discover Our Solutions'),
+    homepage_market_eyebrow: setting('homepage_market_eyebrow', 'Market Overview'),
+    homepage_market_title: setting('homepage_market_title', "Today's Markets"),
+    homepage_research_eyebrow: setting('homepage_research_eyebrow', 'Research & Insights'),
+    homepage_research_title_line_1: setting('homepage_research_title_line_1', 'Knowledge That Moves'),
+    homepage_research_title_line_2: setting('homepage_research_title_line_2', 'With the Market.'),
+    homepage_research_button: setting('homepage_research_button', 'Explore Research'),
+}
+
+const benefitDefaults = [
+    ['Proven Experience', 'Decades of experience in Nigeria’s capital markets and a deep understanding of evolving market conditions.'],
+    ['Client Focused', 'We put your objectives, preferences and long-term financial goals at the centre of every engagement.'],
+    ['Market Expertise', 'Research-driven insights and market intelligence support informed investment decisions.'],
+    ['Trust & Transparency', 'Clear communication, disciplined processes and a strong commitment to professional standards.'],
+]
+
+const highlightDefaults = [
+    ['20+ Years', 'Market Experience'],
+    ['Client Focused', 'Solutions Built Around You'],
+    ['SEC Regulated', 'Professional Standards'],
+    ['Research Driven', 'Insights That Matter'],
+]
+
+const researchDefaults = [
+    ['Market Insights', 'Understanding the Markets. Identifying the Opportunities.', 'Access timely market perspectives and informed analysis.'],
+    ['Special Report', 'Research That Goes Deeper.', 'Explore analysis and perspectives across key market and investment areas.'],
+    ['Market Perspective', 'Stay Ahead of the Conversation.', 'Discover news, commentary and insights from our research team.'],
+]
+
+for (let index = 0; index < benefitDefaults.length; index++) {
+    const number = index + 1
+    formState[`homepage_benefit_${number}_title`] = setting(`homepage_benefit_${number}_title`, benefitDefaults[index][0])
+    formState[`homepage_benefit_${number}_text`] = setting(`homepage_benefit_${number}_text`, benefitDefaults[index][1])
+    formState[`homepage_highlight_${number}_title`] = setting(`homepage_highlight_${number}_title`, highlightDefaults[index][0])
+    formState[`homepage_highlight_${number}_text`] = setting(`homepage_highlight_${number}_text`, highlightDefaults[index][1])
+}
+
+for (let index = 0; index < researchDefaults.length; index++) {
+    const number = index + 1
+    formState[`homepage_research_${number}_category`] = setting(`homepage_research_${number}_category`, researchDefaults[index][0])
+    formState[`homepage_research_${number}_title`] = setting(`homepage_research_${number}_title`, researchDefaults[index][1])
+    formState[`homepage_research_${number}_text`] = setting(`homepage_research_${number}_text`, researchDefaults[index][2])
+}
+
+const form = reactive(formState)
 
 const submit = () => {
     processing.value = true
@@ -201,6 +252,121 @@ const submit = () => {
                                     rows="5"
                                     class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm leading-6 outline-none transition focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"
                                 ></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Homepage Highlight Strip -->
+                    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-200 px-6 py-5">
+                            <h2 class="text-base font-semibold text-slate-900">Homepage Highlights</h2>
+                            <p class="mt-1 text-sm text-slate-500">Edit the four short messages shown beneath the hero.</p>
+                        </div>
+                        <div class="grid gap-5 p-6 sm:grid-cols-2">
+                            <div v-for="number in 4" :key="number" class="space-y-4 rounded-lg border border-slate-200 p-4">
+                                <h3 class="text-sm font-semibold text-slate-800">Highlight {{ number }}</h3>
+                                <input v-model="form[`homepage_highlight_${number}_title`]" type="text"
+                                    aria-label="Highlight title"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10" />
+                                <textarea v-model="form[`homepage_highlight_${number}_text`]" rows="2"
+                                    aria-label="Highlight description"
+                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Why Heritage Benefits -->
+                    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-200 px-6 py-5">
+                            <h2 class="text-base font-semibold text-slate-900">Why Heritage Benefits</h2>
+                            <p class="mt-1 text-sm text-slate-500">Edit the four benefit cards beneath the Why Heritage introduction.</p>
+                        </div>
+                        <div class="grid gap-5 p-6 sm:grid-cols-2">
+                            <div v-for="number in 4" :key="number" class="space-y-4 rounded-lg border border-slate-200 p-4">
+                                <h3 class="text-sm font-semibold text-slate-800">Benefit {{ number }}</h3>
+                                <input v-model="form[`homepage_benefit_${number}_title`]" type="text"
+                                    aria-label="Benefit title"
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10" />
+                                <textarea v-model="form[`homepage_benefit_${number}_text`]" rows="3"
+                                    aria-label="Benefit description"
+                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none focus:border-heritage-navy focus:ring-2 focus:ring-heritage-navy/10"></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Homepage Sections -->
+                    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-200 px-6 py-5">
+                            <h2 class="text-base font-semibold text-slate-900">Investment &amp; Market Sections</h2>
+                            <p class="mt-1 text-sm text-slate-500">Edit the introduction to the investment cards and the market indices heading.</p>
+                        </div>
+                        <div class="grid gap-5 p-6 md:grid-cols-2">
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment section eyebrow</span>
+                                <input v-model="form.homepage_solutions_eyebrow" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            </label>
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment section button</span>
+                                <input v-model="form.homepage_solutions_button" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            </label>
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment heading line 1</span>
+                                <input v-model="form.homepage_solutions_title_line_1" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            </label>
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment heading line 2</span>
+                                <input v-model="form.homepage_solutions_title_line_2" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            </label>
+                            <label class="block md:col-span-2">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment description</span>
+                                <textarea v-model="form.homepage_solutions_description" rows="3" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm"></textarea>
+                            </label>
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Market section eyebrow</span>
+                                <input v-model="form.homepage_market_eyebrow" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            </label>
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Market section title</span>
+                                <input v-model="form.homepage_market_title" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            </label>
+                        </div>
+                    </section>
+
+                    <!-- Research & Insights -->
+                    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <div class="border-b border-slate-200 px-6 py-5">
+                            <h2 class="text-base font-semibold text-slate-900">Research &amp; Insights</h2>
+                            <p class="mt-1 text-sm text-slate-500">Edit the section heading and the three research cards. Their images and destinations remain managed by the site.</p>
+                        </div>
+                        <div class="space-y-6 p-6">
+                            <div class="grid gap-5 md:grid-cols-2">
+                                <label class="block">
+                                    <span class="mb-2 block text-sm font-medium text-slate-700">Eyebrow</span>
+                                    <input v-model="form.homepage_research_eyebrow" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                </label>
+                                <label class="block">
+                                    <span class="mb-2 block text-sm font-medium text-slate-700">Button label</span>
+                                    <input v-model="form.homepage_research_button" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                </label>
+                                <label class="block">
+                                    <span class="mb-2 block text-sm font-medium text-slate-700">Heading line 1</span>
+                                    <input v-model="form.homepage_research_title_line_1" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                </label>
+                                <label class="block">
+                                    <span class="mb-2 block text-sm font-medium text-slate-700">Heading line 2</span>
+                                    <input v-model="form.homepage_research_title_line_2" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                </label>
+                            </div>
+                            <div class="grid gap-5 sm:grid-cols-2">
+                                <div v-for="number in 3" :key="number" class="space-y-4 rounded-lg border border-slate-200 p-4">
+                                    <h3 class="text-sm font-semibold text-slate-800">Research card {{ number }}</h3>
+                                    <input v-model="form[`homepage_research_${number}_category`]" type="text" aria-label="Research card category" placeholder="Category"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                    <input v-model="form[`homepage_research_${number}_title`]" type="text" aria-label="Research card title" placeholder="Title"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                    <textarea v-model="form[`homepage_research_${number}_text`]" rows="3" aria-label="Research card description" placeholder="Description"
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm"></textarea>
+                                </div>
                             </div>
                         </div>
                     </section>

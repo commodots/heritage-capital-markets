@@ -43,6 +43,17 @@ const boardIntroFields = computed(() => boardFields.value.filter(([key]) =>
 const boardCareerFields = computed(() => boardFields.value.filter(([key]) =>
     key.startsWith('board_careers_')
 ))
+const generalSections = computed(() => {
+    const sections = new Map()
+
+    for (const [key, field] of boardFields.value) {
+        const title = field[4] || 'Page Content'
+        if (!sections.has(title)) sections.set(title, [])
+        sections.get(title).push([key, field])
+    }
+
+    return Array.from(sections, ([title, fields]) => ({ title, fields }))
+})
 
 const boardMemberFields = computed(() => Array.from({ length: activeMemberCount.value }, (_, index) => {
     const number = index + 1
@@ -136,8 +147,22 @@ function saveMember(number) {
 // General submit for intro/careers/other groups
 function submitGeneral() {
     processingIntro.value = true
-    router.post(`/admin/page-content/${props.groupKey}`, form, {
+    const payload = Object.fromEntries(Object.entries(form))
+    Object.assign(payload, imageFiles.value)
+
+    router.post(`/admin/page-content/${props.groupKey}`, payload, {
+        forceFormData: true,
         preserveScroll: true,
+        onSuccess: () => {
+            for (const [key, file] of Object.entries(imageFiles.value)) {
+                if (!file) continue
+                delete imageFiles.value[key]
+                if (imagePreviews.value[key]?.startsWith('blob:')) {
+                    URL.revokeObjectURL(imagePreviews.value[key])
+                }
+                delete imagePreviews.value[key]
+            }
+        },
         onFinish: () => { processingIntro.value = false },
     })
 }
@@ -154,7 +179,7 @@ function submitGeneral() {
                 </div>
                 <button type="button" :disabled="processingIntro" @click="submitGeneral"
                     class="rounded bg-heritage-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-heritage-deep disabled:cursor-not-allowed disabled:opacity-60">
-                    {{ processingIntro ? 'Saving Intro...' : 'Save Intro & General Sections' }}
+                    {{ processingIntro ? 'Saving...' : groupKey === 'board' ? 'Save Intro & General Sections' : 'Save Page Content' }}
                 </button>
             </div>
         </div>
@@ -271,19 +296,41 @@ function submitGeneral() {
                 </div>
 
                 <!-- Fallback General Groups -->
-                <div v-else class="grid gap-5 p-6 md:grid-cols-2">
-                    <div v-for="(field, key) in grp.fields" :key="key" :class="field[2] ? 'md:col-span-2' : ''">
-                        <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">
-                            {{ fieldLabel(key) }}
-                        </label>
-                        <textarea v-if="field[2]" :id="key" v-model="form[key]" rows="3"
-                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
-                        <input v-else :id="key" v-model="form[key]" type="text"
-                            class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
-                        <p v-if="page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
-                            {{ page.props.errors[key] }}
-                        </p>
-                    </div>
+                <div v-else class="space-y-8 p-6">
+                    <section v-for="section in generalSections" :key="section.title">
+                        <h3 v-if="section.title !== 'Page Content'"
+                            class="mb-4 border-b border-heritage-border pb-2 font-display text-lg font-semibold text-heritage-navy">
+                            {{ section.title }}
+                        </h3>
+                        <div class="grid gap-5 md:grid-cols-2">
+                            <div v-for="[key, field] in section.fields" :key="key"
+                                :class="field[2] || field[3] === 'image' ? 'md:col-span-2' : ''">
+                                <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">
+                                    {{ fieldLabel(key) }}
+                                </label>
+                                <div v-if="field[3] === 'image'" class="space-y-3">
+                                    <img v-if="imagePreviews[key] || props.settings[key]"
+                                        :src="imagePreviews[key] || imageUrl(props.settings[key])"
+                                        :alt="`${fieldLabel(key)} preview`"
+                                        class="max-h-56 max-w-full rounded border border-heritage-border object-cover" />
+                                    <p v-else class="text-sm text-heritage-muted">No image uploaded. The public page will use its current default image.</p>
+                                    <input :id="key" type="file"
+                                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                        @change="selectImage(key, $event)"
+                                        class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition file:mr-4 file:rounded file:border-0 file:bg-white file:px-3 file:py-2 file:font-semibold file:text-heritage-navy focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+                                    <p class="text-xs text-heritage-muted">JPG, JPEG, PNG or WebP; maximum 10 MB.</p>
+                                </div>
+                                <textarea v-else-if="field[2]" :id="key" v-model="form[key]" rows="3"
+                                    class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
+                                <input v-else :id="key" v-model="form[key]"
+                                    :type="field[3] === 'url' ? 'url' : 'text'"
+                                    class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
+                                <p v-if="page.props.errors[key]" class="mt-1 text-xs font-medium text-red-600">
+                                    {{ page.props.errors[key] }}
+                                </p>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </section>
         </form>
