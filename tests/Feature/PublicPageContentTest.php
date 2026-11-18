@@ -42,15 +42,11 @@ class PublicPageContentTest extends TestCase
             'key' => 'board_title',
             'value' => 'Our Board and Management',
         ]);
-        $this->assertDatabaseHas('site_settings', [
-            'key' => 'board_intro',
-            'value' => 'The people of Heritage bring together experience, market knowledge and a commitment to serving our clients.',
-        ]);
-
         $this->get('/board-management')
             ->assertInertia(fn (Assert $page) => $page
                 ->component('BoardManagement')
                 ->where('content.board_title', 'Our Board and Management')
+                ->where('content.board_intro', 'The people of Heritage bring together experience, market knowledge and a commitment to serving our clients.')
                 ->where('content.board_member_1_name', 'Amina Example')
                 ->where('content.board_member_1_role', 'Board Chair'));
     }
@@ -109,7 +105,10 @@ class PublicPageContentTest extends TestCase
         $this->actingAs($admin)
             ->post('/admin/page-content/board', [
                 'board_member_1_name' => 'Amina Example',
-                'board_member_1_image' => UploadedFile::fake()->image('amina.png'),
+                'board_member_1_image' => UploadedFile::fake()->createWithContent(
+                    'amina.png',
+                    base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/r1sAAAAASUVORK5CYII='),
+                ),
             ])
             ->assertRedirect()
             ->assertSessionHasNoErrors();

@@ -58,6 +58,19 @@ class AdminPermissionsTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_research_administrator_can_manage_research_and_news_but_not_other_modules(): void
+    {
+        $role = AdminRole::query()->where('name', 'Research Administrator')->firstOrFail();
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'admin_role_id' => $role->id,
+        ]);
+
+        $this->actingAs($admin)->get('/admin/research-reports')->assertOk();
+        $this->actingAs($admin)->get('/admin/articles')->assertOk();
+        $this->actingAs($admin)->get('/admin/homepage/hero-slides')->assertForbidden();
+    }
+
     public function test_super_admin_can_reactivate_a_deactivated_administrator(): void
     {
         $role = AdminRole::create([
