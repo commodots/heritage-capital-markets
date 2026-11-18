@@ -190,6 +190,22 @@ class NewsletterSubscriptionTest extends TestCase
         Queue::assertPushed(SendNewsletterCampaignToSubscriber::class, fn ($job) => $job->subscriberId === $active->id);
     }
 
+    public function test_admin_cannot_reactivate_a_subscriber_who_opted_out(): void
+    {
+        $subscriber = NewsletterSubscriber::create([
+            'email' => 'reader@example.com',
+            'is_active' => false,
+            'unsubscribed_at' => now(),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->post("/admin/newsletter-subscribers/{$subscriber->id}/toggle")
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertFalse($subscriber->fresh()->is_active);
+    }
+
     public function test_queued_campaign_delivery_rechecks_subscription_and_includes_unsubscribe_link(): void
     {
         Mail::fake();
