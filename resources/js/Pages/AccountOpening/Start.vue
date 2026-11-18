@@ -24,14 +24,32 @@ const applicationId = ref(null)
 const reference = ref('')
 const errorMessage = ref('')
 
+function emptyPerson() {
+  return {
+    name: '', residential_address: '', lga: '', city: '', state: '', country: '',
+    telephone: '', email: '', date_of_birth: '', nationality: 'Nigerian',
+    id_type: 'NIN', id_number: '', id_expiry: '',
+    state_of_origin: '', lga_of_origin: '', occupation: '', next_of_kin_name: '',
+    next_of_kin_relationship: '', next_of_kin_address: '', next_of_kin_telephone: '',
+    next_of_kin_email: '', signature_mandate: '',
+  }
+}
+
 const form = useForm({
   surname: '', first_name: '', other_names: '', gender: '', date_of_birth: '', mother_maiden_name: '',
   telephone: '', email: '', occupation: '', nationality: 'Nigerian', state_of_origin: '', lga: '',
   id_type: 'NIN', id_number: '', id_expiry: '', residential_address: '', contact_address: '',
-  next_of_kin_name: '', next_of_kin_relationship: '', next_of_kin_telephone: '', next_of_kin_occupation: '',
-  bank_name: '', bank_account_number: '', bank_account_name: '', account_type: 'Savings', bvn: '', chn: '',
-  company_name: '', rc_number: '', nature_of_business: '', joint_account_name: '', second_applicant_name: '',
-  minor_name: '', guardian_name: '', guardian_relationship: '', estate_name: '', executor_name: '', probate_reference: '',
+  next_of_kin_name: '', next_of_kin_relationship: '', next_of_kin_telephone: '',
+  next_of_kin_email: '', next_of_kin_address: '', next_of_kin_occupation: '',
+  bank_name: '', bank_branch: '', bank_account_number: '', bank_account_name: '',
+  account_type: 'Savings', account_opened_at: '', direct_cash_settlement: '', bvn: '', chn: '',
+  company_name: '', rc_number: '', date_of_registration: '', nature_of_business: '',
+  business_address: '', directors: [emptyPerson()],
+  joint_account_name: '', joint_address: '', joint_contact_number: '',
+  joint_applicants: [emptyPerson(), emptyPerson()],
+  minor_name: '', guardian_name: '', guardian_relationship: '', guardian_telephone: '',
+  guardian_occupation: '', estate_name: '', deceased_date_of_birth: '', estate_address: '',
+  administrators: [emptyPerson()],
   additional_information: '',
   declaration_accepted: false,
   passport_photo: null, identity_document: null, utility_bill: null, birth_certificate: null, signature: null,
@@ -40,28 +58,28 @@ const form = useForm({
 const fieldsByStep = {
   individual: [
     ['surname', 'first_name', 'other_names', 'gender', 'date_of_birth', 'mother_maiden_name', 'occupation', 'nationality', 'state_of_origin', 'lga', 'id_type', 'id_number', 'id_expiry'],
-    ['telephone', 'email', 'residential_address', 'contact_address', 'next_of_kin_name', 'next_of_kin_relationship', 'next_of_kin_telephone', 'next_of_kin_occupation'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn', 'chn', 'additional_information'],
+    ['telephone', 'email', 'residential_address', 'contact_address', 'next_of_kin_name', 'next_of_kin_relationship', 'next_of_kin_address', 'next_of_kin_telephone', 'next_of_kin_email', 'next_of_kin_occupation'],
+    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'direct_cash_settlement', 'bvn', 'chn', 'additional_information'],
   ],
   corporate: [
-    ['company_name', 'rc_number', 'nature_of_business'],
-    ['telephone', 'email', 'residential_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'additional_information'],
+    ['company_name', 'rc_number', 'date_of_registration', 'nature_of_business', 'business_address', 'directors'],
+    ['telephone', 'email', 'contact_address'],
+    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'direct_cash_settlement', 'bvn', 'chn', 'additional_information'],
   ],
   joint: [
-    ['joint_account_name', 'second_applicant_name', 'surname', 'first_name', 'other_names'],
-    ['telephone', 'email', 'residential_address', 'contact_address', 'next_of_kin_name', 'next_of_kin_relationship', 'next_of_kin_telephone', 'next_of_kin_occupation'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn', 'chn', 'additional_information'],
+    ['joint_account_name', 'joint_address', 'joint_contact_number', 'direct_cash_settlement'],
+    ['joint_applicants'],
+    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'bvn', 'chn', 'additional_information'],
   ],
   minor: [
-    ['minor_name', 'guardian_name', 'guardian_relationship', 'date_of_birth'],
-    ['telephone', 'email', 'residential_address', 'contact_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'additional_information'],
+    ['surname', 'other_names', 'gender', 'date_of_birth', 'residential_address', 'telephone', 'occupation', 'contact_address', 'email', 'nationality', 'state_of_origin', 'lga', 'id_type', 'id_number', 'id_expiry', 'mother_maiden_name'],
+    ['guardian_name', 'guardian_relationship', 'guardian_telephone', 'guardian_occupation'],
+    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'bvn', 'chn', 'additional_information'],
   ],
   estate: [
-    ['estate_name', 'executor_name', 'probate_reference'],
-    ['telephone', 'email', 'residential_address', 'contact_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'additional_information'],
+    ['estate_name', 'deceased_date_of_birth', 'mother_maiden_name', 'estate_address'],
+    ['administrators'],
+    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'direct_cash_settlement', 'bvn', 'chn', 'additional_information'],
   ],
 }
 
@@ -69,38 +87,81 @@ const visibleSections = computed(() => fieldsByStep[props.accountType].flat())
 const currentStepFields = computed(() => fieldsByStep[props.accountType][step.value - 1] || [])
 
 const fieldLabels = {
-  surname: 'Surname', first_name: 'First Name', other_names: 'Other Names', gender: 'Gender', date_of_birth: 'Date of Birth', mother_maiden_name: 'Mother’s Maiden Name', telephone: 'Telephone', email: 'Email Address', occupation: 'Occupation', nationality: 'Nationality', state_of_origin: 'State of Origin', lga: 'LGA', id_type: 'ID Type', id_number: 'ID Number (e.g. NIN digits)', id_expiry: 'ID Expiry Date', residential_address: 'Residential Address', contact_address: 'Contact Address', next_of_kin_name: 'Next of Kin Full Name', next_of_kin_relationship: 'Next of Kin Relationship', next_of_kin_telephone: 'Next of Kin Telephone', next_of_kin_occupation: 'Next of Kin Occupation', bank_name: 'Settlement Bank Name', bank_account_number: 'Bank Account Number (10 digits)', bank_account_name: 'Bank Account Name (Must match BVN)', account_type: 'Account Category', bvn: 'Bank Verification Number (BVN - 11 digits)', chn: 'Clearing House Number (CHN if applicable)', company_name: 'Registered Company Name', rc_number: 'CAC Registration Number', nature_of_business: 'Nature of Business', joint_account_name: 'Joint Account Name', second_applicant_name: 'Second Applicant Full Name', minor_name: 'Minor’s Full Name', guardian_name: 'Parent/Guardian Full Name', guardian_relationship: 'Relationship to Minor', estate_name: 'Estate/Deceased Full Name', executor_name: 'Administrator/Executor Full Name', probate_reference: 'Probate/Letters of Administration Reference', additional_information: 'Additional Information / Special Instructions'
+  surname: 'Surname', first_name: 'First Name', other_names: 'Other Names', gender: 'Gender',
+  date_of_birth: 'Date of Birth', deceased_date_of_birth: 'Date of Birth (Deceased)',
+  mother_maiden_name: 'Mother’s Maiden Name', telephone: 'Telephone', email: 'Email Address',
+  occupation: 'Occupation', nationality: 'Nationality', state_of_origin: 'State of Origin',
+  lga: 'LGA', id_type: 'Means of Identification', id_number: 'ID Number (NIN: 11 digits)',
+  id_expiry: 'ID Expiry Date', residential_address: 'Residential Address',
+  contact_address: 'Contact Address', next_of_kin_name: 'Next of Kin Name',
+  next_of_kin_relationship: 'Next of Kin Relationship', next_of_kin_telephone: 'Next of Kin Telephone',
+  next_of_kin_email: 'Next of Kin Email', next_of_kin_address: 'Next of Kin Address',
+  next_of_kin_occupation: 'Next of Kin Occupation', bank_name: 'Bank Name',
+  bank_branch: 'Bank Branch', bank_account_number: 'Bank Account Number (10 digits)',
+  bank_account_name: 'Bank Account Name', account_type: 'Account Type',
+  account_opened_at: 'Date Account Was Opened', direct_cash_settlement: 'Direct Cash Settlement',
+  bvn: 'Bank Verification Number (BVN - 11 digits)', chn: 'Clearing House Number (CHN)',
+  company_name: 'Company Name', rc_number: 'RC Number', date_of_registration: 'Date of Registration',
+  nature_of_business: 'Nature of Business', business_address: 'Business Address',
+  joint_account_name: 'Name of Joint Account', joint_address: 'Joint Account Address',
+  joint_contact_number: 'Joint Account Contact Number', minor_name: 'Minor’s Full Name',
+  guardian_name: 'Guardian’s Name', guardian_relationship: 'Relationship to Minor',
+  guardian_telephone: 'Guardian’s Telephone', guardian_occupation: 'Guardian’s Occupation',
+  estate_name: 'Estate Name', estate_address: 'Estate Address',
+  additional_information: 'Additional Information / Special Instructions',
+  directors: 'Company Directors / Signatories', joint_applicants: 'Joint Account Holders',
+  administrators: 'Estate Administrators',
 }
+
+const personFieldLabels = {
+  name: 'Full Name', residential_address: 'Residential Address', lga: 'LGA',
+  city: 'City', state: 'State', country: 'Country', telephone: 'Mobile Number',
+  email: 'Email Address', date_of_birth: 'Date of Birth', nationality: 'Nationality',
+  id_type: 'Means of Identification', id_number: 'ID Number (NIN: 11 digits)', id_expiry: 'ID Expiry Date',
+  state_of_origin: 'State of Origin', lga_of_origin: 'LGA of Origin', occupation: 'Occupation',
+  next_of_kin_name: 'Next of Kin Name', next_of_kin_relationship: 'Next of Kin Relationship',
+  next_of_kin_address: 'Next of Kin Address', next_of_kin_telephone: 'Next of Kin Telephone',
+  next_of_kin_email: 'Next of Kin Email', signature_mandate: 'Signature Mandate',
+}
+
+const personFields = Object.keys(personFieldLabels)
 
 const requiredFieldsByStep = {
   individual: [
     ['surname', 'first_name', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry'],
     ['telephone', 'email', 'residential_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn'],
+    ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn', 'direct_cash_settlement'],
   ],
   corporate: [
-    ['company_name', 'rc_number', 'nature_of_business'],
-    ['telephone', 'email', 'residential_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name'],
+    ['company_name', 'rc_number', 'nature_of_business', 'business_address', 'directors'],
+    ['telephone', 'email', 'contact_address'],
+    ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn'],
   ],
   joint: [
-    ['joint_account_name', 'second_applicant_name', 'surname', 'first_name'],
-    ['telephone', 'email', 'residential_address'],
+    ['joint_account_name', 'joint_address', 'joint_contact_number', 'direct_cash_settlement'],
+    ['joint_applicants'],
     ['bank_name', 'bank_account_number', 'bank_account_name'],
   ],
   minor: [
-    ['minor_name', 'guardian_name', 'guardian_relationship', 'date_of_birth'],
-    ['telephone', 'email', 'residential_address'],
+    ['surname', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry', 'telephone', 'email', 'residential_address'],
+    ['guardian_name', 'guardian_relationship', 'guardian_telephone'],
     ['bank_name', 'bank_account_number', 'bank_account_name'],
   ],
   estate: [
-    ['estate_name', 'executor_name', 'probate_reference'],
-    ['telephone', 'email', 'residential_address'],
+    ['estate_name', 'deceased_date_of_birth', 'estate_address'],
+    ['administrators'],
     ['bank_name', 'bank_account_number', 'bank_account_name'],
   ],
 }
 
 const fieldErrors = ref({})
+const nationalities = [
+  'Nigerian', 'Ghanaian', 'Kenyan', 'South African', 'Ugandan', 'Tanzanian',
+  'Cameroonian', 'Sierra Leonean', 'Liberian', 'Senegalese', 'British',
+  'American', 'Canadian', 'Australian', 'Chinese', 'Indian', 'French',
+  'German', 'Irish', 'Italian', 'Dutch', 'Spanish', 'Japanese', 'Other',
+]
+const personRequiredFields = ['name', 'residential_address', 'telephone', 'email', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry']
 
 onMounted(() => {
   const savedApplication = page.props.accountApplication
@@ -117,6 +178,27 @@ function clearFieldError(key) {
   if (fieldErrors.value[key]) delete fieldErrors.value[key]
 }
 
+function isRequiredField(key) {
+  return (requiredFieldsByStep[props.accountType][step.value - 1] || []).includes(key)
+}
+
+function isRequiredPersonField(key) {
+  return personRequiredFields.includes(key)
+}
+
+function addPerson(listKey) {
+  if (form[listKey].length < 20) form[listKey].push(emptyPerson())
+}
+
+function removePerson(listKey, index) {
+  if (form[listKey].length > 1) form[listKey].splice(index, 1)
+}
+
+function isPhoneValid(value) {
+  const normalized = value.replace(/[\s()-]/g, '')
+  return /^(?:0[789]\d{9}|\+234[789]\d{9}|\+[1-9]\d{7,14})$/.test(normalized)
+}
+
 function validateCurrentStep() {
   fieldErrors.value = {}
   let valid = true
@@ -125,27 +207,62 @@ function validateCurrentStep() {
 
   for (const key of requiredKeys) {
     const val = form[key]
-    if (val === null || val === undefined || val === '') {
+    if (val === null || val === undefined || val === '' || (Array.isArray(val) && val.length === 0)) {
       fieldErrors.value[key] = `${fieldLabels[key] || key} is required.`
       valid = false
     }
   }
 
-  if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    fieldErrors.value['email'] = 'Enter a valid email address.'
-    valid = false
+  for (const key of ['email', 'next_of_kin_email']) {
+    if (form[key] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form[key])) {
+      fieldErrors.value[key] = 'Enter a valid email address.'
+      valid = false
+    }
+  }
+  for (const key of ['telephone', 'next_of_kin_telephone', 'guardian_telephone', 'joint_contact_number']) {
+    if (form[key] && !isPhoneValid(form[key])) {
+      fieldErrors.value[key] = 'Enter a valid telephone number, e.g. 08012345678 or +2348012345678.'
+      valid = false
+    }
   }
   if (form.bvn && !/^\d{11}$/.test(form.bvn)) {
-    fieldErrors.value['bvn'] = 'BVN must be exactly 11 digits.'
+    fieldErrors.value.bvn = 'BVN must be exactly 11 digits.'
     valid = false
   }
   if (form.bank_account_number && !/^\d{10}$/.test(form.bank_account_number)) {
-    fieldErrors.value['bank_account_number'] = 'Bank account number must be 10 digits.'
+    fieldErrors.value.bank_account_number = 'Bank account number must be 10 digits.'
     valid = false
   }
-  if (type === 'individual' && form.id_type === 'NIN' && form.id_number && !/^\d{11}$/.test(form.id_number)) {
+  if (['individual', 'minor'].includes(type) && form.id_type === 'NIN' && form.id_number && !/^\d{11}$/.test(form.id_number)) {
     fieldErrors.value.id_number = 'NIN must be exactly 11 digits.'
     valid = false
+  }
+
+  for (const listKey of ['directors', 'administrators', 'joint_applicants']) {
+    if (!currentStepFields.value.includes(listKey)) continue
+    for (const [index, person] of form[listKey].entries()) {
+      for (const field of personFields) {
+        const errorKey = `${listKey}.${index}.${field}`
+        if (person[field] && ['email', 'next_of_kin_email'].includes(field) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(person[field])) {
+          fieldErrors.value[errorKey] = 'Enter a valid email address.'
+          valid = false
+        }
+        if (person[field] && ['telephone', 'next_of_kin_telephone'].includes(field) && !isPhoneValid(person[field])) {
+          fieldErrors.value[errorKey] = 'Enter a valid telephone number.'
+          valid = false
+        }
+      }
+      if (person.id_type === 'NIN' && person.id_number && !/^\d{11}$/.test(person.id_number)) {
+        fieldErrors.value[`${listKey}.${index}.id_number`] = 'NIN must be exactly 11 digits.'
+        valid = false
+      }
+      for (const field of personRequiredFields) {
+        if (!person[field]?.trim()) {
+          fieldErrors.value[`${listKey}.${index}.${field}`] = `${personFieldLabels[field]} is required.`
+          valid = false
+        }
+      }
+    }
   }
 
   return valid
@@ -257,70 +374,86 @@ function submitApplication() {
           <div v-if="errorMessage" class="mb-5 border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ errorMessage
           }}</div>
           <h2 class="font-display text-2xl font-semibold text-heritage-navy">{{ stepTitles[step - 1] }}</h2>
-          <p class="mt-2 text-sm text-slate-500">Fields and evidence requirements must be confirmed by Heritage before
-            production release.</p>
-          <div v-if="step === 1" class="mt-6 grid gap-5 md:grid-cols-2">
+          <p class="mt-2 text-sm text-slate-500">Complete the required fields marked with <span class="font-bold text-red-600">*</span>.</p>
+          <div v-if="step < 4" class="mt-6 grid gap-5 md:grid-cols-2">
             <template v-for="key in currentStepFields" :key="key">
-              <label v-if="fieldLabels[key]" class="block"><span class="text-sm font-semibold text-heritage-navy">{{
-                fieldLabels[key] }}</span>
-                <select v-if="key === 'gender'" v-model="form[key]"
-                  class="mt-2 w-full border px-3 py-3 focus:border-heritage-gold focus:outline-none"
-                  :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)">
-                  <option value="">Select gender</option>
-                  <option>Female</option>
-                  <option>Male</option>
-                  <option>Prefer not to say</option>
+              <section v-if="['directors', 'administrators', 'joint_applicants'].includes(key)"
+                class="space-y-4 md:col-span-2">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <h3 class="font-semibold text-heritage-navy">
+                    {{ fieldLabels[key] }} <span v-if="isRequiredField(key)" class="text-red-600">*</span>
+                  </h3>
+                  <button v-if="key === 'directors' || key === 'administrators'" type="button"
+                    class="border border-heritage-navy px-4 py-2 text-sm font-semibold text-heritage-navy"
+                    :disabled="form[key].length >= 20" @click="addPerson(key)">
+                    Add {{ key === 'administrators' ? 'administrator' : 'director' }}
+                  </button>
+                </div>
+                <article v-for="(person, index) in form[key]" :key="index" class="rounded-lg border border-slate-200 p-4">
+                  <div class="mb-4 flex items-center justify-between">
+                    <h4 class="font-semibold text-heritage-navy">
+                      {{ key === 'joint_applicants' ? `Party ${index + 1}` : `${key === 'administrators' ? 'Administrator' : 'Director'} ${index + 1}` }}
+                    </h4>
+                    <button v-if="key !== 'joint_applicants' && form[key].length > 1" type="button"
+                      class="text-xs font-semibold text-red-700" @click="removePerson(key, index)">Remove</button>
+                  </div>
+                  <div class="grid gap-4 md:grid-cols-2">
+                    <label v-for="field in personFields" :key="field" class="block">
+                      <span class="text-sm font-semibold text-heritage-navy">
+                        {{ personFieldLabels[field] }} <span v-if="isRequiredPersonField(field)" class="text-red-600">*</span>
+                      </span>
+                      <select v-if="field === 'nationality'" v-model="person[field]" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3">
+                        <option v-for="nationality in nationalities" :key="nationality" :value="nationality">{{ nationality }}</option>
+                      </select>
+                      <select v-else-if="field === 'id_type'" v-model="person[field]" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3">
+                        <option value="NIN">NIN</option><option value="International Passport">International Passport</option>
+                        <option value="Driver’s Licence">Driver’s Licence</option><option value="Voter’s Card">Voter’s Card</option>
+                      </select>
+                      <textarea v-else-if="field.includes('address')" v-model="person[field]" rows="2" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3" />
+                      <input v-else v-model="person[field]" :type="field === 'email' || field.endsWith('_email') ? 'email' : field.includes('telephone') ? 'tel' : (field.includes('date') || field === 'id_expiry') ? 'date' : 'text'"
+                        :required="isRequiredPersonField(field)"
+                        :placeholder="field.includes('telephone') ? '08012345678 or +2348012345678' : ''"
+                        class="mt-2 w-full border px-3 py-3"
+                        :class="fieldErrors[`${key}.${index}.${field}`] ? 'border-red-500' : 'border-slate-300'"
+                        @input="clearFieldError(`${key}.${index}.${field}`)" />
+                      <span v-if="fieldErrors[`${key}.${index}.${field}`]" class="mt-1 block text-xs text-red-600">
+                        {{ fieldErrors[`${key}.${index}.${field}`] }}
+                      </span>
+                    </label>
+                  </div>
+                </article>
+                <p v-if="fieldErrors[key]" class="text-xs text-red-600">{{ fieldErrors[key] }}</p>
+              </section>
+              <label v-else-if="fieldLabels[key]" class="block"
+                :class="['additional_information', 'residential_address', 'contact_address', 'next_of_kin_address', 'business_address', 'joint_address', 'estate_address'].includes(key) ? 'md:col-span-2' : ''">
+                <span class="text-sm font-semibold text-heritage-navy">
+                  {{ fieldLabels[key] }} <span v-if="isRequiredField(key)" class="text-red-600">*</span>
+                </span>
+                <select v-if="key === 'gender'" v-model="form[key]" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
+                  <option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option>
                 </select>
-                <select v-else-if="key === 'id_type'" v-model="form[key]"
-                  class="mt-2 w-full border px-3 py-3 focus:border-heritage-gold focus:outline-none"
-                  :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)">
-                  <option>NIN</option>
-                  <option>International Passport</option>
-                  <option>Driver’s Licence</option>
-                  <option>Voter’s Card</option>
+                <select v-else-if="key === 'nationality'" v-model="form[key]" required class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
+                  <option v-for="nationality in nationalities" :key="nationality" :value="nationality">{{ nationality }}</option>
                 </select>
-                <input v-else v-model="form[key]" @input="clearFieldError(key)"
-                  :type="key === 'email' ? 'email' : (key.includes('date') || key === 'id_expiry' ? 'date' : 'text')"
-                  class="mt-2 w-full border px-3 py-3 focus:border-heritage-gold focus:outline-none"
-                  :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" />
-                <span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
-              </label>
-            </template>
-          </div>
-          <div v-else-if="step === 2" class="mt-6 grid gap-5 md:grid-cols-2">
-            <template v-for="key in currentStepFields" :key="key"><label v-if="fieldLabels[key]"
-                class="block"><span class="text-sm font-semibold text-heritage-navy">{{ fieldLabels[key] }}</span><input
-                  v-model="form[key]" :type="key === 'email' ? 'email' : 'text'" class="mt-2 w-full border px-3 py-3"
-                  :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" /><span v-if="fieldErrors[key]"
-                  class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span></label></template>
-          </div>
-          <div v-else-if="step === 3" class="mt-6 grid gap-5 md:grid-cols-2">
-            <template
-              v-for="key in currentStepFields" :key="key">
-              <label class="block" :class="key === 'additional_information' ? 'md:col-span-2' : 'md:col-span-1'">
-                <span class="text-sm font-semibold text-heritage-navy">{{ fieldLabels[key] || key }}</span>
-
-                <!-- Textarea for Additional Info -->
-                <textarea v-if="key === 'additional_information'" v-model="form[key]" rows="4"
-                  placeholder="Provide any additional account instructions or notes here..."
-                  class="mt-2 w-full border border-slate-300 px-3 py-3 outline-none focus:border-heritage-gold"
-                  @input="clearFieldError(key)"></textarea>
-
-                <!-- Dropdown for Account Type -->
-                <select v-else-if="key === 'account_type'" v-model="form[key]"
-                  class="mt-2 w-full border border-slate-300 px-3 py-3 outline-none focus:border-heritage-gold"
-                  @change="clearFieldError(key)">
-                  <option value="Savings">Savings Account</option>
-                  <option value="Current">Current Account</option>
-                  <option value="Nominee">Nominee / Trading Account</option>
+                <select v-else-if="key === 'id_type'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
+                  <option value="NIN">NIN</option><option value="International Passport">International Passport</option>
+                  <option value="Driver’s Licence">Driver’s Licence</option><option value="Voter’s Card">Voter’s Card</option>
                 </select>
-
-                <!-- Standard Input with Specific Placeholders -->
-                <input v-else v-model="form[key]" type="text"
-                  :placeholder="key === 'bank_account_number' ? 'Enter 10-digit account number' : (key === 'bvn' ? 'Enter 11-digit BVN' : '')"
-                  class="mt-2 w-full border px-3 py-3 outline-none focus:border-heritage-gold"
+                <select v-else-if="key === 'direct_cash_settlement'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
+                  <option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option>
+                </select>
+                <select v-else-if="key === 'account_type'" v-model="form[key]" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
+                  <option value="Savings">Savings</option><option value="Current">Current</option>
+                </select>
+                <textarea v-else-if="key.includes('address') || key === 'additional_information'" v-model="form[key]" rows="3" :required="isRequiredField(key)"
+                  class="mt-2 w-full border border-slate-300 px-3 py-3" @input="clearFieldError(key)" />
+                <input v-else v-model="form[key]" :type="['date_of_birth','deceased_date_of_birth','id_expiry','date_of_registration','account_opened_at'].includes(key) ? 'date' : (key.includes('email') ? 'email' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : 'text'))"
+                  :required="isRequiredField(key)"
+                  :inputmode="['bvn','id_number','bank_account_number'].includes(key) ? 'numeric' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : undefined)"
+                  :maxlength="key === 'bvn' || (key === 'id_number' && form.id_type === 'NIN') ? 11 : (key === 'bank_account_number' ? 10 : undefined)"
+                  :placeholder="key === 'bvn' ? 'Enter 11-digit BVN' : (key === 'id_number' && form.id_type === 'NIN' ? 'Enter 11-digit NIN' : (key === 'bank_account_number' ? 'Enter 10-digit account number' : (key.includes('telephone') || key === 'joint_contact_number' ? '08012345678 or +2348012345678' : '')))"
+                  class="mt-2 w-full border px-3 py-3"
                   :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)" />
-
                 <span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
               </label>
             </template>

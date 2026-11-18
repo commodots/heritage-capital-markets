@@ -56,7 +56,7 @@ class AccountApplicationController extends Controller
         ]);
 
         $formData = $data['form_data'];
-        $this->validateFormData($formData);
+        $this->validateFormData($formData, $type, $step);
 
         $app = null;
         if (!empty($data['application_id'])) {
@@ -89,17 +89,19 @@ class AccountApplicationController extends Controller
         $app->current_step = max($app->current_step, min(4, $step + 1));
 
         $form = $app->form_data;
-        $app->applicant_name = trim(implode(' ', array_filter([
+        $individualName = trim(implode(' ', array_filter([
             $form['surname'] ?? '', $form['first_name'] ?? '', $form['other_names'] ?? '',
-        ]))) ?: (
-            $form['company_name']
-            ?? $form['estate_name']
-            ?? $form['joint_account_name']
-            ?? $form['minor_name']
-            ?? null
-        );
-        $app->email = $form['email'] ?? null;
-        $app->phone = $form['telephone'] ?? $form['phone'] ?? null;
+        ])));
+        $app->applicant_name = match ($type) {
+            'minor' => $form['minor_name'] ?? ($individualName ?: null),
+            'corporate' => $form['company_name'] ?? null,
+            'estate' => $form['estate_name'] ?? null,
+            'joint' => $form['joint_account_name'] ?? null,
+            default => $individualName ?: null,
+        };
+        $primaryPerson = $form['joint_applicants'][0] ?? $form['administrators'][0] ?? $form['directors'][0] ?? [];
+        $app->email = $form['email'] ?? ($primaryPerson['email'] ?? null);
+        $app->phone = $form['telephone'] ?? $form['joint_contact_number'] ?? ($primaryPerson['telephone'] ?? null);
         $app->save();
 
         session()->put('account_application_'.$app->id, $app->reference);
@@ -143,7 +145,7 @@ class AccountApplicationController extends Controller
                 'form_data' => 'Please complete the required fields: ' . implode(', ', $missing),
             ]);
         }
-        $this->validateFormData($formData);
+        $this->validateFormData($formData, $type);
 
         $documents = $app->documents ?? [];
         foreach ($request->file('documents', []) as $key => $file) {
@@ -174,28 +176,33 @@ class AccountApplicationController extends Controller
      */
     private function requiredFields(string $type): array
     {
-        $common = [
-            'telephone', 'email', 'residential_address',
-            'bank_name', 'bank_account_number', 'bank_account_name',
-        ];
-
         return match ($type) {
-            'individual' => array_merge($common, [
-                'surname', 'first_name', 'date_of_birth', 'nationality',
-                'id_type', 'id_number', 'id_expiry',
-            ]),
-            'corporate' => array_merge($common, [
-                'company_name', 'rc_number', 'nature_of_business',
-            ]),
-            'joint' => array_merge($common, [
-                'joint_account_name', 'second_applicant_name', 'surname', 'first_name',
-            ]),
-            'minor' => array_merge($common, [
-                'minor_name', 'guardian_name', 'guardian_relationship', 'date_of_birth',
-            ]),
-            'estate' => array_merge($common, [
-                'estate_name', 'executor_name', 'probate_reference',
-            ]),
+            'individual' => [
+                'surname', 'first_name', 'date_of_birth', 'nationality', 'id_type',
+                'id_number', 'id_expiry', 'telephone', 'email', 'residential_address',
+                'bank_name', 'bank_account_number', 'bank_account_name', 'bvn',
+                'direct_cash_settlement',
+            ],
+            'corporate' => [
+                'company_name', 'rc_number', 'nature_of_business', 'business_address',
+                'directors', 'telephone', 'email', 'contact_address',
+                'bank_name', 'bank_account_number', 'bank_account_name', 'bvn',
+            ],
+            'joint' => [
+                'joint_account_name', 'joint_address', 'joint_contact_number',
+                'direct_cash_settlement', 'joint_applicants', 'bank_name',
+                'bank_account_number', 'bank_account_name',
+            ],
+            'minor' => [
+                'surname', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry',
+                'telephone', 'email',
+                'residential_address', 'guardian_name', 'guardian_relationship',
+                'guardian_telephone', 'bank_name', 'bank_account_number', 'bank_account_name',
+            ],
+            'estate' => [
+                'estate_name', 'deceased_date_of_birth', 'estate_address', 'administrators',
+                'bank_name', 'bank_account_number', 'bank_account_name',
+            ],
         };
     }
 
@@ -219,13 +226,15 @@ class AccountApplicationController extends Controller
         return $application;
     }
 
-    private function validateFormData(array $formData): void
+    private function validateFormData(array $formData, string $type, int $step = 4): void
     {
         $optionalRules = [
             'email' => ['email', 'max:190'],
-            'telephone' => ['string', 'max:50'],
-            'phone' => ['string', 'max:50'],
+            'next_of_kin_email' => ['email', 'max:190'],
             'date_of_birth' => ['date'],
+            'deceased_date_of_birth' => ['date'],
+            'date_of_registration' => ['date'],
+            'account_opened_at' => ['date'],
             'id_expiry' => ['date'],
             'bvn' => ['digits:11'],
             'bank_account_number' => ['digits:10'],
@@ -238,13 +247,79 @@ class AccountApplicationController extends Controller
             }
         }
 
-        if (($formData['id_type'] ?? null) === 'NIN' && filled($formData['id_number'] ?? null)) {
+        if (in_array($type, ['individual', 'minor'], true)
+            && ($formData['id_type'] ?? null) === 'NIN'
+            && filled($formData['id_number'] ?? null)) {
             $rules['id_number'] = ['digits:11'];
+        }
+
+        $personList = match ($type) {
+            'corporate' => 'directors',
+            'estate' => 'administrators',
+            'joint' => 'joint_applicants',
+            default => null,
+        };
+        $personStep = in_array($type, ['joint', 'estate'], true) ? 2 : 1;
+        $validatePeople = $personList !== null && $step >= $personStep;
+        if ($validatePeople) {
+            $rules[$personList] = ['required', 'array', 'min:'.($type === 'joint' ? 2 : 1), 'max:20'];
+            $rules[$personList.'.*.name'] = ['required', 'string', 'max:150'];
+            $rules[$personList.'.*.telephone'] = ['required', 'string', 'max:40'];
+            $rules[$personList.'.*.email'] = ['required', 'email', 'max:190'];
+            $rules[$personList.'.*.date_of_birth'] = ['required', 'date'];
+            $rules[$personList.'.*.nationality'] = ['required', 'string', 'max:80'];
+            $rules[$personList.'.*.residential_address'] = ['required', 'string', 'max:1000'];
+            $rules[$personList.'.*.id_type'] = ['required', 'string', 'max:60'];
+            $rules[$personList.'.*.id_number'] = ['required', 'string', 'max:100'];
+            $rules[$personList.'.*.id_expiry'] = ['required', 'date'];
+            $rules[$personList.'.*.next_of_kin_email'] = ['nullable', 'email', 'max:190'];
         }
 
         if ($rules) {
             validator($formData, $rules)->validate();
         }
+
+        foreach ([
+            'telephone', 'next_of_kin_telephone', 'guardian_telephone', 'joint_contact_number',
+        ] as $field) {
+            if (filled($formData[$field] ?? null) && ! $this->validTelephone($formData[$field])) {
+                throw ValidationException::withMessages([
+                    $field => 'Enter a valid telephone number, such as 08012345678 or +2348012345678.',
+                ]);
+            }
+        }
+
+        if ($validatePeople) {
+            foreach ($formData[$personList] as $index => $person) {
+                if (($person['id_type'] ?? null) === 'NIN'
+                    && filled($person['id_number'] ?? null)
+                    && ! preg_match('/^\d{11}$/', $person['id_number'])) {
+                    throw ValidationException::withMessages([
+                        "{$personList}.{$index}.id_number" => 'NIN must be exactly 11 digits.',
+                    ]);
+                }
+
+                foreach (['telephone', 'next_of_kin_telephone'] as $field) {
+                    if (filled($person[$field] ?? null) && ! $this->validTelephone($person[$field])) {
+                        throw ValidationException::withMessages([
+                            "{$personList}.{$index}.{$field}" => 'Enter a valid telephone number.',
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    private function validTelephone(mixed $telephone): bool
+    {
+        if (! is_string($telephone)) {
+            return false;
+        }
+
+        $normalized = preg_replace('/[\s()-]/', '', $telephone);
+
+        return is_string($normalized)
+            && preg_match('/^(?:0[789]\d{9}|\+234[789]\d{9}|\+[1-9]\d{7,14})$/', $normalized) === 1;
     }
 
     public function success(Request $request, string $type)

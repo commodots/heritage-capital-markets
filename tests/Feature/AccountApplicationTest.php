@@ -69,8 +69,79 @@ class AccountApplicationTest extends TestCase
         $this->assertDatabaseCount('account_applications', 0);
     }
 
+    public function test_invalid_telephone_nin_and_bvn_formats_are_rejected(): void
+    {
+        $this->from('/open-account/individual')
+            ->post('/open-account/individual/save-step', [
+                'step' => 1,
+                'form_data' => json_encode(['telephone' => '12345']),
+            ])
+            ->assertRedirect('/open-account/individual')
+            ->assertSessionHasErrors('telephone');
+
+        $this->from('/open-account/individual')
+            ->post('/open-account/individual/save-step', [
+                'step' => 1,
+                'form_data' => json_encode([
+                    'id_type' => 'NIN',
+                    'id_number' => '1234',
+                    'bvn' => '1234',
+                ]),
+            ])
+            ->assertRedirect('/open-account/individual')
+            ->assertSessionHasErrors(['id_number', 'bvn']);
+
+        $this->assertDatabaseCount('account_applications', 0);
+    }
+
+    public function test_nested_people_have_telephone_and_nin_format_validation(): void
+    {
+        $person = [
+            'name' => 'Ada Example',
+            'residential_address' => '1 Example Street',
+            'telephone' => '12345',
+            'email' => 'person@example.com',
+            'date_of_birth' => '1990-01-01',
+            'nationality' => 'Nigerian',
+            'id_type' => 'NIN',
+            'id_number' => '12345678901',
+            'id_expiry' => '2030-01-01',
+        ];
+
+        $this->from('/open-account/corporate')
+            ->post('/open-account/corporate/save-step', [
+                'step' => 1,
+                'form_data' => json_encode(['directors' => [$person]]),
+            ])
+            ->assertRedirect('/open-account/corporate')
+            ->assertSessionHasErrors('directors.0.telephone');
+
+        $person['telephone'] = '08012345678';
+        $person['id_number'] = '1234';
+        $this->from('/open-account/corporate')
+            ->post('/open-account/corporate/save-step', [
+                'step' => 1,
+                'form_data' => json_encode(['directors' => [$person]]),
+            ])
+            ->assertRedirect('/open-account/corporate')
+            ->assertSessionHasErrors('directors.0.id_number');
+
+        $this->assertDatabaseCount('account_applications', 0);
+    }
+
     public function test_every_account_type_can_be_submitted_with_its_required_fields(): void
     {
+        $person = fn (string $name) => [
+            'name' => $name,
+            'residential_address' => '1 Example Street',
+            'telephone' => '08012345678',
+            'email' => 'person@example.com',
+            'date_of_birth' => '1990-01-01',
+            'nationality' => 'Nigerian',
+            'id_type' => 'NIN',
+            'id_number' => '12345678901',
+            'id_expiry' => '2030-01-01',
+        ];
         $common = [
             'telephone' => '08012345678',
             'email' => 'applicant@example.com',
@@ -90,28 +161,42 @@ class AccountApplicationTest extends TestCase
                 'id_number' => '12345678901',
                 'id_expiry' => '2030-01-01',
                 'bvn' => '12345678901',
+                'direct_cash_settlement' => 'no',
             ],
             'corporate' => $common + [
                 'company_name' => 'Example Limited',
                 'rc_number' => 'RC123456',
                 'nature_of_business' => 'Investment services',
+                'business_address' => '2 Example Street',
+                'contact_address' => '2 Example Street',
+                'directors' => [$person('Ada Example')],
+                'bvn' => '12345678901',
             ],
             'joint' => $common + [
                 'joint_account_name' => 'Ada and Sam Example',
-                'second_applicant_name' => 'Sam Example',
-                'surname' => 'Example',
-                'first_name' => 'Ada',
+                'joint_address' => '3 Example Street',
+                'joint_contact_number' => '08012345678',
+                'direct_cash_settlement' => 'no',
+                'joint_applicants' => [$person('Ada Example'), $person('Sam Example')],
             ],
             'minor' => $common + [
+                'surname' => 'Example',
                 'minor_name' => 'Alex Example',
                 'guardian_name' => 'Ada Example',
                 'guardian_relationship' => 'Parent',
+                'guardian_telephone' => '08012345678',
                 'date_of_birth' => '2015-01-01',
+                'nationality' => 'Nigerian',
+                'residential_address' => '4 Example Street',
+                'id_type' => 'NIN',
+                'id_number' => '12345678901',
+                'id_expiry' => '2030-01-01',
             ],
             'estate' => $common + [
                 'estate_name' => 'Estate of Pat Example',
-                'executor_name' => 'Ada Example',
-                'probate_reference' => 'PROBATE-123',
+                'deceased_date_of_birth' => '1950-01-01',
+                'estate_address' => '5 Example Street',
+                'administrators' => [$person('Ada Example')],
             ],
         ];
 
@@ -160,6 +245,8 @@ class AccountApplicationTest extends TestCase
             'bank_name' => 'Example Bank',
             'bank_account_number' => '0123456789',
             'bank_account_name' => 'Ada Example',
+            'bvn' => '12345678901',
+            'direct_cash_settlement' => 'no',
         ];
 
         $this->post('/open-account/individual/save-step', [

@@ -4,6 +4,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue'
 const props = defineProps({ application: { type: Object, required: true }, documentNames: { type: Array, default: () => [] } })
 const form = useForm({ status: props.application.status, review_notes: props.application.review_notes || '' })
 function save() { form.post(`/admin/account-applications/${props.application.id}`) }
+function fieldLabel(key) { return key.replaceAll('_', ' ') }
 </script>
 <template>
   <AdminLayout>
@@ -22,8 +23,21 @@ function save() { form.post(`/admin/account-applications/${props.application.id}
                 :key="key">
                 <div>
                   <dt class="text-xs uppercase tracking-wide text-slate-500">{{ key.replaceAll('_', ' ') }}</dt>
-                  <dd class="mt-1 wrap-break-word text-sm text-slate-900">{{ typeof value === 'object' ? '—' : (value || '—') }}
-                  </dd>
+                <dd v-if="['directors', 'administrators', 'joint_applicants'].includes(key) && Array.isArray(value)"
+                  class="mt-2 space-y-3">
+                  <article v-for="(person, index) in value" :key="index" class="rounded border border-slate-200 p-3">
+                    <h3 class="mb-2 text-sm font-semibold capitalize">{{ fieldLabel(key.slice(0, -1)) }} {{ index + 1 }}</h3>
+                    <dl class="grid gap-2 sm:grid-cols-2">
+                      <div v-for="(personValue, personKey) in person" :key="personKey">
+                        <dt class="text-xs uppercase tracking-wide text-slate-500">{{ fieldLabel(personKey) }}</dt>
+                        <dd class="mt-1 wrap-break-word text-sm text-slate-900">{{ personValue || '—' }}</dd>
+                      </div>
+                    </dl>
+                  </article>
+                </dd>
+                <dd v-else class="mt-1 wrap-break-word text-sm text-slate-900">
+                  {{ typeof value === 'object' ? '—' : (value || '—') }}
+                </dd>
                 </div>
               </template>
             </dl>
