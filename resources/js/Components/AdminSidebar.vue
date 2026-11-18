@@ -12,6 +12,19 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 const page = usePage()
+const permissions = computed(() => page.props.auth?.user?.permissions ?? [])
+const isSuperAdmin = computed(() => page.props.auth?.user?.is_super_admin === true)
+
+const can = (feature) => isSuperAdmin.value || permissions.value.includes(feature)
+const canShowHomepage = computed(() =>
+    ['homepage', 'market_indices', 'investment_solutions'].some(can)
+)
+const canShowContent = computed(() =>
+    ['pages', 'board_management', 'research', 'articles', 'events', 'faqs', 'media'].some(can)
+)
+const canShowCommunication = computed(() =>
+    ['enquiries', 'newsletter', 'account_applications'].some(can)
+)
 
 const currentPath = computed(() => (page.url || '/').split('?')[0])
 
@@ -53,7 +66,7 @@ function closeSidebar() {
         </div>
 
         <nav class="flex-1 overflow-y-auto px-3 py-5">
-            <div class="mb-5">
+            <div v-if="can('dashboard')" class="mb-5">
                 <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
                     Main
                 </p>
@@ -68,7 +81,7 @@ function closeSidebar() {
                 </a>
             </div>
 
-            <div class="mb-5">
+            <div v-if="canShowHomepage" class="mb-5">
                 <p class="flex items-center gap-2 px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" />
@@ -77,28 +90,28 @@ function closeSidebar() {
                     Homepage
                 </p>
                 <div class="ml-3 space-y-0.5 border-l border-white/10 pl-2">
-                    <a href="/admin/homepage/hero-slides" :class="['admin-sub-item', subItemClass('/admin/homepage/hero-slides')]">
+                    <a v-if="can('homepage')" href="/admin/homepage/hero-slides" :class="['admin-sub-item', subItemClass('/admin/homepage/hero-slides')]">
                         <svg class="nav-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                             <rect x="3" y="4" width="18" height="16" rx="2" />
                             <path d="M7 8h10M7 12h6" />
                         </svg>
                         Hero Slides
                     </a>
-                    <a href="/admin/market-indices" :class="['admin-sub-item', subItemClass('/admin/market-indices')]">
+                    <a v-if="can('market_indices')" href="/admin/market-indices" :class="['admin-sub-item', subItemClass('/admin/market-indices')]">
                         <svg class="nav-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                             <path d="M4 19V5M4 19h16" />
                             <path d="m7 15 4-5 3 2 5-7" />
                         </svg>
                         Market Indices
                     </a>
-                    <a href="/admin/investment-solutions" :class="['admin-sub-item', subItemClass('/admin/investment-solutions')]">
+                    <a v-if="can('investment_solutions')" href="/admin/investment-solutions" :class="['admin-sub-item', subItemClass('/admin/investment-solutions')]">
                         <svg class="nav-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                             <rect x="3" y="7" width="18" height="13" rx="2" />
                             <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18" />
                         </svg>
                         Investment Solutions
                     </a>
-                    <a href="/admin/homepage/settings" :class="['admin-sub-item', subItemClass('/admin/homepage/settings')]">
+                    <a v-if="can('homepage')" href="/admin/homepage/settings" :class="['admin-sub-item', subItemClass('/admin/homepage/settings')]">
                         <svg class="nav-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                             <path d="M4 6h16M4 12h16M4 18h16" />
                             <circle cx="8" cy="6" r="2" fill="currentColor" />
@@ -110,23 +123,26 @@ function closeSidebar() {
                 </div>
             </div>
 
-            <div class="mb-5">
+            <div v-if="canShowContent" class="mb-5">
                 <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
                     Content Management
                 </p>
-                <a href="/admin/pages" :class="['admin-nav-item', navClass('/admin/pages')]">
+                <a v-if="can('pages')" href="/admin/pages" :class="['admin-nav-item', navClass('/admin/pages')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
                         <path d="M14 2v6h6M8 13h8M8 17h6" />
                     </svg>
                     Pages
                 </a>
-                <div class="ml-8 mt-1 space-y-0.5 border-l border-white/10 pl-2">
+                <div v-if="can('pages') || can('board_management')" class="ml-8 mt-1 space-y-0.5 border-l border-white/10 pl-2">
+                    <template v-if="can('pages')">
                     <a href="/admin/page-content/about" :class="['admin-sub-item', subItemClass('/admin/page-content/about')]">About Us</a>
                     <a href="/admin/page-content/investment-solutions" :class="['admin-sub-item', subItemClass('/admin/page-content/investment-solutions')]">Investment Solutions Page</a>
                     <a href="/admin/page-content/investment-details" :class="['admin-sub-item', subItemClass('/admin/page-content/investment-details')]">Solution Details</a>
                     <a href="/admin/page-content/investor-login" :class="['admin-sub-item', subItemClass('/admin/page-content/investor-login')]">Investor Login</a>
-                    <a href="/admin/page-content/board" :class="['admin-sub-item', subItemClass('/admin/page-content/board')]">Board &amp; Management</a>
+                    </template>
+                    <a v-if="can('board_management')" href="/admin/page-content/board" :class="['admin-sub-item', subItemClass('/admin/page-content/board')]">Board &amp; Management</a>
+                    <template v-if="can('pages')">
                     <a href="/admin/page-content/governance" :class="['admin-sub-item', subItemClass('/admin/page-content/governance')]">Corporate Governance</a>
                     <a href="/admin/page-content/fees" :class="['admin-sub-item', subItemClass('/admin/page-content/fees')]">Fees &amp; Charges</a>
                     <a href="/admin/page-content/resources" :class="['admin-sub-item', subItemClass('/admin/page-content/resources')]">Investor Resources</a>
@@ -136,29 +152,30 @@ function closeSidebar() {
                     <a href="/admin/page-content/privacy" :class="['admin-sub-item', subItemClass('/admin/page-content/privacy')]">Privacy Policy</a>
                     <a href="/admin/page-content/terms" :class="['admin-sub-item', subItemClass('/admin/page-content/terms')]">Terms of Use</a>
                     <a href="/admin/page-content/risk" :class="['admin-sub-item', subItemClass('/admin/page-content/risk')]">Risk Disclosure</a>
+                    </template>
                 </div>
-                <a href="/admin/research-reports" :class="['admin-nav-item', navClass('/admin/research-reports')]">
+                <a v-if="can('research')" href="/admin/research-reports" :class="['admin-nav-item', navClass('/admin/research-reports')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
                         <path d="M14 2v6h6M8 13h8M8 17h6" />
                     </svg>
                     Research &amp; Reports
                 </a>
-                <a href="/admin/articles" :class="['admin-nav-item', navClass('/admin/articles')]">
+                <a v-if="can('articles')" href="/admin/articles" :class="['admin-nav-item', navClass('/admin/articles')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M4 5h16v14H4z" />
                         <path d="M7 9h10M7 13h6" />
                     </svg>
                     News &amp; Articles
                 </a>
-                <a href="/admin/events" :class="['admin-nav-item', navClass('/admin/events')]">
+                <a v-if="can('events')" href="/admin/events" :class="['admin-nav-item', navClass('/admin/events')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <rect x="3" y="4" width="18" height="17" rx="2" />
                         <path d="M16 2v4M8 2v4M3 10h18" />
                     </svg>
                     Events
                 </a>
-                <a href="/admin/faqs" :class="['admin-nav-item', navClass('/admin/faqs')]">
+                <a v-if="can('faqs')" href="/admin/faqs" :class="['admin-nav-item', navClass('/admin/faqs')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <circle cx="12" cy="12" r="9" />
                         <path d="M9.5 9a2.5 2.5 0 1 1 4.1 1.9c-.9.7-1.6 1.1-1.6 2.6" />
@@ -166,7 +183,7 @@ function closeSidebar() {
                     </svg>
                     FAQs
                 </a>
-                <a href="/admin/media" :class="['admin-nav-item', navClass('/admin/media')]">
+                <a v-if="can('media')" href="/admin/media" :class="['admin-nav-item', navClass('/admin/media')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <rect x="3" y="4" width="18" height="16" rx="2" />
                         <circle cx="8.5" cy="9" r="1.5" />
@@ -176,25 +193,25 @@ function closeSidebar() {
                 </a>
             </div>
 
-            <div class="mb-5">
+            <div v-if="canShowCommunication" class="mb-5">
                 <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
                     Communication
                 </p>
-                <a href="/admin/enquiries" :class="['admin-nav-item', navClass('/admin/enquiries')]">
+                <a v-if="can('enquiries')" href="/admin/enquiries" :class="['admin-nav-item', navClass('/admin/enquiries')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <rect x="3" y="5" width="18" height="14" rx="2" />
                         <path d="m3 7 9 6 9-6" />
                     </svg>
                     Enquiries
                 </a>
-                <a href="/admin/newsletter-subscribers" :class="['admin-nav-item', navClass('/admin/newsletter-subscribers')]">
+                <a v-if="can('newsletter')" href="/admin/newsletter-subscribers" :class="['admin-nav-item', navClass('/admin/newsletter-subscribers')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <circle cx="12" cy="8" r="3" />
                         <path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" />
                     </svg>
                     Newsletter Subscribers
                 </a>
-                <a href="/admin/account-applications" :class="['admin-nav-item', navClass('/admin/account-applications')]">
+                <a v-if="can('account_applications')" href="/admin/account-applications" :class="['admin-nav-item', navClass('/admin/account-applications')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
                         <path d="M14 2v6h6M8 13h8M8 17h5" />
@@ -203,16 +220,28 @@ function closeSidebar() {
                 </a>
             </div>
 
-            <div>
+            <div v-if="can('settings') || isSuperAdmin">
                 <p class="px-3 pb-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/35">
                     System
                 </p>
-                <a href="/admin/settings" :class="['admin-nav-item', navClass('/admin/settings')]">
+                <a v-if="can('settings')" href="/admin/settings" :class="['admin-nav-item', navClass('/admin/settings')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <circle cx="12" cy="12" r="3" />
                         <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20h-2.5v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H5v-2.5h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5h2.5v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v2.5h-.1a1.7 1.7 0 0 0-1.6 1Z" />
                     </svg>
                     Settings
+                </a>
+                <a v-if="isSuperAdmin" href="/admin/users" :class="['admin-nav-item', navClass('/admin/users')]">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M17 11a3 3 0 1 0-2-5.7M17 14c2.4.4 4 2.6 4 5" />
+                    </svg>
+                    Admin Users
+                </a>
+                <a v-if="isSuperAdmin" href="/admin/user-types" :class="['admin-nav-item', navClass('/admin/user-types')]">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <path d="M4 5h16M4 12h16M4 19h16" /><circle cx="8" cy="5" r="2" /><circle cx="16" cy="12" r="2" /><circle cx="10" cy="19" r="2" />
+                    </svg>
+                    User Types &amp; Permissions
                 </a>
             </div>
         </nav>

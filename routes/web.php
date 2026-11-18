@@ -35,6 +35,8 @@ use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\EnquiryController;
 use App\Http\Controllers\Admin\AccountApplicationAdminController;
 use App\Http\Controllers\Admin\PublicPageContentController;
+use App\Http\Controllers\Admin\AdminRoleController;
+use App\Http\Controllers\Admin\AdminUserController;
 
 use App\Http\Controllers\Auth\LoginController;
 
@@ -245,6 +247,7 @@ Route::prefix('admin')
     */
 
         Route::get('/', [DashboardController::class, 'index'])
+            ->middleware('feature:dashboard')
             ->name('admin.dashboard');
 
 
@@ -254,6 +257,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:homepage')->group(function () {
         Route::get('/homepage/hero-slides', [HeroSlideController::class, 'index'])
             ->name('admin.homepage.hero-slides');
 
@@ -281,6 +285,7 @@ Route::prefix('admin')
 
         Route::post('/homepage/settings', [HomepageSettingsController::class, 'update'])
             ->name('admin.homepage.settings.update');
+        });
 
 
         /*
@@ -289,6 +294,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:pages')->group(function () {
         Route::get('/pages', [PageController::class, 'index'])
             ->name('admin.pages');
 
@@ -303,14 +309,27 @@ Route::prefix('admin')
 
         Route::delete('/pages/{page}', [PageController::class, 'destroy'])
             ->name('admin.pages.destroy');
+        });
 
+        Route::get('/page-content/board', [PublicPageContentController::class, 'edit'])
+            ->defaults('group', 'board')
+            ->middleware('feature:board_management')
+            ->name('admin.page-content.board.edit');
+
+        Route::post('/page-content/board', [PublicPageContentController::class, 'update'])
+            ->defaults('group', 'board')
+            ->middleware('feature:board_management')
+            ->name('admin.page-content.board.update');
+
+        Route::middleware('feature:pages')->group(function () {
         Route::get('/page-content/{group}', [PublicPageContentController::class, 'edit'])
-            ->whereIn('group', ['about', 'investment-solutions', 'investment-details', 'investor-login', 'board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
+            ->whereIn('group', ['about', 'investment-solutions', 'investment-details', 'investor-login', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
             ->name('admin.page-content.edit');
 
         Route::post('/page-content/{group}', [PublicPageContentController::class, 'update'])
-            ->whereIn('group', ['about', 'investment-solutions', 'investment-details', 'investor-login', 'board', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
+            ->whereIn('group', ['about', 'investment-solutions', 'investment-details', 'investor-login', 'governance', 'fees', 'resources', 'privacy', 'terms', 'risk'])
             ->name('admin.page-content.update');
+        });
 
 
         /*
@@ -319,6 +338,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:investment_solutions')->group(function () {
         Route::get('/investment-solutions', [AdminInvestmentSolutionController::class, 'index'])
             ->name('admin.investment-solutions');
 
@@ -333,6 +353,7 @@ Route::prefix('admin')
 
         Route::delete('/investment-solutions/{investmentSolution}', [AdminInvestmentSolutionController::class, 'destroy'])
             ->name('admin.investment-solutions.destroy');
+        });
 
 
         /*
@@ -341,6 +362,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:market_indices')->group(function () {
         Route::get('/market-indices', [MarketIndexController::class, 'index'])
             ->name('admin.market-indices');
 
@@ -355,6 +377,7 @@ Route::prefix('admin')
 
         Route::delete('/market-indices/{marketIndex}', [MarketIndexController::class, 'destroy'])
             ->name('admin.market-indices.destroy');
+        });
 
 
         /*
@@ -363,6 +386,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:research')->group(function () {
         Route::get('/research-reports', [ResearchReportController::class, 'index'])
             ->name('admin.research-reports');
 
@@ -377,6 +401,7 @@ Route::prefix('admin')
 
         Route::delete('/research-reports/{researchReport}', [ResearchReportController::class, 'destroy'])
             ->name('admin.research-reports.destroy');
+        });
 
 
         /*
@@ -385,6 +410,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:articles')->group(function () {
         Route::get('/articles', [ArticleController::class, 'index'])
             ->name('admin.articles');
 
@@ -399,6 +425,7 @@ Route::prefix('admin')
 
         Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])
             ->name('admin.articles.destroy');
+        });
 
 
         /*
@@ -407,6 +434,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:events')->group(function () {
         Route::get('/events', [EventController::class, 'index'])
             ->name('admin.events');
 
@@ -421,6 +449,7 @@ Route::prefix('admin')
 
         Route::delete('/events/{event}', [EventController::class, 'destroy'])
             ->name('admin.events.destroy');
+        });
 
 
         /*
@@ -429,6 +458,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:faqs')->group(function () {
         Route::get('/faqs', [FaqController::class, 'index'])
             ->name('admin.faqs');
 
@@ -443,6 +473,7 @@ Route::prefix('admin')
 
         Route::delete('/faqs/{faq}', [FaqController::class, 'destroy'])
             ->name('admin.faqs.destroy');
+        });
 
 
         /*
@@ -451,6 +482,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:media')->group(function () {
         Route::get('/media', [MediaController::class, 'index'])
             ->name('admin.media');
 
@@ -459,6 +491,7 @@ Route::prefix('admin')
 
         Route::delete('/media/{media}', [MediaController::class, 'destroy'])
             ->name('admin.media.destroy');
+        });
 
 
         /*
@@ -467,6 +500,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:newsletter')->group(function () {
         Route::get('/newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])
             ->name('admin.newsletter-subscribers');
 
@@ -475,6 +509,7 @@ Route::prefix('admin')
 
         Route::get('/newsletter-subscribers/export', [NewsletterSubscriberController::class, 'export'])
             ->name('admin.newsletter-subscribers.export');
+        });
 
 
         /*
@@ -483,11 +518,13 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:settings')->group(function () {
         Route::get('/settings', [SiteSettingController::class, 'index'])
             ->name('admin.settings');
 
         Route::post('/settings', [SiteSettingController::class, 'update'])
             ->name('admin.settings.update');
+        });
 
 
         /*
@@ -496,6 +533,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+        Route::middleware('feature:enquiries')->group(function () {
         Route::get('/enquiries', [EnquiryController::class, 'index'])
             ->name('admin.enquiries');
 
@@ -504,6 +542,7 @@ Route::prefix('admin')
 
         Route::post('/enquiries/{enquiry}', [EnquiryController::class, 'update'])
             ->name('admin.enquiries.update');
+        });
 
                /*
     |--------------------------------------------------------------------------
@@ -511,6 +550,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
     Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
+    ->middleware('feature:newsletter')
     ->name('newsletter.subscribe');
 
 
@@ -520,6 +560,7 @@ Route::prefix('admin')
     |--------------------------------------------------------------------------
     */
 
+    Route::middleware('feature:account_applications')->group(function () {
     Route::get('/account-applications', [AccountApplicationAdminController::class, 'index'])
         ->name('admin.account-applications');
 
@@ -531,6 +572,25 @@ Route::prefix('admin')
 
     Route::get('/account-applications/{application}/documents/{document}', [AccountApplicationAdminController::class, 'download'])
         ->name('admin.account-applications.documents.download');
+    });
+
+    Route::middleware(['feature:user_management', 'superadmin'])->group(function () {
+        Route::get('/user-types', [AdminRoleController::class, 'index'])
+            ->name('admin.user-types');
+        Route::post('/user-types', [AdminRoleController::class, 'store'])
+            ->name('admin.user-types.store');
+        Route::put('/user-types/{adminRole}', [AdminRoleController::class, 'update'])
+            ->name('admin.user-types.update');
+
+        Route::get('/users', [AdminUserController::class, 'index'])
+            ->name('admin.users');
+        Route::post('/users', [AdminUserController::class, 'store'])
+            ->name('admin.users.store');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])
+            ->name('admin.users.update');
+        Route::post('/users/{user}/toggle', [AdminUserController::class, 'toggle'])
+            ->name('admin.users.toggle');
+    });
     });
 
 Route::get('/{slug}', [PublicPageController::class, 'show'])

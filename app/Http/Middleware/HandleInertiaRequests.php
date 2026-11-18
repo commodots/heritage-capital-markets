@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\SiteSetting;
+use App\Support\AdminFeatures;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -15,6 +16,21 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
                 'status' => $request->session()->get('status'),
+            ],
+            'auth' => fn () => [
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'is_super_admin' => (bool) $request->user()->is_super_admin,
+                    'permissions' => $request->user()->is_admin
+                        ? ($request->user()->is_super_admin
+                            ? AdminFeatures::keys()
+                            : ($request->user()->adminRole?->is_active
+                                ? ($request->user()->adminRole->permissions ?? [])
+                                : []))
+                        : [],
+                ] : null,
             ],
             'accountApplication' => fn () => $request->session()->get('accountApplication'),
             'siteSettings' => fn () => SiteSetting::query()

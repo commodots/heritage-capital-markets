@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Article;
 use App\Models\Enquiry;
 use App\Models\HeroSlide;
 use App\Models\InvestmentSolution;
@@ -16,65 +15,61 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $stats = [
-            'heroSlides' => HeroSlide::where('is_active', true)->count(),
+        $user = request()->user();
+        $stats = [];
 
-            'marketIndices' => MarketIndex::where('is_active', true)->count(),
+        if ($user->hasFeature('homepage')) {
+            $stats['heroSlides'] = HeroSlide::where('is_active', true)->count();
+        }
 
-            'investmentSolutions' => InvestmentSolution::where('is_active', true)->count(),
+        if ($user->hasFeature('market_indices')) {
+            $stats['marketIndices'] = MarketIndex::where('is_active', true)->count();
+        }
 
-            'researchReports' => ResearchReport::where('is_published', true)->count(),
+        if ($user->hasFeature('investment_solutions')) {
+            $stats['investmentSolutions'] = InvestmentSolution::where('is_active', true)->count();
+        }
 
-            'enquiries' => Enquiry::where('status', '!=', 'closed')->count(),
+        if ($user->hasFeature('research')) {
+            $stats['researchReports'] = ResearchReport::where('is_published', true)->count();
+        }
 
-            'newsletterSubscribers' => NewsletterSubscriber::where('is_active', true)->count(),
-        ];
+        if ($user->hasFeature('enquiries')) {
+            $stats['enquiries'] = Enquiry::where('status', '!=', 'closed')->count();
+        }
 
-        $recentEnquiries = Enquiry::query()
-            ->latest()
-            ->take(5)
-            ->get([
-                'id',
-                'name',
-                'email',
-                'subject',
-                'status',
-                'created_at',
-            ]);
+        if ($user->hasFeature('newsletter')) {
+            $stats['newsletterSubscribers'] = NewsletterSubscriber::where('is_active', true)->count();
+        }
 
-        $latestHeroSlides = HeroSlide::query()
-            ->orderBy('sort_order')
-            ->take(4)
-            ->get([
-                'id',
-                'title',
-                'image',
-                'is_active',
-                'sort_order',
-            ]);
+        $recentEnquiries = $user->hasFeature('enquiries')
+            ? Enquiry::query()
+                ->latest()
+                ->take(5)
+                ->get(['id', 'name', 'email', 'subject', 'status', 'created_at'])
+            : collect();
 
-        $latestSolutions = InvestmentSolution::query()
-            ->orderBy('sort_order')
-            ->take(4)
-            ->get([
-                'id',
-                'title',
-                'featured_image',
-                'is_active',
-                'sort_order',
-            ]);
+        $latestHeroSlides = $user->hasFeature('homepage')
+            ? HeroSlide::query()
+                ->orderBy('sort_order')
+                ->take(4)
+                ->get(['id', 'title', 'image', 'is_active', 'sort_order'])
+            : collect();
 
-        $latestReports = ResearchReport::query()
-            ->where('is_published', true)
-            ->latest('published_at')
-            ->take(4)
-            ->get([
-                'id',
-                'title',
-                'featured_image',
-                'published_at',
-                'is_published',
-            ]);
+        $latestSolutions = $user->hasFeature('investment_solutions')
+            ? InvestmentSolution::query()
+                ->orderBy('sort_order')
+                ->take(4)
+                ->get(['id', 'title', 'featured_image', 'is_active', 'sort_order'])
+            : collect();
+
+        $latestReports = $user->hasFeature('research')
+            ? ResearchReport::query()
+                ->where('is_published', true)
+                ->latest('published_at')
+                ->take(4)
+                ->get(['id', 'title', 'featured_image', 'published_at', 'is_published'])
+            : collect();
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,

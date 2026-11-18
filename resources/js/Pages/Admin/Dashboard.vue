@@ -1,5 +1,12 @@
 <script setup>
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
+
+const page = usePage()
+const permissions = computed(() => page.props.auth?.user?.permissions ?? [])
+const isSuperAdmin = computed(() => page.props.auth?.user?.is_super_admin === true)
+const can = (feature) => isSuperAdmin.value || permissions.value.includes(feature)
 
 defineProps({
     stats: {
@@ -112,7 +119,7 @@ const statusClass = (status) => {
             <!-- =====================================================
                  STATISTICS
             ====================================================== -->
-            <section>
+            <section v-if="Object.keys(stats).length">
 
                 <div class="mb-4">
                     <h2 class="text-sm font-semibold text-heritage-navy">
@@ -127,7 +134,7 @@ const statusClass = (status) => {
                 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
 
                     <!-- Hero Slides -->
-                    <div
+                    <div v-if="can('homepage')"
                         class="rounded-xl border border-heritage-border bg-white p-5 shadow-sm"
                     >
                         <div class="flex items-start justify-between">
@@ -160,7 +167,7 @@ const statusClass = (status) => {
 
 
                     <!-- Market Indices -->
-                    <div
+                    <div v-if="can('market_indices')"
                         class="rounded-xl border border-heritage-border bg-white p-5 shadow-sm"
                     >
                         <div class="flex items-start justify-between">
@@ -193,7 +200,7 @@ const statusClass = (status) => {
 
 
                     <!-- Investment Solutions -->
-                    <div
+                    <div v-if="can('investment_solutions')"
                         class="rounded-xl border border-heritage-border bg-white p-5 shadow-sm"
                     >
                         <div class="flex items-start justify-between">
@@ -226,7 +233,7 @@ const statusClass = (status) => {
 
 
                     <!-- Research -->
-                    <div
+                    <div v-if="can('research')"
                         class="rounded-xl border border-heritage-border bg-white p-5 shadow-sm"
                     >
                         <div class="flex items-start justify-between">
@@ -259,7 +266,7 @@ const statusClass = (status) => {
 
 
                     <!-- Enquiries -->
-                    <div
+                    <div v-if="can('enquiries')"
                         class="rounded-xl border border-heritage-border bg-white p-5 shadow-sm"
                     >
                         <div class="flex items-start justify-between">
@@ -292,7 +299,7 @@ const statusClass = (status) => {
 
 
                     <!-- Subscribers -->
-                    <div
+                    <div v-if="can('newsletter')"
                         class="rounded-xl border border-heritage-border bg-white p-5 shadow-sm"
                     >
                         <div class="flex items-start justify-between">
@@ -330,7 +337,7 @@ const statusClass = (status) => {
             <!-- =====================================================
                  QUICK ACTIONS
             ====================================================== -->
-            <section>
+            <section v-if="can('homepage') || can('investment_solutions') || can('research') || can('enquiries')">
 
                 <div class="mb-4">
                     <h2 class="text-sm font-semibold text-heritage-navy">
@@ -340,7 +347,7 @@ const statusClass = (status) => {
 
                 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 
-                    <a
+                    <a v-if="can('homepage')"
                         href="/admin/homepage/hero-slides"
                         class="group rounded-xl border border-heritage-border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-heritage-gold hover:shadow-md"
                     >
@@ -360,7 +367,7 @@ const statusClass = (status) => {
                     </a>
 
 
-                    <a
+                    <a v-if="can('investment_solutions')"
                         href="/admin/investment-solutions"
                         class="group rounded-xl border border-heritage-border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-heritage-gold hover:shadow-md"
                     >
@@ -380,7 +387,7 @@ const statusClass = (status) => {
                     </a>
 
 
-                    <a
+                    <a v-if="can('research')"
                         href="/admin/research-reports"
                         class="group rounded-xl border border-heritage-border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-heritage-gold hover:shadow-md"
                     >
@@ -400,7 +407,7 @@ const statusClass = (status) => {
                     </a>
 
 
-                    <a
+                    <a v-if="can('enquiries')"
                         href="/admin/enquiries"
                         class="group rounded-xl border border-heritage-border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-heritage-gold hover:shadow-md"
                     >
@@ -427,12 +434,12 @@ const statusClass = (status) => {
             <!-- =====================================================
                  LOWER GRID
             ====================================================== -->
-            <div class="grid gap-6 xl:grid-cols-2">
+            <div v-if="can('enquiries') || can('research')" class="grid gap-6 xl:grid-cols-2">
 
                 <!-- =================================================
                      RECENT ENQUIRIES
                 ================================================== -->
-                <section
+                <section v-if="can('enquiries')"
                     class="overflow-hidden rounded-xl border border-heritage-border bg-white shadow-sm"
                 >
 
@@ -511,7 +518,7 @@ const statusClass = (status) => {
                 <!-- =================================================
                      LATEST RESEARCH
                 ================================================== -->
-                <section
+                <section v-if="can('research')"
                     class="overflow-hidden rounded-xl border border-heritage-border bg-white shadow-sm"
                 >
 
@@ -602,7 +609,7 @@ const statusClass = (status) => {
             <!-- =====================================================
                  HOMEPAGE CONTENT SNAPSHOT
             ====================================================== -->
-            <section
+            <section v-if="can('homepage') || can('investment_solutions')"
                 class="overflow-hidden rounded-xl border border-heritage-border bg-white shadow-sm"
             >
 
@@ -619,7 +626,7 @@ const statusClass = (status) => {
                         </p>
                     </div>
 
-                    <a
+                    <a v-if="can('homepage')"
                         href="/admin/homepage/hero-slides"
                         class="text-xs font-semibold text-heritage-navy hover:text-heritage-gold"
                     >
@@ -631,7 +638,7 @@ const statusClass = (status) => {
                 <div class="grid gap-6 p-5 lg:grid-cols-2">
 
                     <!-- Hero Slides -->
-                    <div>
+                    <div v-if="can('homepage')">
 
                         <div class="mb-3 text-xs font-semibold uppercase tracking-wider text-heritage-muted">
                             Hero Slides
@@ -702,7 +709,7 @@ const statusClass = (status) => {
 
 
                     <!-- Investment Solutions -->
-                    <div>
+                    <div v-if="can('investment_solutions')">
 
                         <div class="mb-3 text-xs font-semibold uppercase tracking-wider text-heritage-muted">
                             Investment Solutions

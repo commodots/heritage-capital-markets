@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\SiteSetting;
+use App\Models\AdminRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -14,9 +15,19 @@ class PublicPageContentTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function admin(): User
+    {
+        return User::factory()->create([
+            'is_admin' => true,
+            'admin_role_id' => AdminRole::query()
+                ->where('name', 'Legacy Administrator')
+                ->value('id'),
+        ]);
+    }
+
     public function test_admin_can_update_public_page_content(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = $this->admin();
 
         $this->actingAs($admin)
             ->post('/admin/page-content/board', [
@@ -61,7 +72,7 @@ class PublicPageContentTest extends TestCase
     public function test_admin_can_upload_a_board_member_photo_and_public_page_displays_it(): void
     {
         Storage::fake('public');
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = $this->admin();
 
         $this->actingAs($admin)
             ->post('/admin/page-content/board', [
@@ -84,7 +95,7 @@ class PublicPageContentTest extends TestCase
     public function test_admin_cannot_upload_unsupported_board_member_file_type(): void
     {
         Storage::fake('public');
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = $this->admin();
 
         $this->actingAs($admin)
             ->from('/admin/page-content/board')
@@ -101,7 +112,7 @@ class PublicPageContentTest extends TestCase
 
     public function test_admin_has_separate_content_edit_pages(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = $this->admin();
 
         foreach ([
             'board' => 'Admin/PublicPageContent/BoardManagement',
@@ -128,7 +139,7 @@ class PublicPageContentTest extends TestCase
             'value' => 'Existing Board Title',
         ]);
 
-        $this->actingAs(User::factory()->create(['is_admin' => true]))
+        $this->actingAs($this->admin())
             ->post('/admin/page-content/fees', [
                 'fees_title' => 'Updated Fees',
                 'board_title' => 'Should Not Be Saved',
@@ -148,7 +159,7 @@ class PublicPageContentTest extends TestCase
 
     public function test_legal_pages_can_be_edited_separately_and_render_their_content(): void
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin = $this->admin();
 
         $this->actingAs($admin)
             ->post('/admin/page-content/privacy', [

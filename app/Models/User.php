@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -23,6 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'admin_role_id',
+        'is_super_admin',
     ];
 
     /**
@@ -46,6 +49,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_super_admin' => 'boolean',
         ];
+    }
+
+    public function adminRole(): BelongsTo
+    {
+        return $this->belongsTo(AdminRole::class, 'admin_role_id');
+    }
+
+    public function hasFeature(string $feature): bool
+    {
+        if (! $this->is_admin) {
+            return false;
+        }
+
+        if ($this->is_super_admin) {
+            return true;
+        }
+
+        $role = $this->adminRole;
+
+        return $role !== null
+            && $role->is_active
+            && in_array($feature, $role->permissions ?? [], true);
     }
 }
