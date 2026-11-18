@@ -22,6 +22,7 @@ class AdminFeatures
             'enquiries' => 'Enquiries',
             'account_applications' => 'Account Applications',
             'settings' => 'Site Settings',
+            'live_chat' => 'Live Chat',
             'user_management' => 'User Management',
         ];
     }

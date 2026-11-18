@@ -37,6 +37,8 @@ use App\Http\Controllers\Admin\AccountApplicationAdminController;
 use App\Http\Controllers\Admin\PublicPageContentController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Admin\LiveChatController;
 
 use App\Http\Controllers\Auth\LoginController;
 
@@ -126,6 +128,14 @@ Route::post('/contact-us', [ContactController::class, 'store'])
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->middleware('throttle:5,1')
     ->name('newsletter.subscribe');
+
+Route::prefix('chat')->group(function () {
+    Route::get('/availability', [ChatController::class, 'availability'])->middleware('throttle:60,1');
+    Route::post('/start', [ChatController::class, 'start'])->middleware('throttle:5,1');
+    Route::post('/message', [ChatController::class, 'message'])->middleware('throttle:20,1');
+    Route::get('/messages', [ChatController::class, 'messages'])->middleware('throttle:60,1');
+    Route::post('/offline-enquiry', [ChatController::class, 'offlineEnquiry'])->middleware('throttle:5,1');
+});
 
 
 /*
@@ -239,6 +249,23 @@ Route::get('/404', fn() => Inertia::render('Errors/404'))
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->group(function () {
+
+        Route::middleware('feature:live_chat')->prefix('live-chat')->group(function () {
+            Route::get('/unread-count', [LiveChatController::class, 'unreadCount'])
+                ->name('admin.live-chat.unread-count');
+            Route::get('/', [LiveChatController::class, 'index'])
+                ->name('admin.live-chat');
+            Route::get('/{conversation}', [LiveChatController::class, 'show'])
+                ->name('admin.live-chat.show');
+            Route::get('/{conversation}/poll', [LiveChatController::class, 'poll'])
+                ->name('admin.live-chat.poll');
+            Route::post('/{conversation}/reply', [LiveChatController::class, 'reply'])
+                ->name('admin.live-chat.reply');
+            Route::post('/{conversation}/assign', [LiveChatController::class, 'assign'])
+                ->name('admin.live-chat.assign');
+            Route::post('/{conversation}/close', [LiveChatController::class, 'close'])
+                ->name('admin.live-chat.close');
+        });
 
         /*
     |--------------------------------------------------------------------------

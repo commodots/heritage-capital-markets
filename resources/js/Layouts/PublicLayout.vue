@@ -1,6 +1,7 @@
 <script setup>
 import Header from '@/Components/Header.vue'
 import Footer from '@/Components/Footer.vue'
+import LiveChatWidget from '@/Components/LiveChatWidget.vue'
 </script>
 
 <template>
@@ -14,6 +15,7 @@ import Footer from '@/Components/Footer.vue'
         </main>
 
         <Footer />
+        <LiveChatWidget />
 
     </div>
 
