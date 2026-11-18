@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'market_indices' => [
+        'url' => env('MARKET_INDICES_API_URL'),
+        'token' => env('MARKET_INDICES_API_TOKEN'),
+    ],
+
 ];

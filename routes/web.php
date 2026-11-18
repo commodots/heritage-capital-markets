@@ -396,6 +396,12 @@ Route::prefix('admin')
         Route::post('/market-indices', [MarketIndexController::class, 'store'])
             ->name('admin.market-indices.store');
 
+        Route::post('/market-indices/import-csv', [MarketIndexController::class, 'importCsv'])
+            ->name('admin.market-indices.import-csv');
+
+        Route::post('/market-indices/import-api', [MarketIndexController::class, 'importApi'])
+            ->name('admin.market-indices.import-api');
+
         Route::post('/market-indices/{marketIndex}', [MarketIndexController::class, 'update'])
             ->name('admin.market-indices.update');
 
@@ -596,6 +602,10 @@ Route::prefix('admin')
 
     Route::post('/account-applications/{application}', [AccountApplicationAdminController::class, 'update'])
         ->name('admin.account-applications.update');
+
+    Route::get('/account-applications/{application}/pdf', [AccountApplicationController::class, 'downloadPdf'])
+        ->middleware('superadmin')
+        ->name('admin.account-applications.pdf');
 
     Route::get('/account-applications/{application}/documents/{document}', [AccountApplicationAdminController::class, 'download'])
         ->name('admin.account-applications.documents.download');

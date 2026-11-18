@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\AccountApplication;
+use App\Models\User;
+use App\Mail\AccountApplicationSubmitted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -131,6 +134,9 @@ class AccountApplicationTest extends TestCase
 
     public function test_every_account_type_can_be_submitted_with_its_required_fields(): void
     {
+        Mail::fake();
+        User::factory()->create(['is_admin' => true, 'is_super_admin' => true]);
+
         $person = fn (string $name) => [
             'name' => $name,
             'residential_address' => '1 Example Street',
@@ -225,11 +231,15 @@ class AccountApplicationTest extends TestCase
                 $this->assertSame('Alex Example', $application->fresh()->applicant_name);
             }
         }
+
+        Mail::assertSent(AccountApplicationSubmitted::class, 5);
     }
 
     public function test_documents_selected_on_the_final_step_are_saved_with_the_application(): void
     {
         Storage::fake('local');
+        Mail::fake();
+        $superAdmin = User::factory()->create(['is_admin' => true, 'is_super_admin' => true]);
 
         $formData = [
             'surname' => 'Example',
@@ -267,5 +277,11 @@ class AccountApplicationTest extends TestCase
         $application->refresh();
         $this->assertArrayHasKey('passport_photo', $application->documents);
         Storage::disk('local')->assertExists($application->documents['passport_photo']);
+
+        Mail::assertSent(AccountApplicationSubmitted::class, fn ($mail) => str_starts_with($mail->pdfContent, '%PDF-'));
+        $this->actingAs($superAdmin)
+            ->get("/admin/account-applications/{$application->id}/pdf")
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
     }
 }

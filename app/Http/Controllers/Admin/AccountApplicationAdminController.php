@@ -22,11 +22,12 @@ class AccountApplicationAdminController extends Controller
         ]);
     }
 
-    public function show(AccountApplication $application)
+    public function show(Request $request, AccountApplication $application)
     {
         return Inertia::render('Admin/AccountApplications/Show', [
             'application' => $application,
             'documentNames' => array_keys($application->documents ?? []),
+            'canDownloadPdf' => (bool) $request->user()?->is_super_admin,
         ]);
     }
 

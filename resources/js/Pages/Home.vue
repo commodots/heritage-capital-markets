@@ -191,7 +191,7 @@ const researchItems = computed(() => [
                     </h1>
 
                     <!-- Description -->
-                    <p v-if="slide.description" class="mt-6 max-w-xl text-sm leading-7 text-white/75 sm:text-base">
+                    <p v-if="slide.description" class="mt-6 max-w-xl text-[15px] leading-7 text-white/75 sm:text-[17px]">
                         {{ slide.description }}
                     </p>
 
@@ -414,7 +414,7 @@ const researchItems = computed(() => [
                                     {{ market.is_positive ? '▲' : '▼' }}
                                 </span>
 
-                                {{ market.is_positive ? '+' : '-' }}{{ Number(market.change_percent).toFixed(2) }}%
+                                {{ market.is_positive ? '+' : '-' }}{{ Math.abs(Number(market.change_percent)).toFixed(2) }}%
                             </div>
 
                         </div>

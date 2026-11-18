@@ -8,6 +8,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    apiConfigured: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 const page = usePage()
@@ -26,6 +30,8 @@ const form = useForm({
     is_active: true,
     sort_order: 1,
 })
+const csvImportForm = useForm({ csv_file: null })
+const apiImportForm = useForm({})
 
 const activeCount = computed(() =>
     props.indices.filter(index => index.is_active).length
@@ -94,6 +100,25 @@ function submit() {
             onSuccess: () => closeModal(),
         })
     }
+}
+
+function selectCsvFile(event) {
+    csvImportForm.csv_file = event.target.files?.[0] ?? null
+    csvImportForm.clearErrors('csv_file')
+}
+
+function importCsv() {
+    csvImportForm.post('/admin/market-indices/import-csv', {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => csvImportForm.reset(),
+    })
+}
+
+function importApi() {
+    apiImportForm.post('/admin/market-indices/import-api', {
+        preserveScroll: true,
+    })
 }
 
 function toggleIndex(index) {
@@ -234,6 +259,48 @@ function flashMessage() {
                     </p>
                 </div>
 
+                <section class="mb-8 grid gap-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:grid-cols-2">
+                    <form class="space-y-3" @submit.prevent="importCsv">
+                        <div>
+                            <h2 class="font-bold text-heritage-navy">Import a CSV file</h2>
+                            <p class="mt-1 text-xs leading-5 text-slate-500">
+                                Required columns: name, value, change, change_percent. Optional: symbol, is_positive, is_active, sort_order, as_of.
+                                Existing indices are matched by symbol, or by name when no symbol is provided.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <input type="file" accept=".csv,text/csv" required @change="selectCsvFile"
+                                class="min-w-0 flex-1 border border-slate-300 px-3 py-2 text-sm" />
+                            <button type="submit" :disabled="csvImportForm.processing || !csvImportForm.csv_file"
+                                class="rounded-md bg-heritage-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                                {{ csvImportForm.processing ? 'Importing…' : 'Import CSV' }}
+                            </button>
+                        </div>
+                        <p v-if="csvImportForm.errors.csv_file" class="text-sm text-red-600">
+                            {{ csvImportForm.errors.csv_file }}
+                        </p>
+                    </form>
+
+                    <div class="space-y-3 border-t border-slate-200 pt-4 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+                        <div>
+                            <h2 class="font-bold text-heritage-navy">Load from market API</h2>
+                            <p class="mt-1 text-xs leading-5 text-slate-500">
+                                Uses the server-configured HTTPS endpoint. It must return a JSON list (or a data/indices list) with name, value, change and change_percent.
+                            </p>
+                        </div>
+                        <button type="button" :disabled="apiImportForm.processing || !apiConfigured" @click="importApi"
+                            class="rounded-md border border-heritage-gold px-4 py-2 text-sm font-semibold text-heritage-navy disabled:cursor-not-allowed disabled:opacity-50">
+                            {{ apiImportForm.processing ? 'Loading…' : 'Load API prices' }}
+                        </button>
+                        <p v-if="!apiConfigured" class="text-xs text-slate-500">
+                            Configure MARKET_INDICES_API_URL (and optionally MARKET_INDICES_API_TOKEN) to enable API loading.
+                        </p>
+                        <p v-if="apiImportForm.errors.api" class="text-sm text-red-600">
+                            {{ apiImportForm.errors.api }}
+                        </p>
+                    </div>
+                </section>
+
                 <!-- Stats -->
                 <div class="mb-8 grid gap-4 sm:grid-cols-3">
 
@@ -309,7 +376,7 @@ function flashMessage() {
                             </h3>
 
                             <p class="mt-1 text-xs text-slate-400">
-                                Values are currently manually managed.
+                                Update values manually, import a CSV, or load from the configured market data API.
                             </p>
                         </div>
 

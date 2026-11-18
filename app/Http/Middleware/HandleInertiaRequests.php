@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\SiteSetting;
+use App\Models\MarketIndex;
 use App\Support\AdminFeatures;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -33,6 +34,11 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'accountApplication' => fn () => $request->session()->get('accountApplication'),
+            'marketTicker' => fn () => MarketIndex::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get(['id', 'name', 'symbol', 'value', 'change_value', 'change_percent', 'as_of']),
             'siteSettings' => fn () => SiteSetting::query()
                 ->whereIn('key', [
                     'company_name',

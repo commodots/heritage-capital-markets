@@ -1,7 +1,11 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-const props = defineProps({ application: { type: Object, required: true }, documentNames: { type: Array, default: () => [] } })
+const props = defineProps({
+  application: { type: Object, required: true },
+  documentNames: { type: Array, default: () => [] },
+  canDownloadPdf: { type: Boolean, default: false },
+})
 const form = useForm({ status: props.application.status, review_notes: props.application.review_notes || '' })
 function save() { form.post(`/admin/account-applications/${props.application.id}`) }
 function fieldLabel(key) { return key.replaceAll('_', ' ') }
@@ -14,6 +18,10 @@ function fieldLabel(key) { return key.replaceAll('_', ' ') }
         <h1 class="mt-3 text-2xl font-bold">Application {{ application.reference }}</h1>
         <p class="mt-1 text-sm text-slate-500 capitalize">{{ application.account_type }} · {{
           application.status.replaceAll('_',' ') }}</p>
+        <a v-if="canDownloadPdf" :href="`/admin/account-applications/${application.id}/pdf`"
+          class="mt-4 inline-flex rounded-md bg-heritage-navy px-4 py-2 text-sm font-semibold text-white">
+          Download application PDF
+        </a>
       </header>
       <div class="grid gap-6 p-6 lg:grid-cols-[1.3fr_0.7fr]">
         <section class="space-y-5">

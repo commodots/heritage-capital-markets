@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MarketIndex extends Model
 {
+    protected $appends = ['change', 'is_positive'];
+
     protected $fillable = [
         'name',
         'symbol',
@@ -24,4 +26,14 @@ class MarketIndex extends Model
         'as_of' => 'datetime',
         'is_active' => 'boolean',
     ];
+
+    public function getChangeAttribute(): float
+    {
+        return abs((float) ($this->attributes['change_value'] ?? 0));
+    }
+
+    public function getIsPositiveAttribute(): bool
+    {
+        return (float) ($this->attributes['change_value'] ?? 0) >= 0;
+    }
 }

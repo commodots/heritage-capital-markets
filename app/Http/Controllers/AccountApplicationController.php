@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccountApplication;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\AccountApplicationSubmitted;
 
 class AccountApplicationController extends Controller
 {
@@ -147,6 +151,18 @@ class AccountApplicationController extends Controller
         }
         $this->validateFormData($formData, $type);
 
+        $superAdminEmails = User::query()
+            ->where('is_super_admin', true)
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->all();
+
+        if ($superAdminEmails === []) {
+            throw ValidationException::withMessages([
+                'application_id' => 'This application cannot be submitted until a super administrator email is configured.',
+            ]);
+        }
+
         $documents = $app->documents ?? [];
         foreach ($request->file('documents', []) as $key => $file) {
             if ($file) {
@@ -155,8 +171,20 @@ class AccountApplicationController extends Controller
         }
 
         $app->documents = $documents;
+        $app->save();
         $app->status = 'submitted';
         $app->submitted_at = now();
+
+        $pdfContent = Pdf::loadView('pdf.account-application', [
+            'application' => $app,
+        ])->setPaper('a4')->output();
+
+        Mail::to($superAdminEmails)->send(new AccountApplicationSubmitted(
+            $app,
+            $pdfContent,
+            route('admin.account-applications.pdf', $app),
+        ));
+
         $app->save();
 
         session()->forget([
@@ -168,6 +196,15 @@ class AccountApplicationController extends Controller
             'type' => $type,
             'reference' => $app->reference,
         ]);
+    }
+
+    public function downloadPdf(AccountApplication $application)
+    {
+        abort_unless(auth()->user()?->is_super_admin, 403);
+
+        return Pdf::loadView('pdf.account-application', [
+            'application' => $application,
+        ])->setPaper('a4')->download($application->reference.'-account-application.pdf');
     }
 
     /**
