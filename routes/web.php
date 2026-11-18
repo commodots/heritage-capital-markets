@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\HomepageSettingsController;
 use App\Http\Controllers\Admin\InvestmentSolutionController as AdminInvestmentSolutionController;
 use App\Http\Controllers\Admin\LiveChatController;
 use App\Http\Controllers\Admin\MarketIndexController;
+use App\Http\Controllers\Admin\MarketQuoteController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\PageController;
@@ -386,8 +387,14 @@ Route::prefix('admin')
             Route::post('/market-indices', [MarketIndexController::class, 'store'])
                 ->name('admin.market-indices.store');
 
-            Route::post('/market-indices/import-csv', [MarketIndexController::class, 'importCsv'])
+            Route::post('/market-indices/import-csv', [MarketIndexController::class, 'previewCsv'])
                 ->name('admin.market-indices.import-csv');
+
+            Route::post('/market-indices/import-csv/commit', [MarketIndexController::class, 'commitCsv'])
+                ->name('admin.market-indices.import-csv.commit');
+
+            Route::post('/market-indices/import-csv/cancel', [MarketIndexController::class, 'cancelCsv'])
+                ->name('admin.market-indices.import-csv.cancel');
 
             Route::post('/market-indices/import-api', [MarketIndexController::class, 'importApi'])
                 ->name('admin.market-indices.import-api');
@@ -400,6 +407,30 @@ Route::prefix('admin')
 
             Route::delete('/market-indices/{marketIndex}', [MarketIndexController::class, 'destroy'])
                 ->name('admin.market-indices.destroy');
+
+            Route::get('/market-quotes', [MarketQuoteController::class, 'index'])
+                ->name('admin.market-quotes');
+
+            Route::post('/market-quotes', [MarketQuoteController::class, 'store'])
+                ->name('admin.market-quotes.store');
+
+            Route::post('/market-quotes/import-csv', [MarketQuoteController::class, 'previewCsv'])
+                ->name('admin.market-quotes.import-csv');
+
+            Route::post('/market-quotes/import-csv/commit', [MarketQuoteController::class, 'commitCsv'])
+                ->name('admin.market-quotes.import-csv.commit');
+
+            Route::post('/market-quotes/import-csv/cancel', [MarketQuoteController::class, 'cancelCsv'])
+                ->name('admin.market-quotes.import-csv.cancel');
+
+            Route::post('/market-quotes/{marketQuote}', [MarketQuoteController::class, 'update'])
+                ->name('admin.market-quotes.update');
+
+            Route::post('/market-quotes/{marketQuote}/toggle', [MarketQuoteController::class, 'toggle'])
+                ->name('admin.market-quotes.toggle');
+
+            Route::delete('/market-quotes/{marketQuote}', [MarketQuoteController::class, 'destroy'])
+                ->name('admin.market-quotes.destroy');
         });
 
         /*

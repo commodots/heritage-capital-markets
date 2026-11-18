@@ -33,6 +33,18 @@ php artisan queue:work --tries=5
 
 The example environment uses the `log` mailer for local development; it does not deliver email externally. Email recipients are active superadmin users with a configured email address.
 
+## Market Data
+
+The public market ticker is shared by all public pages and displays active stock quotes and market indices. It only displays records stored through the admin tools; no demonstration or fallback prices are seeded. An empty market-data list is shown as unavailable.
+
+Admins with the Market Indices permission can create and edit stock quotes under **Market Quotes** and manage indices under **Market Indices**. CSV uploads are validated and previewed before commit. Invalid rows are listed and skipped; repeated symbols/names are rejected, and successful, failed, and invalid rows are reported after commit.
+
+Stock quote CSVs use the required header row `symbol,name,value,change,change_percent`; optional columns are `as_of,is_active,sort_order`. Symbols must already exist in Market Quotes, movements are signed numeric values, and `as_of` should be an ISO 8601 timestamp.
+
+Market index CSVs use `name,value,change,change_percent`; `symbol,is_positive,is_active,sort_order,as_of` are optional. `change_value` is accepted instead of `change` for compatibility. Indices are matched by symbol or name, and a non-matching row creates a new index.
+
+Market index API imports remain disabled unless HCML approves the integration and a valid HTTPS endpoint is configured through `MARKET_INDICES_API_URL` (set `MARKET_INDICES_API_APPROVED=true`; optionally configure `MARKET_INDICES_API_TOKEN`). Stock quote API integration is not enabled; HCML approval and an approved provider are required before one is connected.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.

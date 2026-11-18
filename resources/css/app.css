@@ -22,6 +22,21 @@
 
     --font-display: "Palatino Linotype", serif;
     --font-sans: "Palatino Linotype", sans-serif;
+
+    --text-xs: 0.8125rem;
+    --text-sm: 0.9375rem;
+}
+
+[class*="text-[9px]"] {
+    font-size: 10px;
+}
+
+[class*="text-[10px]"] {
+    font-size: 11px;
+}
+
+[class*="text-[11px]"] {
+    font-size: 12px;
 }
 
 html {

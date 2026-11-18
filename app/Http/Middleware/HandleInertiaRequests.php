@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\SiteSetting;
 use App\Models\MarketIndex;
+use App\Models\MarketQuote;
 use App\Support\AdminFeatures;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -34,11 +35,37 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'accountApplication' => fn () => $request->session()->get('accountApplication'),
-            'marketTicker' => fn () => MarketIndex::query()
+            'marketTicker' => fn () => MarketQuote::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
-                ->orderBy('id')
-                ->get(['id', 'name', 'symbol', 'value', 'change_value', 'change_percent', 'as_of']),
+                ->orderBy('symbol')
+                ->get(['id', 'name', 'symbol', 'value', 'change_value', 'change_percent', 'as_of'])
+                ->map(fn (MarketQuote $quote) => [
+                    'id' => 'quote-'.$quote->id,
+                    'type' => 'stock',
+                    'name' => $quote->name,
+                    'symbol' => $quote->symbol,
+                    'value' => $quote->value,
+                    'change_value' => $quote->change_value,
+                    'change_percent' => $quote->change_percent,
+                    'as_of' => $quote->as_of,
+                ])
+                ->concat(MarketIndex::query()
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->get(['id', 'name', 'symbol', 'value', 'change_value', 'change_percent', 'as_of'])
+                    ->map(fn (MarketIndex $index) => [
+                        'id' => 'index-'.$index->id,
+                        'type' => 'index',
+                        'name' => $index->name,
+                        'symbol' => $index->symbol,
+                        'value' => $index->value,
+                        'change_value' => $index->change_value,
+                        'change_percent' => $index->change_percent,
+                        'as_of' => $index->as_of,
+                    ]))
+                ->values(),
             'siteSettings' => fn () => SiteSetting::query()
                 ->whereIn('key', [
                     'company_name',

@@ -1,8 +1,11 @@
 <script setup>
+import { usePage } from '@inertiajs/vue3'
 import Header from '@/Components/Header.vue'
 import Footer from '@/Components/Footer.vue'
 import MarketTicker from '@/Components/MarketTicker.vue'
 import LiveChatWidget from '@/Components/LiveChatWidget.vue'
+
+const page = usePage()
 </script>
 
 <template>
@@ -16,7 +19,7 @@ import LiveChatWidget from '@/Components/LiveChatWidget.vue'
         </main>
 
         <Footer />
-        <MarketTicker />
+        <MarketTicker :items="page.props.marketTicker ?? []" />
         <LiveChatWidget />
 
     </div>

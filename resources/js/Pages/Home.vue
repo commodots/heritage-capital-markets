@@ -393,7 +393,7 @@ const researchItems = computed(() => [
                     </div>
 
 
-                    <div class="grid grid-cols-2 gap-y-5 md:grid-cols-5">
+                    <div v-if="markets.length" class="grid grid-cols-2 gap-y-5 md:grid-cols-5">
 
                         <div v-for="market in markets" :key="market.id ?? market.name"
                             class="border-l border-heritage-border pl-4">
@@ -420,6 +420,9 @@ const researchItems = computed(() => [
                         </div>
 
                     </div>
+                    <p v-else class="text-sm text-heritage-muted">
+                        Market data is not currently available.
+                    </p>
 
                 </div>
 

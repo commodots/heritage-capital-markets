@@ -7,12 +7,30 @@ import receptionImage from '@/assets/about/heritage-reception.jpg'
 
 
 const memberNumbers = Array.from({ length: 12 }, (_, i) => i + 1)
-
-
 const expandedBios = ref({})
+const props = defineProps({
+    content: {
+        type: Object,
+        default: () => ({}),
+    },
+})
 
-const toggleBio = (number) => {
-    expandedBios.value[number] = !expandedBios.value[number]
+const memberSections = [
+    { prefix: 'board_member', title: 'Board Members' },
+    { prefix: 'management_member', title: 'Management Team' },
+]
+
+function profileField(prefix, number, field) {
+    return props.content[`${prefix}_${number}_${field}`]
+}
+
+function bioKey(prefix, number) {
+    return `${prefix}_${number}`
+}
+
+const toggleBio = (prefix, number) => {
+    const key = bioKey(prefix, number)
+    expandedBios.value[key] = !expandedBios.value[key]
 }
 
 function imageUrl(path) {
@@ -21,12 +39,6 @@ function imageUrl(path) {
     return cleanPath.startsWith('/') ? cleanPath : `/storage/${cleanPath}`
 }
 
-defineProps({
-    content: {
-        type: Object,
-        default: () => ({}),
-    },
-})
 </script>
 
 <template>
@@ -67,53 +79,58 @@ defineProps({
             </div>
         </section>
 
-        <section v-if="memberNumbers.some(number => content[`board_member_${number}_name`])" class="bg-heritage-offwhite py-16 md:py-20">
-            <div class="container-heritage">
-                <h2 class="font-display text-3xl font-semibold text-heritage-navy md:text-4xl">Meet the team</h2>
-                <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    <template v-for="number in memberNumbers" :key="number">
-                        <article
-                            v-if="content[`board_member_${number}_name`]"
-                            class="rounded border border-heritage-border bg-white p-6 flex flex-col justify-between"
-                        >
-                            <div>
-                                <img
-                                    v-if="content[`board_member_${number}_image`]"
-                                    :src="content[`board_member_${number}_image`].startsWith('/') ? content[`board_member_${number}_image`] : `/storage/${content[`board_member_${number}_image`]}`"
-                                    :alt="content[`board_member_${number}_name`]"
-                                    class="mb-5 h-64 w-full rounded object-cover object-top sm:h-72 lg:h-80 max-w-full transform-gpu"
-                                />
-                                <div
-                                    v-else
-                                    class="mb-5 flex h-64 items-center justify-center rounded bg-heritage-offwhite font-display text-5xl text-heritage-gold"
-                                    aria-hidden="true"
-                                >
-                                    {{ content[`board_member_${number}_name`].charAt(0) }}
-                                </div>
-                                <h3 class="font-display text-xl font-semibold text-heritage-navy">
-                                    {{ content[`board_member_${number}_name`] }}
-                                </h3>
-                                <p v-if="content[`board_member_${number}_role`]" class="mt-1 text-sm font-semibold text-heritage-gold">
-                                    {{ content[`board_member_${number}_role`] }}
-                                </p>
-                                
-                                <div v-if="content[`board_member_${number}_bio`]">
-                                    <p class="mt-4 leading-7 text-heritage-muted" :class="{ 'line-clamp-3': !expandedBios[number] }">
-                                        {{ content[`board_member_${number}_bio`] }}
-                                    </p>
-                                    <button
-                                        @click="toggleBio(number)"
-                                        class="mt-2 text-sm font-semibold text-heritage-gold hover:underline focus:outline-none"
+        <template v-for="memberSection in memberSections" :key="memberSection.prefix">
+            <section
+                v-if="memberNumbers.some(number => profileField(memberSection.prefix, number, 'name'))"
+                class="bg-heritage-offwhite py-16 md:py-20"
+            >
+                <div class="container-heritage">
+                    <h2 class="font-display text-3xl font-semibold text-heritage-navy md:text-4xl">{{ memberSection.title }}</h2>
+                    <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        <template v-for="number in memberNumbers" :key="number">
+                            <article
+                                v-if="profileField(memberSection.prefix, number, 'name')"
+                                class="flex flex-col justify-between rounded border border-heritage-border bg-white p-6"
+                            >
+                                <div>
+                                    <img
+                                        v-if="profileField(memberSection.prefix, number, 'image')"
+                                        :src="imageUrl(profileField(memberSection.prefix, number, 'image'))"
+                                        :alt="profileField(memberSection.prefix, number, 'name')"
+                                        class="mb-5 h-64 w-full max-w-full transform-gpu rounded object-cover object-top sm:h-72 lg:h-80"
+                                    />
+                                    <div
+                                        v-else
+                                        class="mb-5 flex h-64 items-center justify-center rounded bg-white font-display text-5xl text-heritage-gold"
+                                        aria-hidden="true"
                                     >
-                                        {{ expandedBios[number] ? 'See less' : 'See more' }}
-                                    </button>
+                                        {{ profileField(memberSection.prefix, number, 'name').charAt(0) }}
+                                    </div>
+                                    <h3 class="font-display text-xl font-semibold text-heritage-navy">
+                                        {{ profileField(memberSection.prefix, number, 'name') }}
+                                    </h3>
+                                    <p v-if="profileField(memberSection.prefix, number, 'role')" class="mt-1 text-sm font-semibold text-heritage-gold">
+                                        {{ profileField(memberSection.prefix, number, 'role') }}
+                                    </p>
+
+                                    <div v-if="profileField(memberSection.prefix, number, 'bio')">
+                                        <p class="mt-4 leading-7 text-heritage-muted" :class="{ 'line-clamp-3': !expandedBios[bioKey(memberSection.prefix, number)] }">
+                                            {{ profileField(memberSection.prefix, number, 'bio') }}
+                                        </p>
+                                        <button
+                                            @click="toggleBio(memberSection.prefix, number)"
+                                            class="mt-2 text-sm font-semibold text-heritage-gold hover:underline focus:outline-none"
+                                        >
+                                            {{ expandedBios[bioKey(memberSection.prefix, number)] ? 'See less' : 'See more' }}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </article>
-                    </template>
+                            </article>
+                        </template>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </template>
 
         <section id="careers" class="scroll-mt-24 bg-heritage-offwhite py-16 md:py-24">
             <div class="container-heritage grid items-center gap-10 lg:grid-cols-2">

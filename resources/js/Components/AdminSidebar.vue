@@ -129,6 +129,15 @@ function closeSidebar() {
                         </svg>
                         Market Indices
                     </a>
+                    <a v-if="can('market_indices')" href="/admin/market-quotes" :class="['admin-sub-item', subItemClass('/admin/market-quotes')]">
+                        <svg class="nav-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                            <path d="M4 6h16M4 12h16M4 18h16" />
+                            <circle cx="7" cy="6" r="1" fill="currentColor" />
+                            <circle cx="13" cy="12" r="1" fill="currentColor" />
+                            <circle cx="9" cy="18" r="1" fill="currentColor" />
+                        </svg>
+                        Market Quotes
+                    </a>
                     <a v-if="can('investment_solutions')" href="/admin/investment-solutions" :class="['admin-sub-item', subItemClass('/admin/investment-solutions')]">
                         <svg class="nav-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                             <rect x="3" y="7" width="18" height="13" rx="2" />
