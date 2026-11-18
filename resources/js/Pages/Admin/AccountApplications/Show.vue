@@ -18,7 +18,7 @@ function fieldLabel(key) { return key.replaceAll('_', ' ') }
         <h1 class="mt-3 text-2xl font-bold">Application {{ application.reference }}</h1>
         <p class="mt-1 text-sm text-slate-500 capitalize">{{ application.account_type }} · {{
           application.status.replaceAll('_',' ') }}</p>
-        <a v-if="canDownloadPdf" :href="`/admin/account-applications/${application.id}/pdf`"
+        <a v-if="canDownloadPdf && application.status !== 'draft'" :href="`/admin/account-applications/${application.id}/pdf`"
           class="mt-4 inline-flex rounded-md bg-heritage-navy px-4 py-2 text-sm font-semibold text-white">
           Download application PDF
         </a>

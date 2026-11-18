@@ -18,12 +18,13 @@ class PublicPageContent
             'board_profiles_note' => ['Information about individual board and management members will be published here as approved profiles become available.', 2000, true],
         ];
 
-        // Dynamically generate fields for 12 board members
-        for ($i = 1; $i <= 12; $i++) {
-            $boardFields["board_member_{$i}_name"] = ['', 255, false];
-            $boardFields["board_member_{$i}_role"] = ['', 255, false];
-            $boardFields["board_member_{$i}_bio"] = ['', 50000, true];
-            $boardFields["board_member_{$i}_image"] = ['', 10240, false, 'image'];
+        foreach (['board_member', 'management_member'] as $memberType) {
+            for ($i = 1; $i <= 12; $i++) {
+                $boardFields["{$memberType}_{$i}_name"] = ['', 255, false];
+                $boardFields["{$memberType}_{$i}_role"] = ['', 255, false];
+                $boardFields["{$memberType}_{$i}_bio"] = ['', 50000, true];
+                $boardFields["{$memberType}_{$i}_image"] = ['', 10240, false, 'image'];
+            }
         }
 
         $boardFields['board_careers_eyebrow'] = ['Careers', 100, false];

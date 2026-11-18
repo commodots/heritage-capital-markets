@@ -27,7 +27,7 @@ class AccountApplicationAdminController extends Controller
         return Inertia::render('Admin/AccountApplications/Show', [
             'application' => $application,
             'documentNames' => array_keys($application->documents ?? []),
-            'canDownloadPdf' => (bool) $request->user()?->is_super_admin,
+            'canDownloadPdf' => (bool) $request->user()?->hasFeature('account_applications'),
         ]);
     }
 

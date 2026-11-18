@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\HeroSlide;
 use App\Models\InvestmentSolution;
-use App\Models\MarketIndex;
 use Illuminate\Database\Seeder;
 
 class HomepageSeeder extends Seeder
@@ -128,80 +127,6 @@ class HomepageSeeder extends Seeder
 
         foreach ($solutions as $solution) {
             InvestmentSolution::create($solution);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Market Indices
-        |--------------------------------------------------------------------------
-        |
-        | These are the existing homepage demonstration figures.
-        | We will later replace them with live market data.
-        |--------------------------------------------------------------------------
-        */
-
-        MarketIndex::query()->delete();
-
-        $markets = [
-            [
-                'name' => 'NGX All-Share',
-                'symbol' => 'NGXASI',
-                'value' => 102026.75,
-                'change_value' => null,
-                'change_percent' => 0.63,
-                'as_of' => now(),
-                'is_active' => true,
-                'sort_order' => 1,
-            ],
-
-            [
-                'name' => 'NGX 30',
-                'symbol' => 'NGX30',
-                'value' => 3938.85,
-                'change_value' => null,
-                'change_percent' => 0.41,
-                'as_of' => now(),
-                'is_active' => true,
-                'sort_order' => 2,
-            ],
-
-            [
-                'name' => 'Banking',
-                'symbol' => 'BANKING',
-                'value' => 1205.67,
-                'change_value' => null,
-                'change_percent' => 0.75,
-                'as_of' => now(),
-                'is_active' => true,
-                'sort_order' => 3,
-            ],
-
-            [
-                'name' => 'Industrial Goods',
-                'symbol' => 'INDUSTRIAL',
-                'value' => 4182.11,
-                'change_value' => null,
-                'change_percent' => -0.28,
-                'as_of' => now(),
-                'is_active' => true,
-                'sort_order' => 4,
-            ],
-
-            [
-                'name' => 'Oil & Gas',
-                'symbol' => 'OILGAS',
-                'value' => 2216.36,
-                'change_value' => null,
-                'change_percent' => 0.31,
-                'as_of' => now(),
-                'is_active' => true,
-                'sort_order' => 5,
-            ],
-        ];
-
-        foreach ($markets as $market) {
-            MarketIndex::create($market);
         }
     }
 }

@@ -29,13 +29,13 @@ class LiveChatController extends Controller
         $conversation->load(['messages' => fn ($q) => $q->orderBy('id'), 'assignee:id,name']);
         return response()->json([
             'conversation' => $this->conversationData($conversation, true),
-            'unreadCount' => $this->unreadCount(),
+            'unreadCount' => $this->countUnreadConversations(),
         ]);
     }
 
     public function unreadCount()
     {
-        return response()->json(['count' => $this->unreadCount()]);
+        return response()->json(['count' => $this->countUnreadConversations()]);
     }
 
     public function reply(Request $request, ChatConversation $conversation)
@@ -83,7 +83,7 @@ class LiveChatController extends Controller
             'conversations' => $conversations,
             'conversation' => $selected ? $this->conversationData($selected->load(['messages' => fn ($q) => $q->orderBy('id'), 'assignee:id,name']), true) : null,
             'admins' => $admins,
-            'unreadCount' => $this->unreadCount(),
+            'unreadCount' => $this->countUnreadConversations(),
         ]);
     }
 
@@ -95,7 +95,7 @@ class LiveChatController extends Controller
         }
     }
 
-    private function unreadCount(): int
+    private function countUnreadConversations(): int
     {
         $userId = auth()->id();
         return ChatConversation::where(function ($q) use ($userId) {

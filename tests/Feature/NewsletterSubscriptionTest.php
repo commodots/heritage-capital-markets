@@ -2,13 +2,26 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\SendNewsletterCampaignToSubscriber;
+use App\Mail\NewsletterCampaignEmail;
 use App\Models\NewsletterSubscriber;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class NewsletterSubscriptionTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function admin(): User
+    {
+        return User::factory()->create([
+            'is_admin' => true,
+            'is_super_admin' => true,
+        ]);
+    }
 
     public function test_it_creates_a_normalized_newsletter_subscription(): void
     {
@@ -23,6 +36,7 @@ class NewsletterSubscriptionTest extends TestCase
             'email' => 'test.user@example.com',
             'is_active' => true,
         ]);
+        $this->assertNotNull(NewsletterSubscriber::first()->subscribed_at);
     }
 
     public function test_an_active_duplicate_gets_a_friendly_message_without_a_duplicate(): void
@@ -47,7 +61,9 @@ class NewsletterSubscriptionTest extends TestCase
         $subscriber = NewsletterSubscriber::create([
             'email' => 'reader@example.com',
             'is_active' => false,
+            'unsubscribed_at' => now()->subDay(),
         ]);
+        $oldVersion = $subscriber->subscriptionVersion();
 
         $response = $this->from('/')->post('/newsletter/subscribe', [
             'email' => 'reader@example.com',
@@ -59,7 +75,10 @@ class NewsletterSubscriptionTest extends TestCase
         $this->assertDatabaseHas('newsletter_subscribers', [
             'id' => $subscriber->id,
             'is_active' => true,
+            'unsubscribed_at' => null,
         ]);
+        $this->assertGreaterThan($oldVersion, $subscriber->fresh()->subscriptionVersion());
+        $this->assertNotNull($subscriber->fresh()->subscribed_at);
     }
 
     public function test_it_rejects_invalid_emails_and_filled_honeypot_fields(): void
@@ -96,5 +115,142 @@ class NewsletterSubscriptionTest extends TestCase
     {
         $this->get('/admin/newsletter-subscribers/export')
             ->assertRedirect('/login');
+    }
+
+    public function test_a_signed_unsubscribe_link_confirms_and_processes_without_login(): void
+    {
+        $subscriber = NewsletterSubscriber::create([
+            'email' => 'reader@example.com',
+            'is_active' => true,
+            'subscribed_at' => now(),
+        ]);
+        $url = $subscriber->unsubscribeUrl();
+
+        $this->get($url)
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Newsletter/Unsubscribe', false)
+                ->where('email', 'reader@example.com')
+                ->where('isSubscribed', true));
+
+        $this->post($url)->assertRedirect();
+
+        $this->assertFalse($subscriber->fresh()->is_active);
+        $this->assertNotNull($subscriber->fresh()->unsubscribed_at);
+        $this->assertSame('unsubscribed', $subscriber->fresh()->status);
+    }
+
+    public function test_unsubscribe_links_must_be_signed_and_are_invalidated_after_resubscription(): void
+    {
+        $subscriber = NewsletterSubscriber::create([
+            'email' => 'reader@example.com',
+            'is_active' => true,
+            'subscribed_at' => now(),
+        ]);
+        $url = $subscriber->unsubscribeUrl();
+
+        $this->get('/newsletter/unsubscribe/'.$subscriber->id.'?version='.$subscriber->subscriptionVersion())
+            ->assertForbidden();
+
+        $this->post($url)->assertRedirect();
+        $this->from('/')->post('/newsletter/subscribe', [
+            'email' => 'reader@example.com',
+            'website' => '',
+        ])->assertRedirect('/');
+
+        $this->get($url)->assertForbidden();
+    }
+
+    public function test_admin_campaigns_are_queued_only_for_active_subscribers(): void
+    {
+        Queue::fake();
+        $active = NewsletterSubscriber::create([
+            'email' => 'active@example.com',
+            'is_active' => true,
+        ]);
+        NewsletterSubscriber::create([
+            'email' => 'unsubscribed@example.com',
+            'is_active' => false,
+            'unsubscribed_at' => now(),
+        ]);
+        NewsletterSubscriber::create([
+            'email' => 'inactive@example.com',
+            'is_active' => false,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->post('/admin/newsletter-subscribers/campaign', [
+                'subject' => 'Market update',
+                'body' => 'This is a test campaign.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success', 'Campaign scheduled for delivery to 1 active subscriber(s).');
+
+        Queue::assertPushed(SendNewsletterCampaignToSubscriber::class, 1);
+        Queue::assertPushed(SendNewsletterCampaignToSubscriber::class, fn ($job) => $job->subscriberId === $active->id);
+    }
+
+    public function test_admin_cannot_reactivate_a_subscriber_who_opted_out(): void
+    {
+        $subscriber = NewsletterSubscriber::create([
+            'email' => 'reader@example.com',
+            'is_active' => false,
+            'unsubscribed_at' => now(),
+        ]);
+
+        $this->actingAs($this->admin())
+            ->post("/admin/newsletter-subscribers/{$subscriber->id}/toggle")
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertFalse($subscriber->fresh()->is_active);
+    }
+
+    public function test_queued_campaign_delivery_rechecks_subscription_and_includes_unsubscribe_link(): void
+    {
+        Mail::fake();
+        $subscriber = NewsletterSubscriber::create([
+            'email' => 'reader@example.com',
+            'is_active' => true,
+            'subscribed_at' => now(),
+        ]);
+        $job = new SendNewsletterCampaignToSubscriber($subscriber->id, 'Market update', 'Hello there.');
+
+        $subscriber->update([
+            'is_active' => false,
+            'unsubscribed_at' => now(),
+        ]);
+        $job->handle();
+        Mail::assertNothingSent();
+
+        $subscriber->update([
+            'is_active' => true,
+            'unsubscribed_at' => null,
+            'subscription_version' => $subscriber->subscriptionVersion() + 1,
+        ]);
+        $job->handle();
+
+        Mail::assertSent(NewsletterCampaignEmail::class, function (NewsletterCampaignEmail $mail) use ($subscriber) {
+            return $mail->hasTo($subscriber->email)
+                && str_contains($mail->render(), '/newsletter/unsubscribe/'.$subscriber->id);
+        });
+    }
+
+    public function test_admin_export_includes_status_and_unsubscribe_timestamp(): void
+    {
+        NewsletterSubscriber::create([
+            'email' => 'reader@example.com',
+            'is_active' => false,
+            'unsubscribed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin())
+            ->get('/admin/newsletter-subscribers/export')
+            ->assertOk();
+
+        $csv = $response->streamedContent();
+        $this->assertStringContainsString('unsubscribed_at', $csv);
+        $this->assertStringContainsString('unsubscribed', $csv);
+        $this->assertStringContainsString('reader@example.com', $csv);
     }
 }

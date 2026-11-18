@@ -8,10 +8,20 @@ defineProps({
         type: Array,
         default: () => [],
     },
+    documents: {
+        type: Array,
+        default: () => [],
+    },
+    canManageDocuments: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 const fileInput = ref(null)
+const documentInput = ref(null)
 const form = useForm({ file: null })
+const documentForm = useForm({ name: '', caption: '', file: null })
 
 function submit() {
     form.post('/admin/media', {
@@ -29,6 +39,18 @@ function remove(item) {
     if (confirm(`Are you sure you want to delete "${fileName(item)}"?`)) {
         router.delete(`/admin/media/${item.id}`, { preserveScroll: true })
     }
+}
+
+function submitDocument() {
+    documentForm.post('/admin/media/documents', {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            documentForm.reset()
+            documentForm.clearErrors()
+            if (documentInput.value) documentInput.value.value = ''
+        },
+    })
 }
 
 function fileName(item) {
@@ -83,6 +105,57 @@ function url(item) {
                     </button>
                 </div>
             </form>
+
+            <section class="mb-8 rounded-lg border border-slate-200 bg-white p-6">
+                <h2 class="text-lg font-semibold text-heritage-navy">Downloadable documents</h2>
+                <p class="mt-1 text-sm text-slate-500">
+                    <template v-if="canManageDocuments">
+                        Publish PDF, DOC or DOCX forms and resources on the public Downloads page. Maximum size: 10 MB.
+                    </template>
+                    <template v-else>
+                        Downloadable forms and resources published on the public Downloads page.
+                    </template>
+                </p>
+                <form v-if="canManageDocuments" class="mt-5 grid gap-4 md:grid-cols-2" @submit.prevent="submitDocument">
+                    <label class="block">
+                        <span class="text-sm font-medium text-slate-700">Document title <span class="text-red-600">*</span></span>
+                        <input v-model="documentForm.name" type="text" required maxlength="255"
+                            class="mt-2 w-full rounded border border-slate-300 p-3 text-sm">
+                        <span v-if="documentForm.errors.name" class="mt-1 block text-sm text-red-600">{{ documentForm.errors.name }}</span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-slate-700">Description</span>
+                        <input v-model="documentForm.caption" type="text" maxlength="1000"
+                            class="mt-2 w-full rounded border border-slate-300 p-3 text-sm">
+                        <span v-if="documentForm.errors.caption" class="mt-1 block text-sm text-red-600">{{ documentForm.errors.caption }}</span>
+                    </label>
+                    <label class="block md:col-span-2">
+                        <span class="text-sm font-medium text-slate-700">Document file <span class="text-red-600">*</span></span>
+                        <input id="download-document" ref="documentInput" type="file" required accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            class="mt-2 block w-full rounded border border-slate-300 p-3 text-sm"
+                            @change="documentForm.file = $event.target.files?.[0] || null">
+                        <span v-if="documentForm.errors.file" class="mt-1 block text-sm text-red-600">{{ documentForm.errors.file }}</span>
+                    </label>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="btn-gold" :disabled="documentForm.processing || !documentForm.file">
+                            {{ documentForm.processing ? 'Publishing...' : 'Publish document' }}
+                        </button>
+                    </div>
+                </form>
+
+                <div v-if="documents.length" class="mt-6 divide-y divide-slate-200 border-y border-slate-200">
+                    <article v-for="document in documents" :key="document.id"
+                        class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0">
+                            <p class="truncate font-medium text-heritage-navy">{{ document.name }}</p>
+                            <p v-if="document.caption" class="mt-1 text-sm text-slate-500">{{ document.caption }}</p>
+                        </div>
+                        <button v-if="canManageDocuments" type="button" class="shrink-0 text-sm font-medium text-red-600 hover:underline"
+                            @click="remove(document)">Delete document</button>
+                    </article>
+                </div>
+                <p v-else-if="canManageDocuments" class="mt-5 text-sm text-slate-500">No downloadable documents have been published.</p>
+            </section>
 
             <div v-if="media.length" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <article v-for="item in media" :key="item.id"
