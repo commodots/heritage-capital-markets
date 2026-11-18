@@ -153,7 +153,9 @@ class AccountApplicationController extends Controller
 
         $superAdminEmails = User::query()
             ->where('is_super_admin', true)
+            ->where('is_admin', true)
             ->whereNotNull('email')
+            ->where('email', '<>', '')
             ->pluck('email')
             ->all();
 

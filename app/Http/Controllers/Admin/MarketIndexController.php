@@ -21,7 +21,7 @@ class MarketIndexController extends Controller
                 ->orderBy('sort_order')
                 ->orderBy('id')
                 ->get(),
-            'apiConfigured' => filled(config('services.market_indices.url')),
+            'apiConfigured' => $this->apiUrl() !== null,
         ]);
     }
 
@@ -126,15 +126,15 @@ class MarketIndexController extends Controller
 
     public function importApi()
     {
-        $url = config('services.market_indices.url');
-        if (! is_string($url) || ! filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https') {
+        $url = $this->apiUrl();
+        if ($url === null) {
             throw ValidationException::withMessages([
                 'api' => 'Configure a valid HTTPS MARKET_INDICES_API_URL before importing from an API.',
             ]);
         }
 
         try {
-            $request = Http::acceptJson()->timeout(15);
+            $request = Http::acceptJson()->timeout(15)->withoutRedirecting();
             $token = config('services.market_indices.token');
             if (filled($token)) {
                 $request = $request->withToken($token);
@@ -181,6 +181,17 @@ class MarketIndexController extends Controller
         $this->importRows($rows);
 
         return back()->with('success', count($rows).' market indices imported from the configured API.');
+    }
+
+    private function apiUrl(): ?string
+    {
+        $url = config('services.market_indices.url');
+
+        return is_string($url)
+            && filter_var($url, FILTER_VALIDATE_URL)
+            && parse_url($url, PHP_URL_SCHEME) === 'https'
+                ? $url
+                : null;
     }
 
     public function destroy(MarketIndex $marketIndex)

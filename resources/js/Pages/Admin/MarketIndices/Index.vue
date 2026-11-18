@@ -265,6 +265,7 @@ function flashMessage() {
                             <h2 class="font-bold text-heritage-navy">Import a CSV file</h2>
                             <p class="mt-1 text-xs leading-5 text-slate-500">
                                 Required columns: name, value, change, change_percent. Optional: symbol, is_positive, is_active, sort_order, as_of.
+                                Use 1 or 0 for is_positive and is_active.
                                 Existing indices are matched by symbol, or by name when no symbol is provided.
                             </p>
                         </div>
