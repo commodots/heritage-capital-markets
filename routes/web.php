@@ -39,7 +39,6 @@ use App\Http\Controllers\ResearchCentreController;
 use App\Http\Controllers\ResourcesNewsController;
 use App\Http\Controllers\SearchController;
 use App\Support\AccountOpeningFormSchema;
-use App\Support\PublicPageContent;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -91,9 +90,9 @@ Route::get('/terms-of-use', [PublicContentPageController::class, 'termsOfUse'])
 Route::get('/risk-disclosure', [PublicContentPageController::class, 'riskDisclosure'])
     ->name('risk-disclosure');
 
-Route::get('/investor-login', fn () => Inertia::render('InvestorLogin', [
-    'content' => PublicPageContent::groupValues('investor-login'),
-]))
+Route::get('/investor-login', fn () => redirect()->away(
+    'https://heritagecapital.xcloudintegra.com/LoginInnovationbedai.aspx?ReturnUrl=%2f',
+))
     ->name('investor-login');
 
 /*
@@ -631,7 +630,6 @@ Route::prefix('admin')
                 ->name('admin.account-applications.update');
 
             Route::get('/account-applications/{application}/pdf', [AccountApplicationController::class, 'downloadPdf'])
-                ->middleware('superadmin')
                 ->name('admin.account-applications.pdf');
 
             Route::get('/account-applications/{application}/documents/{document}', [AccountApplicationAdminController::class, 'download'])

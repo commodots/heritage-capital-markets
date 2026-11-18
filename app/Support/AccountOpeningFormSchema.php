@@ -26,7 +26,7 @@ class AccountOpeningFormSchema
             'requiredFieldsByStep' => [
                 ['surname', 'first_name', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry'],
                 ['telephone', 'email', 'residential_address'],
-                ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn', 'direct_cash_settlement'],
+                ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn', 'direct_cash_settlement'],
             ],
             'peopleField' => null,
             'peopleMinimum' => 0,
@@ -41,7 +41,7 @@ class AccountOpeningFormSchema
             'requiredFieldsByStep' => [
                 ['company_name', 'rc_number', 'nature_of_business', 'business_address', 'directors'],
                 ['telephone', 'email', 'contact_address'],
-                ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn'],
+                ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn'],
             ],
             'peopleField' => 'directors',
             'peopleSingularLabel' => 'Director / Signatory',
@@ -57,7 +57,7 @@ class AccountOpeningFormSchema
             'requiredFieldsByStep' => [
                 ['joint_account_name', 'joint_address', 'joint_contact_number', 'direct_cash_settlement'],
                 ['joint_applicants'],
-                ['bank_name', 'bank_account_number', 'bank_account_name'],
+                ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn'],
             ],
             'peopleField' => 'joint_applicants',
             'peopleSingularLabel' => 'Joint Account Holder',
@@ -73,7 +73,7 @@ class AccountOpeningFormSchema
             'requiredFieldsByStep' => [
                 ['surname', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry', 'telephone', 'email', 'residential_address'],
                 ['guardian_name', 'guardian_relationship', 'guardian_telephone'],
-                ['bank_name', 'bank_account_number', 'bank_account_name'],
+                ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn'],
             ],
             'peopleField' => null,
             'peopleMinimum' => 0,
@@ -88,7 +88,7 @@ class AccountOpeningFormSchema
             'requiredFieldsByStep' => [
                 ['estate_name', 'deceased_date_of_birth', 'estate_address'],
                 ['administrators'],
-                ['bank_name', 'bank_account_number', 'bank_account_name'],
+                ['bank_name', 'bank_account_number', 'bank_account_name', 'account_type', 'bvn'],
             ],
             'peopleField' => 'administrators',
             'peopleSingularLabel' => 'Administrator',
@@ -111,7 +111,7 @@ class AccountOpeningFormSchema
         'state_of_origin' => 'State of Origin',
         'lga' => 'LGA',
         'id_type' => 'Means of Identification',
-        'id_number' => 'ID Number (NIN: 11 digits)',
+        'id_number' => 'National Identification Number (NIN - 11 digits)',
         'id_expiry' => 'ID Expiry Date',
         'residential_address' => 'Residential Address',
         'contact_address' => 'Contact Address',
@@ -163,7 +163,7 @@ class AccountOpeningFormSchema
         'date_of_birth' => 'Date of Birth',
         'nationality' => 'Nationality',
         'id_type' => 'Means of Identification',
-        'id_number' => 'ID Number (NIN: 11 digits)',
+        'id_number' => 'National Identification Number (NIN - 11 digits)',
         'id_expiry' => 'ID Expiry Date',
         'state_of_origin' => 'State of Origin',
         'lga_of_origin' => 'LGA of Origin',

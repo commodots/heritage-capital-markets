@@ -9,9 +9,11 @@ use App\Support\AccountOpeningFormSchema;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use RuntimeException;
 
 class AccountApplicationController extends Controller
 {
@@ -83,7 +85,13 @@ class AccountApplicationController extends Controller
         }
 
         $existingData = $app->form_data ?? [];
-        $app->form_data = array_replace_recursive($existingData, $formData);
+        $mergedFormData = array_replace_recursive($existingData, $formData);
+        foreach (['directors', 'administrators', 'joint_applicants'] as $peopleList) {
+            if (array_key_exists($peopleList, $formData)) {
+                $mergedFormData[$peopleList] = $formData[$peopleList];
+            }
+        }
+        $app->form_data = $mergedFormData;
         $storedDocuments = $app->documents ?? [];
 
         foreach ($request->file('documents', []) as $key => $file) {
@@ -182,6 +190,9 @@ class AccountApplicationController extends Controller
             'application' => $app,
         ])->setPaper('a4')->output();
 
+        $pdfPath = $this->privatePdfPath($app);
+        $this->storePrivatePdf($pdfPath, $pdfContent);
+        $app->pdf_path = $pdfPath;
         $app->save();
 
         Mail::to($superAdminEmails)->queue(new AccountApplicationSubmitted(
@@ -203,11 +214,24 @@ class AccountApplicationController extends Controller
 
     public function downloadPdf(AccountApplication $application)
     {
-        abort_unless(auth()->user()?->is_super_admin, 403);
+        abort_unless(auth()->user()?->hasFeature('account_applications'), 403);
+        abort_if($application->status === 'draft', 404);
 
-        return Pdf::loadView('pdf.account-application', [
-            'application' => $application,
-        ])->setPaper('a4')->download($application->reference.'-account-application.pdf');
+        $path = $application->pdf_path;
+        if (! $path || ! Storage::disk('local')->exists($path)) {
+            $pdfContent = Pdf::loadView('pdf.account-application', [
+                'application' => $application,
+            ])->setPaper('a4')->output();
+            $path = $this->privatePdfPath($application);
+            $this->storePrivatePdf($path, $pdfContent);
+            $application->forceFill(['pdf_path' => $path])->save();
+        }
+
+        return Storage::disk('local')->download(
+            $path,
+            $application->reference.'-account-application.pdf',
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     public function downloadBlankForm(string $type)
@@ -260,8 +284,11 @@ class AccountApplicationController extends Controller
             'date_of_registration' => ['date'],
             'account_opened_at' => ['date'],
             'id_expiry' => ['date'],
+            'id_type' => ['in:NIN'],
             'bvn' => ['digits:11'],
             'bank_account_number' => ['digits:10'],
+            'account_type' => ['in:Savings,Current'],
+            'rc_number' => ['regex:/^(?:RC)?\d{1,8}$/i'],
         ];
         $rules = [];
 
@@ -298,7 +325,7 @@ class AccountApplicationController extends Controller
                 'date_of_birth' => ['date'],
                 'nationality' => ['string', 'max:80'],
                 'residential_address' => ['string', 'max:1000'],
-                'id_type' => ['string', 'max:60'],
+                'id_type' => ['in:NIN'],
                 'id_number' => ['string', 'max:100'],
                 'id_expiry' => ['date'],
             ];
@@ -356,6 +383,18 @@ class AccountApplicationController extends Controller
 
         return is_string($normalized)
             && preg_match('/^(?:0[789]\d{9}|\+234[789]\d{9}|\+[1-9]\d{7,14})$/', $normalized) === 1;
+    }
+
+    private function privatePdfPath(AccountApplication $application): string
+    {
+        return 'account-applications/'.$application->reference.'/completed-application.pdf';
+    }
+
+    private function storePrivatePdf(string $path, string $contents): void
+    {
+        if (! Storage::disk('local')->put($path, $contents)) {
+            throw new RuntimeException('Unable to securely store the completed account application PDF.');
+        }
     }
 
     public function success(Request $request, string $type)

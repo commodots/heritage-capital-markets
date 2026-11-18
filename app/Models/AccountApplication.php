@@ -9,7 +9,11 @@ class AccountApplication extends Model
     protected $fillable = [
         'reference', 'account_type', 'applicant_name', 'email', 'phone',
         'status', 'current_step', 'form_data', 'documents', 'submitted_at',
-        'review_notes',
+        'review_notes', 'pdf_path',
+    ];
+
+    protected $hidden = [
+        'pdf_path',
     ];
 
     protected $casts = [

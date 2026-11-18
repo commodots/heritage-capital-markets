@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, nextTick } from 'vue'
 import { router, useForm, usePage } from '@inertiajs/vue3'
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import SeoHead from '@/Components/SeoHead.vue'
@@ -16,6 +16,7 @@ const fieldLabels = computed(() => props.formSchema.fieldLabels)
 const personFieldLabels = computed(() => props.formSchema.personFieldLabels)
 const personFields = computed(() => props.formSchema.personFields)
 const step = ref(1)
+const stepHeading = ref(null)
 const applicationId = ref(null)
 const reference = ref('')
 const errorMessage = ref('')
@@ -66,6 +67,11 @@ onMounted(() => {
     reference.value = savedApplication.reference
     if (savedApplication.form_data) Object.assign(form, savedApplication.form_data)
     if (savedApplication.current_step) step.value = Math.min(4, Math.max(1, Number(savedApplication.current_step)))
+  }
+
+  form.id_type = 'NIN'
+  for (const listKey of ['directors', 'administrators', 'joint_applicants']) {
+    for (const person of form[listKey] || []) person.id_type = 'NIN'
   }
 })
 
@@ -127,13 +133,27 @@ function validateCurrentStep() {
     fieldErrors.value.bvn = 'BVN must be exactly 11 digits.'
     valid = false
   }
+  if (form.account_type && !['Savings', 'Current'].includes(form.account_type)) {
+    fieldErrors.value.account_type = 'Select Savings or Current.'
+    valid = false
+  }
+  if (form.rc_number && !/^(?:RC)?\d{1,8}$/i.test(form.rc_number)) {
+    fieldErrors.value.rc_number = 'Enter a valid RC number (RC followed by up to 8 digits).'
+    valid = false
+  }
   if (form.bank_account_number && !/^\d{10}$/.test(form.bank_account_number)) {
     fieldErrors.value.bank_account_number = 'Bank account number must be 10 digits.'
     valid = false
   }
-  if (['individual', 'minor'].includes(type) && form.id_type === 'NIN' && form.id_number && !/^\d{11}$/.test(form.id_number)) {
-    fieldErrors.value.id_number = 'NIN must be exactly 11 digits.'
-    valid = false
+  if (['individual', 'minor'].includes(type)) {
+    if (form.id_type !== 'NIN') {
+      fieldErrors.value.id_type = 'NIN is required.'
+      valid = false
+    }
+    if (form.id_number && !/^\d{11}$/.test(form.id_number)) {
+      fieldErrors.value.id_number = 'NIN must be exactly 11 digits.'
+      valid = false
+    }
   }
 
   for (const listKey of ['directors', 'administrators', 'joint_applicants']) {
@@ -150,7 +170,11 @@ function validateCurrentStep() {
           valid = false
         }
       }
-      if (person.id_type === 'NIN' && person.id_number && !/^\d{11}$/.test(person.id_number)) {
+      if (person.id_type !== 'NIN') {
+        fieldErrors.value[`${listKey}.${index}.id_type`] = 'NIN is required.'
+        valid = false
+      }
+      if (person.id_number && !/^\d{11}$/.test(person.id_number)) {
         fieldErrors.value[`${listKey}.${index}.id_number`] = 'NIN must be exactly 11 digits.'
         valid = false
       }
@@ -195,14 +219,18 @@ function saveStep(nextStep) {
   router.post(`/open-account/${props.accountType}/save-step`, payload, {
     forceFormData: true,
     preserveScroll: true,
-    onSuccess: (pageProps) => {
+    onSuccess: async (pageProps) => {
       // Pull app info safely from flash or shared controller response
       const saved = pageProps.props.accountApplication
       if (saved?.id) {
         applicationId.value = saved.id
         reference.value = saved.reference
       }
-      if (nextStep) step.value = nextStep
+      if (nextStep) {
+        step.value = nextStep
+        await nextTick()
+        stepHeading.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
     },
     onError: (errors) => {
       errorMessage.value = Object.values(errors)[0] || 'Please review your entries and try again.'
@@ -271,7 +299,7 @@ function submitApplication() {
             reference: <strong>{{ reference }}</strong></div>
           <div v-if="errorMessage" class="mb-5 border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ errorMessage
           }}</div>
-          <h2 class="font-display text-2xl font-semibold text-heritage-navy">{{ stepTitles[step - 1] }}</h2>
+          <h2 ref="stepHeading" class="scroll-mt-24 font-display text-2xl font-semibold text-heritage-navy">{{ stepTitles[step - 1] }}</h2>
           <p class="mt-2 text-sm text-slate-500">Complete the required fields marked with <span class="font-bold text-red-600">*</span>.</p>
           <div v-if="step < 4" class="mt-6 grid gap-5 md:grid-cols-2">
             <template v-for="key in currentStepFields" :key="key">
@@ -284,7 +312,7 @@ function submitApplication() {
                   <button v-if="key === 'directors' || key === 'administrators'" type="button"
                     class="border border-heritage-navy px-4 py-2 text-sm font-semibold text-heritage-navy"
                     :disabled="form[key].length >= 20" @click="addPerson(key)">
-                    Add {{ key === 'administrators' ? 'administrator' : 'director' }}
+                    Add {{ key === 'administrators' ? 'Administrator' : 'Director' }}
                   </button>
                 </div>
                 <article v-for="(person, index) in form[key]" :key="index" class="rounded-lg border border-slate-200 p-4">
@@ -303,13 +331,13 @@ function submitApplication() {
                       <select v-if="field === 'nationality'" v-model="person[field]" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3">
                         <option v-for="nationality in nationalities" :key="nationality" :value="nationality">{{ nationality }}</option>
                       </select>
-                      <select v-else-if="field === 'id_type'" v-model="person[field]" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3">
-                        <option value="NIN">NIN</option><option value="International Passport">International Passport</option>
-                        <option value="Driver’s Licence">Driver’s Licence</option><option value="Voter’s Card">Voter’s Card</option>
-                      </select>
+                      <input v-else-if="field === 'id_type'" v-model="person[field]" readonly :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 bg-slate-100 px-3 py-3" />
                       <textarea v-else-if="field.includes('address')" v-model="person[field]" rows="2" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3" />
                       <input v-else v-model="person[field]" :type="field === 'email' || field.endsWith('_email') ? 'email' : field.includes('telephone') ? 'tel' : (field.includes('date') || field === 'id_expiry') ? 'date' : 'text'"
                         :required="isRequiredPersonField(field)"
+                        :inputmode="field === 'id_number' ? 'numeric' : (field.includes('telephone') ? 'tel' : undefined)"
+                        :maxlength="field === 'id_number' ? 11 : undefined"
+                        :pattern="field === 'id_number' ? '[0-9]{11}' : undefined"
                         :placeholder="field.includes('telephone') ? '08012345678 or +2348012345678' : ''"
                         class="mt-2 w-full border px-3 py-3"
                         :class="fieldErrors[`${key}.${index}.${field}`] ? 'border-red-500' : 'border-slate-300'"
@@ -333,14 +361,11 @@ function submitApplication() {
                 <select v-else-if="key === 'nationality'" v-model="form[key]" required class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
                   <option v-for="nationality in nationalities" :key="nationality" :value="nationality">{{ nationality }}</option>
                 </select>
-                <select v-else-if="key === 'id_type'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
-                  <option value="NIN">NIN</option><option value="International Passport">International Passport</option>
-                  <option value="Driver’s Licence">Driver’s Licence</option><option value="Voter’s Card">Voter’s Card</option>
-                </select>
+                <input v-else-if="key === 'id_type'" v-model="form[key]" readonly :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 bg-slate-100 px-3 py-3" />
                 <select v-else-if="key === 'direct_cash_settlement'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
                   <option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option>
                 </select>
-                <select v-else-if="key === 'account_type'" v-model="form[key]" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
+                <select v-else-if="key === 'account_type'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
                   <option value="Savings">Savings</option><option value="Current">Current</option>
                 </select>
                 <textarea v-else-if="key.includes('address') || key === 'additional_information'" v-model="form[key]" rows="3" :required="isRequiredField(key)"
@@ -348,8 +373,9 @@ function submitApplication() {
                 <input v-else v-model="form[key]" :type="['date_of_birth','deceased_date_of_birth','id_expiry','date_of_registration','account_opened_at'].includes(key) ? 'date' : (key.includes('email') ? 'email' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : 'text'))"
                   :required="isRequiredField(key)"
                   :inputmode="['bvn','id_number','bank_account_number'].includes(key) ? 'numeric' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : undefined)"
-                  :maxlength="key === 'bvn' || (key === 'id_number' && form.id_type === 'NIN') ? 11 : (key === 'bank_account_number' ? 10 : undefined)"
-                  :placeholder="key === 'bvn' ? 'Enter 11-digit BVN' : (key === 'id_number' && form.id_type === 'NIN' ? 'Enter 11-digit NIN' : (key === 'bank_account_number' ? 'Enter 10-digit account number' : (key.includes('telephone') || key === 'joint_contact_number' ? '08012345678 or +2348012345678' : '')))"
+                  :maxlength="key === 'bvn' || key === 'id_number' ? 11 : (key === 'bank_account_number' ? 10 : (key === 'rc_number' ? 10 : undefined))"
+                  :pattern="['bvn','id_number'].includes(key) ? '[0-9]{11}' : (key === 'bank_account_number' ? '[0-9]{10}' : (key === 'rc_number' ? '(RC)?[0-9]{1,8}' : undefined))"
+                  :placeholder="key === 'bvn' ? 'Enter 11-digit BVN' : (key === 'id_number' ? 'Enter 11-digit NIN' : (key === 'bank_account_number' ? 'Enter 10-digit account number' : (key === 'rc_number' ? 'e.g. RC123456' : (key.includes('telephone') || key === 'joint_contact_number' ? '08012345678 or +2348012345678' : ''))))"
                   class="mt-2 w-full border px-3 py-3"
                   :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)" />
                 <span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
@@ -372,7 +398,7 @@ function submitApplication() {
               the information supplied
               is accurate and consent to
               Heritage Capital Markets
-              processing it for account-opening review.</label><span v-if="fieldErrors.declaration_accepted"
+              processing it for account-opening review. <span class="font-bold text-red-600">*</span></label><span v-if="fieldErrors.declaration_accepted"
               class="mt-1 block text-xs text-red-600">{{ fieldErrors.declaration_accepted }}</span>
           </div>
           <div class="mt-8 flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-6">

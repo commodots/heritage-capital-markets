@@ -23,7 +23,7 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Account Opening
 
-The Downloads page provides online applications and printable blank PDFs for individual, corporate, joint, minor, and estate accounts. These PDFs are generated from the same form schema used by the online forms and submission validation. Superadmins can publish additional approved PDF/DOC/DOCX documents from the Media Library.
+The Downloads page provides online applications and printable blank PDFs for individual, corporate, joint, minor, and estate accounts. These PDFs are generated from the same form schema used by the online forms and submission validation. Completed application PDFs and supporting KYC documents are stored on Laravel's private local disk and downloaded only through the authorized Account Applications admin routes. Superadmins can publish additional approved PDF/DOC/DOCX documents from the Media Library.
 
 Account-submission emails are encrypted and queued. Production must configure a real mail transport, set `QUEUE_CONNECTION=database` (or another persistent queue), and run a queue worker, for example:
 
