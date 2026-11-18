@@ -129,7 +129,7 @@ class NewsletterSubscriptionTest extends TestCase
         $this->get($url)
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->component('Newsletter/Unsubscribe')
+                ->component('Newsletter/Unsubscribe', false)
                 ->where('email', 'reader@example.com')
                 ->where('isSubscribed', true));
 
@@ -216,7 +216,7 @@ class NewsletterSubscriptionTest extends TestCase
 
         Mail::assertSent(NewsletterCampaignEmail::class, function (NewsletterCampaignEmail $mail) use ($subscriber) {
             return $mail->hasTo($subscriber->email)
-                && str_contains($mail->render(), $mail->unsubscribeUrl);
+                && str_contains($mail->render(), '/newsletter/unsubscribe/'.$subscriber->id);
         });
     }
 

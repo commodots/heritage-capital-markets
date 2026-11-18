@@ -33,6 +33,10 @@ php artisan queue:work --tries=5
 
 The example environment uses the `log` mailer for local development; it does not deliver email externally. Email recipients are active superadmin users with a configured email address.
 
+## Newsletter Campaigns
+
+Admins with the Newsletter Subscribers permission can export subscriber status to CSV and send plain-text campaigns to subscribed addresses. Campaign delivery uses the configured queue and rechecks subscription status before sending. Campaign emails include a signed unsubscribe link that works without an account; unsubscribing immediately excludes the address from future campaigns, and only the subscriber can opt back in through the public signup form.
+
 ## Market Data
 
 The public market ticker is shared by all public pages and displays active stock quotes and market indices. It only displays records stored through the admin tools; no demonstration or fallback prices are seeded. An empty market-data list is shown as unavailable.
