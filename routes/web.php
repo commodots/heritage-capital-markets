@@ -124,6 +124,14 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->middleware('throttle:5,1')
     ->name('newsletter.subscribe');
 
+Route::get('/newsletter/unsubscribe/{newsletterSubscriber}', [NewsletterController::class, 'confirmUnsubscribe'])
+    ->middleware('signed')
+    ->name('newsletter.unsubscribe.confirm');
+
+Route::post('/newsletter/unsubscribe/{newsletterSubscriber}', [NewsletterController::class, 'unsubscribe'])
+    ->middleware('signed')
+    ->name('newsletter.unsubscribe.process');
+
 Route::prefix('chat')->group(function () {
     Route::get('/availability', [ChatController::class, 'availability'])->middleware('throttle:60,1');
     Route::post('/start', [ChatController::class, 'start'])->middleware('throttle:5,1');
@@ -555,6 +563,9 @@ Route::prefix('admin')
         Route::middleware('feature:newsletter')->group(function () {
             Route::get('/newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])
                 ->name('admin.newsletter-subscribers');
+
+            Route::post('/newsletter-subscribers/campaign', [NewsletterSubscriberController::class, 'sendCampaign'])
+                ->name('admin.newsletter-subscribers.campaign');
 
             Route::post('/newsletter-subscribers/{newsletterSubscriber}/toggle', [NewsletterSubscriberController::class, 'toggle'])
                 ->name('admin.newsletter-subscribers.toggle');
