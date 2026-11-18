@@ -21,6 +21,18 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Account Opening
+
+The Downloads page provides online applications and printable blank PDFs for individual, corporate, joint, minor, and estate accounts. These PDFs are generated from the same form schema used by the online forms and submission validation. Superadmins can publish additional approved PDF/DOC/DOCX documents from the Media Library.
+
+Account-submission emails are encrypted and queued. Production must configure a real mail transport, set `QUEUE_CONNECTION=database` (or another persistent queue), and run a queue worker, for example:
+
+```sh
+php artisan queue:work --tries=5
+```
+
+The example environment uses the `log` mailer for local development; it does not deliver email externally. Email recipients are active superadmin users with a configured email address.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.

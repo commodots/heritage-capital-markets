@@ -1,8 +1,8 @@
 <script setup>
 import Header from '@/Components/Header.vue'
 import Footer from '@/Components/Footer.vue'
-import LiveChatWidget from '@/Components/LiveChatWidget.vue'
 import MarketTicker from '@/Components/MarketTicker.vue'
+import LiveChatWidget from '@/Components/LiveChatWidget.vue'
 </script>
 
 <template>
@@ -10,13 +10,13 @@ import MarketTicker from '@/Components/MarketTicker.vue'
     <div class="min-h-screen bg-white">
 
         <Header />
-        <MarketTicker />
 
         <main>
             <slot />
         </main>
 
         <Footer />
+        <MarketTicker />
         <LiveChatWidget />
 
     </div>

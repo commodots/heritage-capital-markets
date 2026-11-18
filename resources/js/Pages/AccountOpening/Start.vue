@@ -6,19 +6,15 @@ import SeoHead from '@/Components/SeoHead.vue'
 
 const props = defineProps({
   accountType: { type: String, required: true },
-  accountTypes: { type: Array, default: () => [] }
+  accountTypes: { type: Array, default: () => [] },
+  formSchema: { type: Object, required: true },
 })
 
 const page = usePage()
-const labels = {
-  individual: 'Individual Account',
-  corporate: 'Corporate Account',
-  joint: 'Joint Account',
-  minor: 'Minor Account',
-  estate: 'Estate Account'
-}
-
-const stepTitles = ['Applicant details', 'Contact & Next of Kin', 'Bank & Account details', 'Documents & Declaration']
+const stepTitles = computed(() => props.formSchema.stepTitles)
+const fieldLabels = computed(() => props.formSchema.fieldLabels)
+const personFieldLabels = computed(() => props.formSchema.personFieldLabels)
+const personFields = computed(() => props.formSchema.personFields)
 const step = ref(1)
 const applicationId = ref(null)
 const reference = ref('')
@@ -55,105 +51,6 @@ const form = useForm({
   passport_photo: null, identity_document: null, utility_bill: null, birth_certificate: null, signature: null,
 })
 
-const fieldsByStep = {
-  individual: [
-    ['surname', 'first_name', 'other_names', 'gender', 'date_of_birth', 'mother_maiden_name', 'occupation', 'nationality', 'state_of_origin', 'lga', 'id_type', 'id_number', 'id_expiry'],
-    ['telephone', 'email', 'residential_address', 'contact_address', 'next_of_kin_name', 'next_of_kin_relationship', 'next_of_kin_address', 'next_of_kin_telephone', 'next_of_kin_email', 'next_of_kin_occupation'],
-    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'direct_cash_settlement', 'bvn', 'chn', 'additional_information'],
-  ],
-  corporate: [
-    ['company_name', 'rc_number', 'date_of_registration', 'nature_of_business', 'business_address', 'directors'],
-    ['telephone', 'email', 'contact_address'],
-    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'direct_cash_settlement', 'bvn', 'chn', 'additional_information'],
-  ],
-  joint: [
-    ['joint_account_name', 'joint_address', 'joint_contact_number', 'direct_cash_settlement'],
-    ['joint_applicants'],
-    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'bvn', 'chn', 'additional_information'],
-  ],
-  minor: [
-    ['surname', 'other_names', 'gender', 'date_of_birth', 'residential_address', 'telephone', 'occupation', 'contact_address', 'email', 'nationality', 'state_of_origin', 'lga', 'id_type', 'id_number', 'id_expiry', 'mother_maiden_name'],
-    ['guardian_name', 'guardian_relationship', 'guardian_telephone', 'guardian_occupation'],
-    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'bvn', 'chn', 'additional_information'],
-  ],
-  estate: [
-    ['estate_name', 'deceased_date_of_birth', 'mother_maiden_name', 'estate_address'],
-    ['administrators'],
-    ['bank_name', 'bank_branch', 'bank_account_number', 'bank_account_name', 'account_type', 'account_opened_at', 'direct_cash_settlement', 'bvn', 'chn', 'additional_information'],
-  ],
-}
-
-const visibleSections = computed(() => fieldsByStep[props.accountType].flat())
-const currentStepFields = computed(() => fieldsByStep[props.accountType][step.value - 1] || [])
-
-const fieldLabels = {
-  surname: 'Surname', first_name: 'First Name', other_names: 'Other Names', gender: 'Gender',
-  date_of_birth: 'Date of Birth', deceased_date_of_birth: 'Date of Birth (Deceased)',
-  mother_maiden_name: 'Mother’s Maiden Name', telephone: 'Telephone', email: 'Email Address',
-  occupation: 'Occupation', nationality: 'Nationality', state_of_origin: 'State of Origin',
-  lga: 'LGA', id_type: 'Means of Identification', id_number: 'ID Number (NIN: 11 digits)',
-  id_expiry: 'ID Expiry Date', residential_address: 'Residential Address',
-  contact_address: 'Contact Address', next_of_kin_name: 'Next of Kin Name',
-  next_of_kin_relationship: 'Next of Kin Relationship', next_of_kin_telephone: 'Next of Kin Telephone',
-  next_of_kin_email: 'Next of Kin Email', next_of_kin_address: 'Next of Kin Address',
-  next_of_kin_occupation: 'Next of Kin Occupation', bank_name: 'Bank Name',
-  bank_branch: 'Bank Branch', bank_account_number: 'Bank Account Number (10 digits)',
-  bank_account_name: 'Bank Account Name', account_type: 'Account Type',
-  account_opened_at: 'Date Account Was Opened', direct_cash_settlement: 'Direct Cash Settlement',
-  bvn: 'Bank Verification Number (BVN - 11 digits)', chn: 'Clearing House Number (CHN)',
-  company_name: 'Company Name', rc_number: 'RC Number', date_of_registration: 'Date of Registration',
-  nature_of_business: 'Nature of Business', business_address: 'Business Address',
-  joint_account_name: 'Name of Joint Account', joint_address: 'Joint Account Address',
-  joint_contact_number: 'Joint Account Contact Number', minor_name: 'Minor’s Full Name',
-  guardian_name: 'Guardian’s Name', guardian_relationship: 'Relationship to Minor',
-  guardian_telephone: 'Guardian’s Telephone', guardian_occupation: 'Guardian’s Occupation',
-  estate_name: 'Estate Name', estate_address: 'Estate Address',
-  additional_information: 'Additional Information / Special Instructions',
-  directors: 'Company Directors / Signatories', joint_applicants: 'Joint Account Holders',
-  administrators: 'Estate Administrators',
-}
-
-const personFieldLabels = {
-  name: 'Full Name', residential_address: 'Residential Address', lga: 'LGA',
-  city: 'City', state: 'State', country: 'Country', telephone: 'Mobile Number',
-  email: 'Email Address', date_of_birth: 'Date of Birth', nationality: 'Nationality',
-  id_type: 'Means of Identification', id_number: 'ID Number (NIN: 11 digits)', id_expiry: 'ID Expiry Date',
-  state_of_origin: 'State of Origin', lga_of_origin: 'LGA of Origin', occupation: 'Occupation',
-  next_of_kin_name: 'Next of Kin Name', next_of_kin_relationship: 'Next of Kin Relationship',
-  next_of_kin_address: 'Next of Kin Address', next_of_kin_telephone: 'Next of Kin Telephone',
-  next_of_kin_email: 'Next of Kin Email', signature_mandate: 'Signature Mandate',
-}
-
-const personFields = Object.keys(personFieldLabels)
-
-const requiredFieldsByStep = {
-  individual: [
-    ['surname', 'first_name', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry'],
-    ['telephone', 'email', 'residential_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn', 'direct_cash_settlement'],
-  ],
-  corporate: [
-    ['company_name', 'rc_number', 'nature_of_business', 'business_address', 'directors'],
-    ['telephone', 'email', 'contact_address'],
-    ['bank_name', 'bank_account_number', 'bank_account_name', 'bvn'],
-  ],
-  joint: [
-    ['joint_account_name', 'joint_address', 'joint_contact_number', 'direct_cash_settlement'],
-    ['joint_applicants'],
-    ['bank_name', 'bank_account_number', 'bank_account_name'],
-  ],
-  minor: [
-    ['surname', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry', 'telephone', 'email', 'residential_address'],
-    ['guardian_name', 'guardian_relationship', 'guardian_telephone'],
-    ['bank_name', 'bank_account_number', 'bank_account_name'],
-  ],
-  estate: [
-    ['estate_name', 'deceased_date_of_birth', 'estate_address'],
-    ['administrators'],
-    ['bank_name', 'bank_account_number', 'bank_account_name'],
-  ],
-}
-
 const fieldErrors = ref({})
 const nationalities = [
   'Nigerian', 'Ghanaian', 'Kenyan', 'South African', 'Ugandan', 'Tanzanian',
@@ -161,8 +58,6 @@ const nationalities = [
   'American', 'Canadian', 'Australian', 'Chinese', 'Indian', 'French',
   'German', 'Irish', 'Italian', 'Dutch', 'Spanish', 'Japanese', 'Other',
 ]
-const personRequiredFields = ['name', 'residential_address', 'telephone', 'email', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry']
-
 onMounted(() => {
   const savedApplication = page.props.accountApplication
 
@@ -179,12 +74,15 @@ function clearFieldError(key) {
 }
 
 function isRequiredField(key) {
-  return (requiredFieldsByStep[props.accountType][step.value - 1] || []).includes(key)
+  return (props.formSchema.requiredFieldsByStep[step.value - 1] || []).includes(key)
 }
 
 function isRequiredPersonField(key) {
-  return personRequiredFields.includes(key)
+  return props.formSchema.requiredPersonFields.includes(key)
 }
+
+const visibleSections = computed(() => props.formSchema.fieldsByStep.flat())
+const currentStepFields = computed(() => props.formSchema.fieldsByStep[step.value - 1] || [])
 
 function addPerson(listKey) {
   if (form[listKey].length < 20) form[listKey].push(emptyPerson())
@@ -203,12 +101,12 @@ function validateCurrentStep() {
   fieldErrors.value = {}
   let valid = true
   const type = props.accountType
-  const requiredKeys = requiredFieldsByStep[type][step.value - 1] || []
+  const requiredKeys = props.formSchema.requiredFieldsByStep[step.value - 1] || []
 
   for (const key of requiredKeys) {
     const val = form[key]
     if (val === null || val === undefined || val === '' || (Array.isArray(val) && val.length === 0)) {
-      fieldErrors.value[key] = `${fieldLabels[key] || key} is required.`
+      fieldErrors.value[key] = `${fieldLabels.value[key] || key} is required.`
       valid = false
     }
   }
@@ -241,7 +139,7 @@ function validateCurrentStep() {
   for (const listKey of ['directors', 'administrators', 'joint_applicants']) {
     if (!currentStepFields.value.includes(listKey)) continue
     for (const [index, person] of form[listKey].entries()) {
-      for (const field of personFields) {
+      for (const field of personFields.value) {
         const errorKey = `${listKey}.${index}.${field}`
         if (person[field] && ['email', 'next_of_kin_email'].includes(field) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(person[field])) {
           fieldErrors.value[errorKey] = 'Enter a valid email address.'
@@ -256,9 +154,9 @@ function validateCurrentStep() {
         fieldErrors.value[`${listKey}.${index}.id_number`] = 'NIN must be exactly 11 digits.'
         valid = false
       }
-      for (const field of personRequiredFields) {
+      for (const field of props.formSchema.requiredPersonFields) {
         if (!person[field]?.trim()) {
-          fieldErrors.value[`${listKey}.${index}.${field}`] = `${personFieldLabels[field]} is required.`
+          fieldErrors.value[`${listKey}.${index}.${field}`] = `${personFieldLabels.value[field]} is required.`
           valid = false
         }
       }
@@ -346,14 +244,14 @@ function submitApplication() {
 
 <template>
   <PublicLayout>
-    <SeoHead :title="`Open ${labels[accountType]}`"
+    <SeoHead :title="`Open ${formSchema.accountLabel}`"
       description="Complete the Heritage Capital Markets account opening application."
       :canonical-path="`/open-account/${accountType}`" />
     <section class="bg-heritage-navy px-6 py-14 text-white md:py-20">
       <div class="container-heritage max-w-5xl">
         <p class="text-xs font-semibold uppercase tracking-[.22em] text-heritage-gold">Investor Services · Account
           Opening</p>
-        <h1 class="mt-3 font-display text-4xl font-semibold md:text-5xl">{{ labels[accountType] }}</h1>
+        <h1 class="mt-3 font-display text-4xl font-semibold md:text-5xl">{{ formSchema.accountLabel }}</h1>
         <p class="mt-4 max-w-3xl text-white/75">Complete the form in stages. You can save your progress and return to
           the remaining steps in this browser session.</p>
       </div>

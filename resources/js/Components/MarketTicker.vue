@@ -12,19 +12,26 @@ function formattedValue(value) {
     maximumFractionDigits: 2,
   })
 }
+
+function isPositive(index) {
+  if (typeof index.is_positive === 'boolean') {
+    return index.is_positive
+  }
+
+  return Number(index.change_percent ?? index.change_value ?? 0) >= 0
+}
 </script>
 
 <template>
-  <div class="sticky top-[4.625rem] z-40 overflow-hidden border-b border-heritage-gold/30 bg-heritage-navy text-white"
+  <div class="overflow-hidden border-t border-heritage-gold/30 bg-heritage-navy text-white"
     role="region" aria-label="Market price ticker">
     <div v-if="indices.length" class="ticker-track flex w-max items-center py-2">
       <div v-for="(index, itemIndex) in tickerItems" :key="`${index.id}-${itemIndex}`"
         class="flex shrink-0 items-center gap-2 border-r border-white/20 px-5 text-xs">
         <span class="font-semibold">{{ index.symbol || index.name }}</span>
         <span class="tabular-nums text-white/90">{{ formattedValue(index.value) }}</span>
-        <span :class="index.is_positive ? 'text-emerald-300' : 'text-red-300'" class="tabular-nums">
-          {{ index.is_positive ? '+' : '-' }}{{ formattedValue(index.change) }}
-          ({{ index.is_positive ? '+' : '-' }}{{ Math.abs(Number(index.change_percent ?? 0)).toFixed(2) }}%)
+        <span :class="isPositive(index) ? 'text-emerald-300' : 'text-red-300'" class="tabular-nums">
+          {{ isPositive(index) ? '+' : '-' }}{{ Math.abs(Number(index.change_percent ?? index.change_value ?? 0)).toFixed(2) }}%
         </span>
       </div>
     </div>

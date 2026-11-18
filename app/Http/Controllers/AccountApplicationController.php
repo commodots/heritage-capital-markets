@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AccountApplicationSubmitted;
 use App\Models\AccountApplication;
 use App\Models\User;
+use App\Support\AccountOpeningFormSchema;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Mail\AccountApplicationSubmitted;
 
 class AccountApplicationController extends Controller
 {
-    private const TYPES = ['individual', 'corporate', 'joint', 'minor', 'estate'];
+    private const TYPES = AccountOpeningFormSchema::TYPES;
 
     public function start(string $type)
     {
@@ -25,6 +26,7 @@ class AccountApplicationController extends Controller
         return Inertia::render('AccountOpening/Start', [
             'accountType' => $type,
             'accountTypes' => self::TYPES,
+            'formSchema' => AccountOpeningFormSchema::forType($type),
             'accountApplication' => $application ? [
                 'id' => $application->id,
                 'reference' => $application->reference,
@@ -63,7 +65,7 @@ class AccountApplicationController extends Controller
         $this->validateFormData($formData, $type, $step);
 
         $app = null;
-        if (!empty($data['application_id'])) {
+        if (! empty($data['application_id'])) {
             $app = AccountApplication::whereKey($data['application_id'])
                 ->where('account_type', $type)
                 ->where('status', 'draft')
@@ -71,8 +73,8 @@ class AccountApplicationController extends Controller
             abort_unless(session()->get('account_application_'.$app->id) === $app->reference, 403);
         }
 
-        if (!$app) {
-            $app = new AccountApplication();
+        if (! $app) {
+            $app = new AccountApplication;
             $app->reference = 'HCML-'.strtoupper(Str::random(8));
             $app->account_type = $type;
             $app->status = 'draft';
@@ -144,16 +146,18 @@ class AccountApplicationController extends Controller
                 $missing[] = $field;
             }
         }
-        if (!empty($missing)) {
+        if (! empty($missing)) {
             throw ValidationException::withMessages([
-                'form_data' => 'Please complete the required fields: ' . implode(', ', $missing),
+                'form_data' => 'Please complete the required fields: '.implode(', ', $missing),
             ]);
         }
         $this->validateFormData($formData, $type);
 
         $superAdminEmails = User::query()
+            ->where('is_admin', true)
             ->where('is_super_admin', true)
             ->whereNotNull('email')
+            ->where('email', '!=', '')
             ->pluck('email')
             ->all();
 
@@ -171,7 +175,6 @@ class AccountApplicationController extends Controller
         }
 
         $app->documents = $documents;
-        $app->save();
         $app->status = 'submitted';
         $app->submitted_at = now();
 
@@ -179,13 +182,13 @@ class AccountApplicationController extends Controller
             'application' => $app,
         ])->setPaper('a4')->output();
 
-        Mail::to($superAdminEmails)->send(new AccountApplicationSubmitted(
+        $app->save();
+
+        Mail::to($superAdminEmails)->queue(new AccountApplicationSubmitted(
             $app,
             $pdfContent,
             route('admin.account-applications.pdf', $app),
         ));
-
-        $app->save();
 
         session()->forget([
             'account_application_'.$app->id,
@@ -207,46 +210,30 @@ class AccountApplicationController extends Controller
         ])->setPaper('a4')->download($application->reference.'-account-application.pdf');
     }
 
+    public function downloadBlankForm(string $type)
+    {
+        abort_unless(in_array($type, self::TYPES, true), 404);
+
+        $schema = AccountOpeningFormSchema::forType($type);
+
+        return Pdf::loadView('pdf.account-opening-blank', [
+            'schema' => $schema,
+        ])->setPaper('a4')->download($type.'-account-opening-form.pdf');
+    }
+
     /**
      * Required text fields per account type. Document upload requirements are
      * enforced separately at the KYC document-review stage.
      */
     private function requiredFields(string $type): array
     {
-        return match ($type) {
-            'individual' => [
-                'surname', 'first_name', 'date_of_birth', 'nationality', 'id_type',
-                'id_number', 'id_expiry', 'telephone', 'email', 'residential_address',
-                'bank_name', 'bank_account_number', 'bank_account_name', 'bvn',
-                'direct_cash_settlement',
-            ],
-            'corporate' => [
-                'company_name', 'rc_number', 'nature_of_business', 'business_address',
-                'directors', 'telephone', 'email', 'contact_address',
-                'bank_name', 'bank_account_number', 'bank_account_name', 'bvn',
-            ],
-            'joint' => [
-                'joint_account_name', 'joint_address', 'joint_contact_number',
-                'direct_cash_settlement', 'joint_applicants', 'bank_name',
-                'bank_account_number', 'bank_account_name',
-            ],
-            'minor' => [
-                'surname', 'date_of_birth', 'nationality', 'id_type', 'id_number', 'id_expiry',
-                'telephone', 'email',
-                'residential_address', 'guardian_name', 'guardian_relationship',
-                'guardian_telephone', 'bank_name', 'bank_account_number', 'bank_account_name',
-            ],
-            'estate' => [
-                'estate_name', 'deceased_date_of_birth', 'estate_address', 'administrators',
-                'bank_name', 'bank_account_number', 'bank_account_name',
-            ],
-        };
+        return AccountOpeningFormSchema::forType($type)['requiredFields'];
     }
 
     private function currentDraft(string $type): ?AccountApplication
     {
         $id = session()->get('account_application_current_'.$type);
-        if (!$id) {
+        if (! $id) {
             return null;
         }
 
@@ -256,7 +243,7 @@ class AccountApplicationController extends Controller
             ->where('status', 'draft')
             ->first();
 
-        if (!$application || session()->get('account_application_'.$application->id) !== $application->reference) {
+        if (! $application || session()->get('account_application_'.$application->id) !== $application->reference) {
             return null;
         }
 
@@ -290,25 +277,37 @@ class AccountApplicationController extends Controller
             $rules['id_number'] = ['digits:11'];
         }
 
-        $personList = match ($type) {
-            'corporate' => 'directors',
-            'estate' => 'administrators',
-            'joint' => 'joint_applicants',
-            default => null,
-        };
-        $personStep = in_array($type, ['joint', 'estate'], true) ? 2 : 1;
+        $schema = AccountOpeningFormSchema::forType($type);
+        $personList = $schema['peopleField'];
+        $personStep = null;
+        if ($personList !== null) {
+            foreach ($schema['fieldsByStep'] as $index => $fields) {
+                if (in_array($personList, $fields, true)) {
+                    $personStep = $index + 1;
+                    break;
+                }
+            }
+        }
         $validatePeople = $personList !== null && $step >= $personStep;
         if ($validatePeople) {
-            $rules[$personList] = ['required', 'array', 'min:'.($type === 'joint' ? 2 : 1), 'max:20'];
-            $rules[$personList.'.*.name'] = ['required', 'string', 'max:150'];
-            $rules[$personList.'.*.telephone'] = ['required', 'string', 'max:40'];
-            $rules[$personList.'.*.email'] = ['required', 'email', 'max:190'];
-            $rules[$personList.'.*.date_of_birth'] = ['required', 'date'];
-            $rules[$personList.'.*.nationality'] = ['required', 'string', 'max:80'];
-            $rules[$personList.'.*.residential_address'] = ['required', 'string', 'max:1000'];
-            $rules[$personList.'.*.id_type'] = ['required', 'string', 'max:60'];
-            $rules[$personList.'.*.id_number'] = ['required', 'string', 'max:100'];
-            $rules[$personList.'.*.id_expiry'] = ['required', 'date'];
+            $rules[$personList] = ['required', 'array', 'min:'.$schema['peopleMinimum'], 'max:20'];
+            $nestedFieldRules = [
+                'name' => ['string', 'max:150'],
+                'telephone' => ['string', 'max:40'],
+                'email' => ['email', 'max:190'],
+                'date_of_birth' => ['date'],
+                'nationality' => ['string', 'max:80'],
+                'residential_address' => ['string', 'max:1000'],
+                'id_type' => ['string', 'max:60'],
+                'id_number' => ['string', 'max:100'],
+                'id_expiry' => ['date'],
+            ];
+            foreach ($schema['requiredPersonFields'] as $field) {
+                $rules[$personList.'.*.'.$field] = [
+                    'required',
+                    ...$nestedFieldRules[$field],
+                ];
+            }
             $rules[$personList.'.*.next_of_kin_email'] = ['nullable', 'email', 'max:190'];
         }
 

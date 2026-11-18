@@ -65,28 +65,30 @@ function submit() {
                         <div class="mt-8 grid gap-5 md:grid-cols-2">
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Full Name *</span>
-                                <input v-model="form.name" type="text" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.name ? 'border-red-500' : 'border-slate-300'" />
+                                <input v-model="form.name" type="text" required class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.name ? 'border-red-500' : 'border-slate-300'" />
                                 <span v-if="errors.name" class="mt-1 block text-xs text-red-600">{{ errors.name }}</span>
                             </label>
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Email *</span>
-                                <input v-model="form.email" type="email" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.email ? 'border-red-500' : 'border-slate-300'" />
+                                <input v-model="form.email" type="email" required class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.email ? 'border-red-500' : 'border-slate-300'" />
                                 <span v-if="errors.email" class="mt-1 block text-xs text-red-600">{{ errors.email }}</span>
                             </label>
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Phone *</span>
-                                <input v-model="form.phone" type="tel" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.phone ? 'border-red-500' : 'border-slate-300'" />
+                                <input v-model="form.phone" type="tel" required class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.phone ? 'border-red-500' : 'border-slate-300'" />
                                 <span v-if="errors.phone" class="mt-1 block text-xs text-red-600">{{ errors.phone }}</span>
                             </label>
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-heritage-navy">Account Type *</span>
-                                <select v-model="form.account_type" class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.account_type ? 'border-red-500' : 'border-slate-300'">
+                                <select v-model="form.account_type" required class="mt-2 w-full border px-4 py-3 outline-none focus:border-heritage-gold" :class="errors.account_type ? 'border-red-500' : 'border-slate-300'">
                                     <option>Individual / Personal</option>
                                     <option>Corporate / Institutional</option>
-                                    <option>Professional / High Net Worth</option>
+                                    <option>Joint</option>
+                                    <option>Minor / Child</option>
+                                    <option>Estate / Trust</option>
                                 </select>
                                 <span v-if="errors.account_type" class="mt-1 block text-xs text-red-600">{{ errors.account_type }}</span>
                             </label>
