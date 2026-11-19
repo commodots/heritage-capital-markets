@@ -56,13 +56,57 @@ const boardIntroFields = computed(() => boardFields.value.filter(([key]) =>
 const boardCareerFields = computed(() => boardFields.value.filter(([key]) =>
     key.startsWith('board_careers_')
 ))
+const headlineGroups = computed(() => {
+    const groups = new Map()
+
+    for (const [key] of boardFields.value) {
+        const lineMatch = key.match(/^(.*_title)_line_(\d+)$/)
+        const accentMatch = key.match(/^(.*_title)_accent$/)
+        const prefix = lineMatch?.[1] ?? accentMatch?.[1]
+        if (!prefix) continue
+
+        if (!groups.has(prefix)) groups.set(prefix, { prefix, parts: [] })
+        groups.get(prefix).parts.push({
+            key,
+            order: lineMatch ? Number(lineMatch[2]) : Number.MAX_SAFE_INTEGER,
+        })
+    }
+
+    return Array.from(groups.values())
+        .filter(group => group.parts.length > 1)
+        .map(group => ({
+            ...group,
+            key: `__headline_${group.prefix}`,
+            label: fieldLabel(group.prefix),
+            parts: group.parts.sort((a, b) => a.order - b.order),
+        }))
+})
+const mergedHeadlines = reactive(Object.fromEntries(headlineGroups.value.map(group => [
+    group.key,
+    group.parts.map(({ key }) => form[key] ?? '').join('\n'),
+])))
 const generalSections = computed(() => {
     const sections = new Map()
+    const groupsByPart = new Map()
+    const firstPartByKey = new Map()
+
+    for (const group of headlineGroups.value) {
+        for (const part of group.parts) groupsByPart.set(part.key, group)
+        firstPartByKey.set(group.parts[0].key, group)
+    }
 
     for (const [key, field] of boardFields.value) {
         const title = field[4] || 'Page Content'
         if (!sections.has(title)) sections.set(title, [])
-        sections.get(title).push([key, field])
+        const group = groupsByPart.get(key)
+        if (!group) {
+            sections.get(title).push([key, field])
+        } else if (firstPartByKey.has(key)) {
+            sections.get(title).push([
+                group.key,
+                [group.label, 4000, true, 'text', title, group],
+            ])
+        }
     }
 
     return Array.from(sections, ([title, fields]) => ({ title, fields }))
@@ -166,6 +210,13 @@ function submitGeneral() {
     const payload = Object.fromEntries(Object.entries(form))
     Object.assign(payload, imageFiles.value)
 
+    for (const group of headlineGroups.value) {
+        const lines = (mergedHeadlines[group.key] ?? '').split(/\r?\n/)
+        group.parts.forEach(({ key }, index) => {
+            payload[key] = lines[index] ?? ''
+        })
+    }
+
     router.post(`/admin/page-content/${props.groupKey}`, payload, {
         forceFormData: true,
         preserveScroll: true,
@@ -181,6 +232,24 @@ function submitGeneral() {
         },
         onFinish: () => { processingIntro.value = false },
     })
+}
+
+function fieldValue(key, field) {
+    return field[5] ? mergedHeadlines[key] : form[key]
+}
+
+function setFieldValue(key, field, value) {
+    if (field[5]) {
+        mergedHeadlines[key] = value
+    } else {
+        form[key] = value
+    }
+}
+
+function fieldError(key, field) {
+    const keys = field[5]?.parts.map(part => part.key) ?? [key]
+    return keys.map(errorKey => page.props.errors[errorKey]).filter(Boolean).join(' ')
+        || page.props.errors[key]
 }
 </script>
 
@@ -321,7 +390,7 @@ function submitGeneral() {
                             <div v-for="[key, field] in section.fields" :key="key"
                                 :class="field[2] || field[3] === 'image' ? 'md:col-span-2' : ''">
                                 <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">
-                                    {{ fieldLabel(key) }}
+                                    {{ field[5]?.label || fieldLabel(key) }}
                                 </label>
                                 <div v-if="field[3] === 'image'" class="space-y-3">
                                     <img v-if="imagePreviews[key] || props.settings[key]"
@@ -335,13 +404,16 @@ function submitGeneral() {
                                         class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition file:mr-4 file:rounded file:border-0 file:bg-white file:px-3 file:py-2 file:font-semibold file:text-heritage-navy focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
                                     <p class="text-xs text-heritage-muted">JPG, JPEG, PNG or WebP; maximum 10 MB.</p>
                                 </div>
-                                <textarea v-else-if="field[2]" :id="key" v-model="form[key]" rows="3"
+                                <textarea v-else-if="field[2]" :id="key"
+                                    :value="fieldValue(key, field)"
+                                    :rows="field[5] ? field[5].parts.length : 3"
+                                    @input="setFieldValue(key, field, $event.target.value)"
                                     class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
                                 <input v-else :id="key" v-model="form[key]"
                                     :type="field[3] === 'url' ? 'url' : 'text'"
                                     class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
-                                <p v-if="page.props.errors[key]" class="mt-1 text-xs font-medium text-red-600">
-                                    {{ page.props.errors[key] }}
+                                <p v-if="fieldError(key, field)" class="mt-1 text-xs font-medium text-red-600">
+                                    {{ fieldError(key, field) }}
                                 </p>
                             </div>
                         </div>

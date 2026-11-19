@@ -281,6 +281,15 @@ function closeSidebar() {
                     </svg>
                     Admin Users
                 </a>
+                <a v-if="isSuperAdmin" href="/admin/role-assignments" :class="['admin-nav-item', navClass('/admin/role-assignments')]">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <path d="M4 5h16M4 12h16M4 19h16" />
+                        <circle cx="8" cy="5" r="2" />
+                        <circle cx="16" cy="12" r="2" />
+                        <circle cx="10" cy="19" r="2" />
+                    </svg>
+                    Assign Admin Roles
+                </a>
                 <a v-if="isSuperAdmin" href="/admin/user-types" :class="['admin-nav-item', navClass('/admin/user-types')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
                         <path d="M4 5h16M4 12h16M4 19h16" /><circle cx="8" cy="5" r="2" /><circle cx="16" cy="12" r="2" /><circle cx="10" cy="19" r="2" />

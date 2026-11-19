@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminRole;
+use App\Models\User;
 use App\Support\AdminFeatures;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,6 +18,42 @@ class AdminRoleController extends Controller
             'roles' => AdminRole::withCount('users')->latest()->get(),
             'features' => AdminFeatures::all(),
         ]);
+    }
+
+    public function assignments()
+    {
+        return Inertia::render('Admin/RoleAssignments/Index', [
+            'users' => User::with('adminRole')
+                ->where(function ($query) {
+                    $query->where('is_admin', true)
+                        ->orWhereNotNull('admin_role_id');
+                })
+                ->where('is_super_admin', false)
+                ->orderBy('name')
+                ->get(),
+            'roles' => AdminRole::where('is_active', true)
+                ->orderBy('name')
+                ->get(),
+        ]);
+    }
+
+    public function assign(Request $request, User $user)
+    {
+        abort_unless(
+            ($user->is_admin || $user->admin_role_id !== null) && ! $user->is_super_admin,
+            404
+        );
+
+        $data = $request->validate([
+            'admin_role_id' => [
+                'required',
+                Rule::exists('admin_roles', 'id')->where('is_active', true),
+            ],
+        ]);
+
+        $user->update(['admin_role_id' => $data['admin_role_id']]);
+
+        return back()->with('success', 'Administrator role assigned successfully.');
     }
 
     public function store(Request $request)

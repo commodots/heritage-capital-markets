@@ -11,6 +11,8 @@ class InvestmentSolution extends Model
         'slug',
         'short_description',
         'description',
+        'overview_eyebrow',
+        'overview_title',
         'featured_image',
         'button_label',
         'button_url',

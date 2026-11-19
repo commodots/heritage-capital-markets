@@ -644,6 +644,11 @@ Route::prefix('admin')
             Route::put('/user-types/{adminRole}', [AdminRoleController::class, 'update'])
                 ->name('admin.user-types.update');
 
+            Route::get('/role-assignments', [AdminRoleController::class, 'assignments'])
+                ->name('admin.role-assignments');
+            Route::put('/role-assignments/{user}', [AdminRoleController::class, 'assign'])
+                ->name('admin.role-assignments.assign');
+
             Route::get('/users', [AdminUserController::class, 'index'])
                 ->name('admin.users');
             Route::post('/users', [AdminUserController::class, 'store'])

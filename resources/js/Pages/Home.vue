@@ -448,8 +448,7 @@ const researchItems = computed(() => [
                         </div>
 
                         <h2 class="mt-3 font-display text-4xl leading-tight text-heritage-navy">
-                            {{ setting('homepage_solutions_title_line_1', 'Solutions for Today.') }}<br />
-                            {{ setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.') }}
+                            {{ setting('homepage_solutions_title_line_1', 'Solutions for Today.') }}<template v-if="setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.')"><br />{{ setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.') }}</template>
                         </h2>
 
                         <p class="mt-4 text-sm leading-6 text-heritage-muted">
@@ -693,8 +692,10 @@ const researchItems = computed(() => [
 
                         <h2 class="mt-2 font-display text-4xl leading-tight text-heritage-navy sm:text-5xl">
                             {{ setting('homepage_research_title_line_1', 'Knowledge That Moves') }}
-                            <br />
-                            {{ setting('homepage_research_title_line_2', 'With the Market.') }}
+                            <template v-if="setting('homepage_research_title_line_2', 'With the Market.')">
+                                <br />
+                                {{ setting('homepage_research_title_line_2', 'With the Market.') }}
+                            </template>
                         </h2>
 
                     </div>

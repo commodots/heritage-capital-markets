@@ -236,13 +236,24 @@ class AccountApplicationController extends Controller
 
     public function downloadBlankForm(string $type)
     {
-        abort_unless(in_array($type, self::TYPES, true), 404);
+        $forms = [
+            'individual' => 'HCML KYC Individual.pdf',
+            'corporate' => 'HCML kyc corporate.pdf',
+            'joint' => 'HCML kyc Joint account.pdf',
+            'minor' => 'HCML kyc Minor Account.pdf',
+            'estate' => 'HCML kyc ESTATE ACCOUNT.pdf',
+        ];
 
-        $schema = AccountOpeningFormSchema::forType($type);
+        abort_unless(isset($forms[$type]), 404);
 
-        return Pdf::loadView('pdf.account-opening-blank', [
-            'schema' => $schema,
-        ])->setPaper('a4')->download($type.'-account-opening-form.pdf');
+        $path = public_path($forms[$type]);
+        abort_unless(is_file($path), 404);
+
+        return response()->download(
+            $path,
+            $type.'-account-opening-form.pdf',
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     /**

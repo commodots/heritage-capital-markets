@@ -68,6 +68,10 @@ const formState = {
     homepage_solutions_eyebrow: setting('homepage_solutions_eyebrow', 'Invest With Confidence'),
     homepage_solutions_title_line_1: setting('homepage_solutions_title_line_1', 'Solutions for Today.'),
     homepage_solutions_title_line_2: setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.'),
+    homepage_solutions_heading: [
+        setting('homepage_solutions_title_line_1', 'Solutions for Today.'),
+        setting('homepage_solutions_title_line_2', 'A Stronger Tomorrow.'),
+    ].join('\n'),
     homepage_solutions_description: setting(
         'homepage_solutions_description',
         'From wealth management to capital markets advisory, we provide tailored solutions to help you grow, protect and manage your wealth.'
@@ -78,6 +82,10 @@ const formState = {
     homepage_research_eyebrow: setting('homepage_research_eyebrow', 'Research & Insights'),
     homepage_research_title_line_1: setting('homepage_research_title_line_1', 'Knowledge That Moves'),
     homepage_research_title_line_2: setting('homepage_research_title_line_2', 'With the Market.'),
+    homepage_research_heading: [
+        setting('homepage_research_title_line_1', 'Knowledge That Moves'),
+        setting('homepage_research_title_line_2', 'With the Market.'),
+    ].join('\n'),
     homepage_research_button: setting('homepage_research_button', 'Explore Research'),
 }
 
@@ -120,6 +128,21 @@ const form = reactive(formState)
 
 const submit = () => {
     processing.value = true
+    const splitHeading = (heading) => {
+        const [firstLine = '', ...remainingLines] = heading.split(/\r?\n/)
+        return [firstLine, remainingLines.join(' ')]
+    }
+
+    const headings = [
+        [form.homepage_solutions_heading, 'homepage_solutions_title_line_1', 'homepage_solutions_title_line_2'],
+        [form.homepage_research_heading, 'homepage_research_title_line_1', 'homepage_research_title_line_2'],
+    ]
+
+    headings.forEach(([heading, firstKey, secondKey]) => {
+        const [firstLine, secondLine] = splitHeading(heading)
+        form[firstKey] = firstLine
+        form[secondKey] = secondLine
+    })
 
     router.post('/admin/homepage/settings', form, {
         preserveScroll: true,
@@ -309,13 +332,10 @@ const submit = () => {
                                 <span class="mb-2 block text-sm font-medium text-slate-700">Investment section button</span>
                                 <input v-model="form.homepage_solutions_button" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
                             </label>
-                            <label class="block">
-                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment heading line 1</span>
-                                <input v-model="form.homepage_solutions_title_line_1" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
-                            </label>
-                            <label class="block">
-                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment heading line 2</span>
-                                <input v-model="form.homepage_solutions_title_line_2" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                            <label class="block md:col-span-2">
+                                <span class="mb-2 block text-sm font-medium text-slate-700">Investment section heading</span>
+                                <textarea v-model="form.homepage_solutions_heading" rows="2" placeholder="Use one line per visual line"
+                                    class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm"></textarea>
                             </label>
                             <label class="block md:col-span-2">
                                 <span class="mb-2 block text-sm font-medium text-slate-700">Investment description</span>
@@ -348,13 +368,10 @@ const submit = () => {
                                     <span class="mb-2 block text-sm font-medium text-slate-700">Button label</span>
                                     <input v-model="form.homepage_research_button" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
                                 </label>
-                                <label class="block">
-                                    <span class="mb-2 block text-sm font-medium text-slate-700">Heading line 1</span>
-                                    <input v-model="form.homepage_research_title_line_1" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
-                                </label>
-                                <label class="block">
-                                    <span class="mb-2 block text-sm font-medium text-slate-700">Heading line 2</span>
-                                    <input v-model="form.homepage_research_title_line_2" type="text" class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm" />
+                                <label class="block md:col-span-2">
+                                    <span class="mb-2 block text-sm font-medium text-slate-700">Heading</span>
+                                    <textarea v-model="form.homepage_research_heading" rows="2" placeholder="Use one line per visual line"
+                                        class="w-full resize-y rounded-lg border border-slate-300 px-4 py-3 text-sm"></textarea>
                                 </label>
                             </div>
                             <div class="grid gap-5 sm:grid-cols-2">

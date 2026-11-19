@@ -96,9 +96,9 @@ const journey = computed(() => [
             <div class="mx-auto max-w-300 px-6 py-14 lg:px-12 lg:py-20">
                 <div class="grid gap-10 lg:grid-cols-[1.15fr_.85fr]">
                     <div>
-                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ contentText('solution_detail_overview_eyebrow', 'Overview') }}</div>
+                        <div class="text-[10px] font-semibold uppercase tracking-[0.22em] text-heritage-gold">{{ solution.overview_eyebrow || 'Overview' }}</div>
                         <h2 class="mt-3 font-display text-3xl leading-tight text-heritage-navy sm:text-4xl">
-                                    {{ contentText('solution_detail_overview_title', 'A solution designed around your objectives') }}
+                            {{ solution.overview_title || 'A solution designed around your objectives' }}
                         </h2>
                         <div class="mt-6 max-w-3xl text-base leading-8 text-heritage-muted" v-html="solution.description"></div>
                     </div>
