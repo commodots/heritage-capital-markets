@@ -15,6 +15,8 @@ const stepTitles = computed(() => props.formSchema.stepTitles)
 const fieldLabels = computed(() => props.formSchema.fieldLabels)
 const personFieldLabels = computed(() => props.formSchema.personFieldLabels)
 const personFields = computed(() => props.formSchema.personFields)
+const identificationTypes = computed(() => props.formSchema.identificationTypes)
+const legalDisclosure = computed(() => props.formSchema.legalDisclosure)
 const step = ref(1)
 const stepHeading = ref(null)
 const applicationId = ref(null)
@@ -25,7 +27,6 @@ function emptyPerson() {
   return {
     name: '', residential_address: '', lga: '', city: '', state: '', country: '',
     telephone: '', email: '', date_of_birth: '', nationality: 'Nigerian',
-    id_type: 'NIN', id_number: '', id_expiry: '',
     state_of_origin: '', lga_of_origin: '', occupation: '', next_of_kin_name: '',
     next_of_kin_relationship: '', next_of_kin_address: '', next_of_kin_telephone: '',
     next_of_kin_email: '', signature_mandate: '',
@@ -33,7 +34,7 @@ function emptyPerson() {
 }
 
 const form = useForm({
-  surname: '', first_name: '', other_names: '', gender: '', date_of_birth: '', mother_maiden_name: '',
+  surname: '', other_names: '', gender: '', date_of_birth: '', mother_maiden_name: '',
   telephone: '', email: '', occupation: '', nationality: 'Nigerian', state_of_origin: '', lga: '',
   id_type: 'NIN', id_number: '', id_expiry: '', residential_address: '', contact_address: '',
   next_of_kin_name: '', next_of_kin_relationship: '', next_of_kin_telephone: '',
@@ -44,11 +45,16 @@ const form = useForm({
   business_address: '', directors: [emptyPerson()],
   joint_account_name: '', joint_address: '', joint_contact_number: '',
   joint_applicants: [emptyPerson(), emptyPerson()],
-  minor_name: '', guardian_name: '', guardian_relationship: '', guardian_telephone: '',
+  guardian_name: '', guardian_relationship: '', guardian_telephone: '',
   guardian_occupation: '', estate_name: '', deceased_date_of_birth: '', estate_address: '',
   administrators: [emptyPerson()],
   additional_information: '',
   declaration_accepted: false,
+  legal_signatories: [],
+  indemnity_date: '',
+  indemnity_witness_name: '',
+  indemnity_witness_signature: '',
+  indemnity_witness_date: '',
   passport_photo: null, identity_document: null, utility_bill: null, birth_certificate: null, signature: null,
 })
 
@@ -68,12 +74,59 @@ onMounted(() => {
     if (savedApplication.form_data) Object.assign(form, savedApplication.form_data)
     if (savedApplication.current_step) step.value = Math.min(4, Math.max(1, Number(savedApplication.current_step)))
   }
-
-  form.id_type = 'NIN'
-  for (const listKey of ['directors', 'administrators', 'joint_applicants']) {
-    for (const person of form[listKey] || []) person.id_type = 'NIN'
-  }
+  syncLegalSignatories()
 })
+
+function sourceLegalSignerNames() {
+  switch (props.accountType) {
+    case 'individual':
+      return [ [form.surname, form.other_names].filter(Boolean).join(' ').trim() ]
+    case 'minor':
+      return [form.guardian_name || '']
+    case 'corporate':
+      return (form.directors || []).map((person) => person.name || '')
+    case 'joint':
+      return (form.joint_applicants || []).map((person) => person.name || '')
+    case 'estate':
+      return (form.administrators || []).map((person) => person.name || '')
+    default:
+      return ['']
+  }
+}
+
+function syncLegalSignatories() {
+  const currentSignatories = Array.isArray(form.legal_signatories) ? form.legal_signatories : []
+  form.legal_signatories = sourceLegalSignerNames().map((sourceName, index) => {
+    const current = currentSignatories[index] || {}
+
+    return {
+      terms_name: current.terms_name || sourceName,
+      terms_signature: current.terms_signature || '',
+      terms_date: current.terms_date || '',
+      aml_name: current.aml_name || sourceName,
+      aml_signature: current.aml_signature || '',
+      aml_date: current.aml_date || '',
+      indemnity_name: current.indemnity_name || sourceName,
+      indemnity_signature: current.indemnity_signature || '',
+    }
+  })
+}
+
+function legalSignerContact(index) {
+  const peopleField = {
+    corporate: 'directors',
+    joint: 'joint_applicants',
+    estate: 'administrators',
+  }[props.accountType]
+  const person = peopleField ? form[peopleField]?.[index] : null
+
+  return {
+    email: person?.email || form.email || '',
+    telephone: props.accountType === 'minor'
+      ? form.guardian_telephone || ''
+      : person?.telephone || form.telephone || form.joint_contact_number || '',
+  }
+}
 
 function clearFieldError(key) {
   if (fieldErrors.value[key]) delete fieldErrors.value[key]
@@ -91,7 +144,7 @@ const visibleSections = computed(() => props.formSchema.fieldsByStep.flat())
 const currentStepFields = computed(() => props.formSchema.fieldsByStep[step.value - 1] || [])
 
 function addPerson(listKey) {
-  if (form[listKey].length < 20) form[listKey].push(emptyPerson())
+  if (form[listKey].length < props.formSchema.peopleMaximum) form[listKey].push(emptyPerson())
 }
 
 function removePerson(listKey, index) {
@@ -146,11 +199,11 @@ function validateCurrentStep() {
     valid = false
   }
   if (['individual', 'minor'].includes(type)) {
-    if (form.id_type !== 'NIN') {
-      fieldErrors.value.id_type = 'NIN is required.'
+    if (!identificationTypes.value.includes(form.id_type)) {
+      fieldErrors.value.id_type = 'Select a valid means of identification.'
       valid = false
     }
-    if (form.id_number && !/^\d{11}$/.test(form.id_number)) {
+    if (form.id_type === 'NIN' && form.id_number && !/^\d{11}$/.test(form.id_number)) {
       fieldErrors.value.id_number = 'NIN must be exactly 11 digits.'
       valid = false
     }
@@ -169,14 +222,6 @@ function validateCurrentStep() {
           fieldErrors.value[errorKey] = 'Enter a valid telephone number.'
           valid = false
         }
-      }
-      if (person.id_type !== 'NIN') {
-        fieldErrors.value[`${listKey}.${index}.id_type`] = 'NIN is required.'
-        valid = false
-      }
-      if (person.id_number && !/^\d{11}$/.test(person.id_number)) {
-        fieldErrors.value[`${listKey}.${index}.id_number`] = 'NIN must be exactly 11 digits.'
-        valid = false
       }
       for (const field of props.formSchema.requiredPersonFields) {
         if (!person[field]?.trim()) {
@@ -241,9 +286,29 @@ function saveStep(nextStep) {
 function submitApplication() {
   errorMessage.value = ''
 
+  syncLegalSignatories()
+  fieldErrors.value = {}
   if (!form.declaration_accepted) {
     fieldErrors.value.declaration_accepted = 'You must accept the declaration to submit.'
-    errorMessage.value = 'Please accept the declaration checkbox.'
+    errorMessage.value = 'Please complete and accept all legal disclosures.'
+    return
+  }
+
+  let valid = true
+  for (const [index, signatory] of form.legal_signatories.entries()) {
+    for (const field of ['terms_name', 'terms_signature', 'terms_date', 'aml_name', 'aml_signature', 'aml_date', 'indemnity_name', 'indemnity_signature']) {
+      if (!String(signatory[field] || '').trim()) {
+        fieldErrors.value[`legal_signatories.${index}.${field}`] = 'This field is required.'
+        valid = false
+      }
+    }
+  }
+  if (!form.indemnity_date) {
+    fieldErrors.value.indemnity_date = 'The E-Indemnity date is required.'
+    valid = false
+  }
+  if (!valid) {
+    errorMessage.value = 'Complete the legal disclosure signature and date fields before submitting.'
     return
   }
 
@@ -255,6 +320,11 @@ function submitApplication() {
   const payload = new FormData()
   payload.append('application_id', String(applicationId.value))
   payload.append('declaration_accepted', form.declaration_accepted ? '1' : '0')
+  payload.append('legal_signatories', JSON.stringify(form.legal_signatories))
+  payload.append('indemnity_date', form.indemnity_date)
+  payload.append('indemnity_witness_name', form.indemnity_witness_name || '')
+  payload.append('indemnity_witness_signature', form.indemnity_witness_signature || '')
+  payload.append('indemnity_witness_date', form.indemnity_witness_date || '')
 
   for (const key of ['passport_photo', 'identity_document', 'utility_bill', 'birth_certificate', 'signature']) {
     if (form[key] instanceof File) payload.append(`documents[${key}]`, form[key])
@@ -311,7 +381,7 @@ function submitApplication() {
                   </h3>
                   <button v-if="key === 'directors' || key === 'administrators'" type="button"
                     class="border border-heritage-navy px-4 py-2 text-sm font-semibold text-heritage-navy"
-                    :disabled="form[key].length >= 20" @click="addPerson(key)">
+                    :disabled="form[key].length >= formSchema.peopleMaximum" @click="addPerson(key)">
                     Add {{ key === 'administrators' ? 'Administrator' : 'Director' }}
                   </button>
                 </div>
@@ -331,13 +401,9 @@ function submitApplication() {
                       <select v-if="field === 'nationality'" v-model="person[field]" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3">
                         <option v-for="nationality in nationalities" :key="nationality" :value="nationality">{{ nationality }}</option>
                       </select>
-                      <input v-else-if="field === 'id_type'" v-model="person[field]" readonly :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 bg-slate-100 px-3 py-3" />
                       <textarea v-else-if="field.includes('address')" v-model="person[field]" rows="2" :required="isRequiredPersonField(field)" class="mt-2 w-full border border-slate-300 px-3 py-3" />
                       <input v-else v-model="person[field]" :type="field === 'email' || field.endsWith('_email') ? 'email' : field.includes('telephone') ? 'tel' : (field.includes('date') || field === 'id_expiry') ? 'date' : 'text'"
                         :required="isRequiredPersonField(field)"
-                        :inputmode="field === 'id_number' ? 'numeric' : (field.includes('telephone') ? 'tel' : undefined)"
-                        :maxlength="field === 'id_number' ? 11 : undefined"
-                        :pattern="field === 'id_number' ? '[0-9]{11}' : undefined"
                         :placeholder="field.includes('telephone') ? '08012345678 or +2348012345678' : ''"
                         class="mt-2 w-full border px-3 py-3"
                         :class="fieldErrors[`${key}.${index}.${field}`] ? 'border-red-500' : 'border-slate-300'"
@@ -361,7 +427,9 @@ function submitApplication() {
                 <select v-else-if="key === 'nationality'" v-model="form[key]" required class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
                   <option v-for="nationality in nationalities" :key="nationality" :value="nationality">{{ nationality }}</option>
                 </select>
-                <input v-else-if="key === 'id_type'" v-model="form[key]" readonly :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 bg-slate-100 px-3 py-3" />
+                <select v-else-if="key === 'id_type'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError('id_type'); clearFieldError('id_number')">
+                  <option v-for="identificationType in identificationTypes" :key="identificationType" :value="identificationType">{{ identificationType }}</option>
+                </select>
                 <select v-else-if="key === 'direct_cash_settlement'" v-model="form[key]" :required="isRequiredField(key)" class="mt-2 w-full border border-slate-300 px-3 py-3" @change="clearFieldError(key)">
                   <option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option>
                 </select>
@@ -372,10 +440,10 @@ function submitApplication() {
                   class="mt-2 w-full border border-slate-300 px-3 py-3" @input="clearFieldError(key)" />
                 <input v-else v-model="form[key]" :type="['date_of_birth','deceased_date_of_birth','id_expiry','date_of_registration','account_opened_at'].includes(key) ? 'date' : (key.includes('email') ? 'email' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : 'text'))"
                   :required="isRequiredField(key)"
-                  :inputmode="['bvn','id_number','bank_account_number'].includes(key) ? 'numeric' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : undefined)"
-                  :maxlength="key === 'bvn' || key === 'id_number' ? 11 : (key === 'bank_account_number' ? 10 : (key === 'rc_number' ? 10 : undefined))"
-                  :pattern="['bvn','id_number'].includes(key) ? '[0-9]{11}' : (key === 'bank_account_number' ? '[0-9]{10}' : (key === 'rc_number' ? '(RC)?[0-9]{1,8}' : undefined))"
-                  :placeholder="key === 'bvn' ? 'Enter 11-digit BVN' : (key === 'id_number' ? 'Enter 11-digit NIN' : (key === 'bank_account_number' ? 'Enter 10-digit account number' : (key === 'rc_number' ? 'e.g. RC123456' : (key.includes('telephone') || key === 'joint_contact_number' ? '08012345678 or +2348012345678' : ''))))"
+                  :inputmode="key === 'id_number' && form.id_type !== 'NIN' ? undefined : (['bvn','id_number','bank_account_number'].includes(key) ? 'numeric' : (key.includes('telephone') || key === 'joint_contact_number' ? 'tel' : undefined))"
+                  :maxlength="key === 'bvn' || (key === 'id_number' && form.id_type === 'NIN') ? 11 : (key === 'bank_account_number' ? 10 : (key === 'rc_number' ? 10 : undefined))"
+                  :pattern="key === 'bvn' || (key === 'id_number' && form.id_type === 'NIN') ? '[0-9]{11}' : (key === 'bank_account_number' ? '[0-9]{10}' : (key === 'rc_number' ? '(RC)?[0-9]{1,8}' : undefined))"
+                  :placeholder="key === 'bvn' ? 'Enter 11-digit BVN' : (key === 'id_number' ? (form.id_type === 'NIN' ? 'Enter 11-digit NIN' : 'Enter identification number') : (key === 'bank_account_number' ? 'Enter 10-digit account number' : (key === 'rc_number' ? 'e.g. RC123456' : (key.includes('telephone') || key === 'joint_contact_number' ? '08012345678 or +2348012345678' : ''))))"
                   class="mt-2 w-full border px-3 py-3"
                   :class="fieldErrors[key] ? 'border-red-500' : 'border-slate-300'" @input="clearFieldError(key)" />
                 <span v-if="fieldErrors[key]" class="mt-1 block text-xs text-red-600">{{ fieldErrors[key] }}</span>
@@ -383,22 +451,87 @@ function submitApplication() {
             </template>
           </div>
           <div v-else class="mt-6 space-y-5">
+            <section class="space-y-5">
+              <p class="text-sm text-slate-600">Read each disclosure. The signature and date fields below are part of the account-opening declaration.</p>
+              <article v-for="(section, sectionKey) in legalDisclosure" :key="sectionKey" class="border border-slate-200 p-5">
+                <h3 class="font-display text-xl font-semibold text-heritage-navy">{{ section.title }}</h3>
+                <ol v-if="section.clauses" class="mt-4 list-[lower-alpha] space-y-3 pl-5 text-sm leading-6 text-slate-700">
+                  <li v-for="(clause, clauseKey) in section.clauses" :key="clauseKey">{{ clause }}</li>
+                </ol>
+                <div v-if="section.paragraphs" class="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                  <p v-for="paragraph in section.paragraphs" :key="paragraph">{{ paragraph }}</p>
+                </div>
+                <p v-if="section.acknowledgement" class="mt-4 font-medium text-slate-800">{{ section.acknowledgement }}</p>
+                <div v-if="sectionKey === 'eIndemnity'" class="mt-4 space-y-2 border-t border-slate-200 pt-4 text-sm text-slate-700">
+                  <p v-for="(signatory, index) in form.legal_signatories" :key="index">
+                    Whereas: {{ signatory.indemnity_name }} · Email: {{ legalSignerContact(index).email }} · Telephone: {{ legalSignerContact(index).telephone }}
+                  </p>
+                </div>
+              </article>
+            </section>
+
+            <section class="space-y-4 border border-slate-200 p-5">
+              <h3 class="font-display text-xl font-semibold text-heritage-navy">Signatures</h3>
+              <article v-for="(signatory, index) in form.legal_signatories" :key="index" class="border-t border-slate-200 pt-4">
+                <h4 class="font-semibold text-heritage-navy">{{ formSchema.legalSignatoryLabel }} {{ index + 1 }}</h4>
+                <div class="mt-4 grid gap-4 md:grid-cols-2">
+                  <label v-for="field in [
+                    { key: 'terms_name', label: 'Name for Terms and Conditions' },
+                    { key: 'terms_signature', label: 'Terms and Conditions Signature (type full name)' },
+                    { key: 'terms_date', label: 'Terms and Conditions Date' },
+                    { key: 'aml_name', label: 'Name for Anti-Money Laundering Declaration' },
+                    { key: 'aml_signature', label: 'Anti-Money Laundering Signature (type full name)' },
+                    { key: 'aml_date', label: 'Anti-Money Laundering Date' },
+                    { key: 'indemnity_name', label: 'Name for E-Indemnity' },
+                    { key: 'indemnity_signature', label: 'E-Indemnity Signature (type full name)' },
+                  ]" :key="field.key" class="block">
+                    <span class="text-sm font-semibold text-heritage-navy">{{ field.label }} <span class="text-red-600">*</span></span>
+                    <input v-model="signatory[field.key]" :type="field.key.endsWith('_date') ? 'date' : 'text'" required
+                      class="mt-2 w-full border px-3 py-3"
+                      :class="fieldErrors[`legal_signatories.${index}.${field.key}`] ? 'border-red-500' : 'border-slate-300'"
+                      @input="clearFieldError(`legal_signatories.${index}.${field.key}`)" />
+                    <span v-if="fieldErrors[`legal_signatories.${index}.${field.key}`]" class="mt-1 block text-xs text-red-600">
+                      {{ fieldErrors[`legal_signatories.${index}.${field.key}`] }}
+                    </span>
+                  </label>
+                </div>
+              </article>
+              <label class="block max-w-sm">
+                <span class="text-sm font-semibold text-heritage-navy">E-Indemnity Date <span class="text-red-600">*</span></span>
+                <input v-model="form.indemnity_date" type="date" required class="mt-2 w-full border border-slate-300 px-3 py-3"
+                  :class="fieldErrors.indemnity_date ? 'border-red-500' : ''" @input="clearFieldError('indemnity_date')" />
+                <span v-if="fieldErrors.indemnity_date" class="mt-1 block text-xs text-red-600">{{ fieldErrors.indemnity_date }}</span>
+              </label>
+              <div class="border-t border-slate-200 pt-4">
+                <h4 class="font-semibold text-heritage-navy">Witness (optional)</h4>
+                <div class="mt-3 grid gap-4 md:grid-cols-3">
+                  <label v-for="field in [
+                    { key: 'indemnity_witness_name', label: 'Witness Name', type: 'text' },
+                    { key: 'indemnity_witness_signature', label: 'Witness Signature (type full name)', type: 'text' },
+                    { key: 'indemnity_witness_date', label: 'Witness Date', type: 'date' },
+                  ]" :key="field.key" class="block">
+                    <span class="text-sm font-semibold text-heritage-navy">{{ field.label }}</span>
+                    <input v-model="form[field.key]" :type="field.type" class="mt-2 w-full border border-slate-300 px-3 py-3" />
+                  </label>
+                </div>
+              </div>
+              <p class="border-t border-slate-200 pt-4 text-sm text-slate-600">
+                <strong>For HCML use only:</strong> Account Officer confirmation and Internal Control details are completed by Heritage Capital Markets.
+              </p>
+            </section>
+
             <p class="text-sm text-slate-600">Upload applicable supporting documents. Files are limited to PDF, JPG and
               PNG,
               maximum 5 MB each.</p>
             <label
-              v-for="item in [{ key: 'passport_photo', label: 'Passport Photograph' }, { key: 'identity_document', label: 'Means of Identification' }, { key: 'utility_bill', label: 'Recent Utility Bill' }, { key: 'birth_certificate', label: 'Birth Certificate (if applicable)' }, { key: 'signature', label: 'Signature' }]"
+              v-for="item in [{ key: 'passport_photo', label: 'Passport Photograph' }, { key: 'identity_document', label: 'Means of Identification' }, { key: 'utility_bill', label: 'Recent Utility Bill' }, { key: 'birth_certificate', label: 'Birth Certificate' }, { key: 'signature', label: 'Signature' }]"
               :key="item.key" class="block"><span class="text-sm font-semibold text-heritage-navy">{{ item.label
               }}</span><input type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-2 block w-full border p-3 text-sm"
                 :class="fieldErrors[item.key] ? 'border-red-500' : 'border-slate-300'"
                 @change="setFile(item.key, $event)" /><span v-if="fieldErrors[item.key]"
                 class="mt-1 block text-xs text-red-600">{{ fieldErrors[item.key] }}</span></label>
             <label class="flex gap-3 text-sm leading-6 text-slate-700"><input v-model="form.declaration_accepted"
-                type="checkbox" class="mt-1" @input="clearFieldError('declaration_accepted')" required />I confirm that
-              the information supplied
-              is accurate and consent to
-              Heritage Capital Markets
-              processing it for account-opening review. <span class="font-bold text-red-600">*</span></label><span v-if="fieldErrors.declaration_accepted"
+                type="checkbox" class="mt-1" @input="clearFieldError('declaration_accepted')" required />I confirm that the information supplied is accurate, have read and agree to the Terms and Conditions, Anti-Money Laundering Act, E-Indemnity and Risk Disclosure above, and consent to Heritage Capital Markets processing my information for account-opening review. <span class="font-bold text-red-600">*</span></label><span v-if="fieldErrors.declaration_accepted"
               class="mt-1 block text-xs text-red-600">{{ fieldErrors.declaration_accepted }}</span>
           </div>
           <div class="mt-8 flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-6">

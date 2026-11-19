@@ -133,9 +133,27 @@ class AccountApplicationController extends Controller
     public function submit(Request $request, string $type)
     {
         abort_unless(in_array($type, self::TYPES, true), 404);
+        $request->merge([
+            'legal_signatories' => is_string($request->input('legal_signatories'))
+                ? json_decode($request->input('legal_signatories'), true)
+                : $request->input('legal_signatories'),
+        ]);
         $data = $request->validate([
             'application_id' => ['required', 'integer', 'exists:account_applications,id'],
             'declaration_accepted' => ['accepted'],
+            'legal_signatories' => ['required', 'array', 'min:1'],
+            'legal_signatories.*.terms_name' => ['required', 'string', 'max:150'],
+            'legal_signatories.*.terms_signature' => ['required', 'string', 'max:150'],
+            'legal_signatories.*.terms_date' => ['required', 'date'],
+            'legal_signatories.*.aml_name' => ['required', 'string', 'max:150'],
+            'legal_signatories.*.aml_signature' => ['required', 'string', 'max:150'],
+            'legal_signatories.*.aml_date' => ['required', 'date'],
+            'legal_signatories.*.indemnity_name' => ['required', 'string', 'max:150'],
+            'legal_signatories.*.indemnity_signature' => ['required', 'string', 'max:150'],
+            'indemnity_date' => ['required', 'date'],
+            'indemnity_witness_name' => ['nullable', 'string', 'max:150'],
+            'indemnity_witness_signature' => ['nullable', 'string', 'max:150'],
+            'indemnity_witness_date' => ['nullable', 'date'],
             'documents' => ['nullable', 'array'],
             'documents.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
@@ -160,6 +178,27 @@ class AccountApplicationController extends Controller
             ]);
         }
         $this->validateFormData($formData, $type);
+        $schema = AccountOpeningFormSchema::forType($type);
+        $signatoryCount = $schema['peopleField'] === null
+            ? 1
+            : count($formData[$schema['peopleField']] ?? []);
+        if (count($data['legal_signatories']) !== $signatoryCount) {
+            throw ValidationException::withMessages([
+                'legal_signatories' => 'Provide a complete set of legal signatures for each account holder or signatory.',
+            ]);
+        }
+
+        $formData['declaration_accepted'] = (bool) $data['declaration_accepted'];
+        $formData['legal_signatories'] = $data['legal_signatories'];
+        $formData['indemnity_date'] = $data['indemnity_date'];
+        foreach ([
+            'indemnity_witness_name',
+            'indemnity_witness_signature',
+            'indemnity_witness_date',
+        ] as $field) {
+            $formData[$field] = $data[$field] ?? null;
+        }
+        $app->form_data = $formData;
 
         $superAdminEmails = User::query()
             ->where('is_admin', true)
@@ -186,9 +225,7 @@ class AccountApplicationController extends Controller
         $app->status = 'submitted';
         $app->submitted_at = now();
 
-        $pdfContent = Pdf::loadView('pdf.account-application', [
-            'application' => $app,
-        ])->setPaper('a4')->output();
+        $pdfContent = $this->renderApplicationPdf($app);
 
         $pdfPath = $this->privatePdfPath($app);
         $this->storePrivatePdf($pdfPath, $pdfContent);
@@ -217,15 +254,13 @@ class AccountApplicationController extends Controller
         abort_unless(auth()->user()?->hasFeature('account_applications'), 403);
         abort_if($application->status === 'draft', 404);
 
-        $path = $application->pdf_path;
-        if (! $path || ! Storage::disk('local')->exists($path)) {
-            $pdfContent = Pdf::loadView('pdf.account-application', [
-                'application' => $application,
-            ])->setPaper('a4')->output();
-            $path = $this->privatePdfPath($application);
-            $this->storePrivatePdf($path, $pdfContent);
-            $application->forceFill(['pdf_path' => $path])->save();
-        }
+        $pdfContent = $this->renderApplicationPdf($application);
+        $path = $this->privatePdfPath($application);
+        $this->storePrivatePdf($path, $pdfContent);
+        $application->forceFill([
+            'form_data' => $application->form_data,
+            'pdf_path' => $path,
+        ])->save();
 
         return Storage::disk('local')->download(
             $path,
@@ -295,7 +330,7 @@ class AccountApplicationController extends Controller
             'date_of_registration' => ['date'],
             'account_opened_at' => ['date'],
             'id_expiry' => ['date'],
-            'id_type' => ['in:NIN'],
+            'id_number' => ['string', 'max:100'],
             'bvn' => ['digits:11'],
             'bank_account_number' => ['digits:10'],
             'account_type' => ['in:Savings,Current'],
@@ -316,6 +351,10 @@ class AccountApplicationController extends Controller
         }
 
         $schema = AccountOpeningFormSchema::forType($type);
+        if (filled($formData['id_type'] ?? null)) {
+            $rules['id_type'] = ['in:'.implode(',', $schema['identificationTypes'])];
+        }
+
         $personList = $schema['peopleField'];
         $personStep = null;
         if ($personList !== null) {
@@ -328,7 +367,7 @@ class AccountApplicationController extends Controller
         }
         $validatePeople = $personList !== null && $step >= $personStep;
         if ($validatePeople) {
-            $rules[$personList] = ['required', 'array', 'min:'.$schema['peopleMinimum'], 'max:20'];
+            $rules[$personList] = ['required', 'array', 'min:'.$schema['peopleMinimum'], 'max:'.$schema['peopleMaximum']];
             $nestedFieldRules = [
                 'name' => ['string', 'max:150'],
                 'telephone' => ['string', 'max:40'],
@@ -336,9 +375,6 @@ class AccountApplicationController extends Controller
                 'date_of_birth' => ['date'],
                 'nationality' => ['string', 'max:80'],
                 'residential_address' => ['string', 'max:1000'],
-                'id_type' => ['in:NIN'],
-                'id_number' => ['string', 'max:100'],
-                'id_expiry' => ['date'],
             ];
             foreach ($schema['requiredPersonFields'] as $field) {
                 $rules[$personList.'.*.'.$field] = [
@@ -365,14 +401,6 @@ class AccountApplicationController extends Controller
 
         if ($validatePeople) {
             foreach ($formData[$personList] as $index => $person) {
-                if (($person['id_type'] ?? null) === 'NIN'
-                    && filled($person['id_number'] ?? null)
-                    && ! preg_match('/^\d{11}$/', $person['id_number'])) {
-                    throw ValidationException::withMessages([
-                        "{$personList}.{$index}.id_number" => 'NIN must be exactly 11 digits.',
-                    ]);
-                }
-
                 foreach (['telephone', 'next_of_kin_telephone'] as $field) {
                     if (filled($person[$field] ?? null) && ! $this->validTelephone($person[$field])) {
                         throw ValidationException::withMessages([
@@ -382,6 +410,24 @@ class AccountApplicationController extends Controller
                 }
             }
         }
+    }
+
+    private function renderApplicationPdf(AccountApplication $application): string
+    {
+        $formData = $application->form_data ?? [];
+        if ($application->status === 'submitted') {
+            $formData['declaration_accepted'] = true;
+            $application->form_data = $formData;
+        }
+
+        $schema = AccountOpeningFormSchema::forType($application->account_type);
+
+        return Pdf::loadView('pdf.account-application', [
+            'application' => $application,
+            'fieldLabels' => $schema['fieldLabels'],
+            'personFieldLabels' => $schema['personFieldLabels'],
+            'legalDisclosure' => $schema['legalDisclosure'],
+        ])->setPaper('a4')->output();
     }
 
     private function validTelephone(mixed $telephone): bool
