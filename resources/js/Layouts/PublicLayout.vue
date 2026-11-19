@@ -4,6 +4,7 @@ import Header from '@/Components/Header.vue'
 import Footer from '@/Components/Footer.vue'
 import MarketTicker from '@/Components/MarketTicker.vue'
 import LiveChatWidget from '@/Components/LiveChatWidget.vue'
+import WhatsAppChatWidget from '@/Components/WhatsAppChatWidget.vue'
 
 const page = usePage()
 </script>
@@ -21,6 +22,7 @@ const page = usePage()
         <Footer />
         <MarketTicker :items="page.props.marketTicker ?? []" />
         <LiveChatWidget />
+        <WhatsAppChatWidget />
 
     </div>
 

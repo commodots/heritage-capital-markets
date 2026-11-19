@@ -279,4 +279,14 @@ class PublicPageContentTest extends TestCase
                 ->where('content.resources_title', 'Investor Learning Centre')
                 ->has('markets'));
     }
+
+    public function test_public_pages_receive_the_configured_whatsapp_business_phone(): void
+    {
+        config(['services.whatsapp.business_phone' => '+234 801 234 5678']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('whatsappBusinessPhone', '+234 801 234 5678'));
+    }
 }

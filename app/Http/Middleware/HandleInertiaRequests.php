@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'accountApplication' => fn () => $request->session()->get('accountApplication'),
+            'whatsappBusinessPhone' => config('services.whatsapp.business_phone'),
             'marketTicker' => fn () => MarketQuote::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
