@@ -26,6 +26,7 @@ const processingMembers = ref({})
 const processingIntro = ref(false)
 const imageFiles = ref({})
 const imagePreviews = ref({})
+const imageRemovals = ref({})
 
 const memberCategories = [
     { prefix: 'board_member', title: 'Board Members' },
@@ -140,6 +141,7 @@ function removeMember(prefix, number) {
     })
     const imageKey = `${prefix}_${number}_image`
     delete imageFiles.value[imageKey]
+    imageRemovals.value[imageKey] = true
     if (imagePreviews.value[imageKey]?.startsWith('blob:')) {
         URL.revokeObjectURL(imagePreviews.value[imageKey])
     }
@@ -169,6 +171,7 @@ function selectImage(key, event) {
     }
 
     imageFiles.value[key] = file
+    delete imageRemovals.value[key]
     imagePreviews.value[key] = URL.createObjectURL(file)
 }
 
@@ -186,6 +189,8 @@ function saveMember(prefix, number) {
     const imageKey = `${prefix}_${number}_image`
     if (imageFiles.value[imageKey]) {
         payload[imageKey] = imageFiles.value[imageKey]
+    } else if (imageRemovals.value[imageKey]) {
+        payload[imageKey] = null
     }
 
     router.post(`/admin/page-content/${props.groupKey}`, payload, {
@@ -193,6 +198,7 @@ function saveMember(prefix, number) {
         preserveScroll: true,
         onSuccess: () => {
             delete imageFiles.value[imageKey]
+            delete imageRemovals.value[imageKey]
             if (imagePreviews.value[imageKey]?.startsWith('blob:')) {
                 URL.revokeObjectURL(imagePreviews.value[imageKey])
             }
@@ -333,7 +339,7 @@ function fieldError(key, field) {
                                     <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">{{ fieldLabel(key) }}</label>
 
                                     <div v-if="field[3] === 'image'" class="space-y-3">
-                                        <img v-if="imagePreviews[key] || props.settings[key]"
+                                        <img v-if="imagePreviews[key] || (props.settings[key] && !imageRemovals[key])"
                                             :src="imagePreviews[key] || imageUrl(props.settings[key])"
                                             :alt="`${fieldLabel(key)} preview`"
                                             class="h-44 w-36 rounded border border-heritage-border object-cover object-top" />
