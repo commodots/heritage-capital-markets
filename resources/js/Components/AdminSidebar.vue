@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import heritageLogo from '@/assets/logo/heritage-logo.png'
 
@@ -23,33 +23,8 @@ const canShowContent = computed(() =>
     ['pages', 'board_management', 'research', 'articles', 'events', 'faqs', 'media'].some(can)
 )
 const canShowCommunication = computed(() =>
-    ['enquiries', 'newsletter', 'account_applications', 'live_chat'].some(can)
+    ['enquiries', 'newsletter', 'account_applications'].some(can)
 )
-const chatUnreadCount = ref(0)
-let chatUnreadTimer
-
-async function refreshChatUnreadCount() {
-    if (!can('live_chat')) return
-    try {
-        const response = await fetch('/admin/live-chat/unread-count', {
-            headers: { Accept: 'application/json' },
-            credentials: 'same-origin',
-        })
-        if (response.ok) {
-            const data = await response.json()
-            chatUnreadCount.value = Number(data.count) || 0
-        }
-    } catch (_) {}
-}
-
-onMounted(() => {
-    refreshChatUnreadCount()
-    chatUnreadTimer = window.setInterval(refreshChatUnreadCount, 4000)
-})
-
-onUnmounted(() => {
-    if (chatUnreadTimer) window.clearInterval(chatUnreadTimer)
-})
 
 const currentPath = computed(() => (page.url || '/').split('?')[0])
 
@@ -252,16 +227,6 @@ function closeSidebar() {
                     </svg>
                     Account Applications
                 </a>
-                <a v-if="can('live_chat')" href="/admin/live-chat" :class="['admin-nav-item', navClass('/admin/live-chat')]">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                        <path d="M4 5h16v12H9l-5 4V5Z" />
-                        <path d="M8 9h8M8 13h5" />
-                    </svg>
-                    <span class="flex-1">Live Chat</span>
-                    <span v-if="chatUnreadCount > 0" class="rounded-full bg-heritage-gold px-2 py-0.5 text-[10px] font-semibold text-heritage-navy">
-                        {{ chatUnreadCount }}
-                    </span>
-                </a>
             </div>
 
             <div v-if="can('settings') || isSuperAdmin">
@@ -280,6 +245,15 @@ function closeSidebar() {
                         <circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M17 11a3 3 0 1 0-2-5.7M17 14c2.4.4 4 2.6 4 5" />
                     </svg>
                     Admin Users
+                </a>
+                <a v-if="isSuperAdmin" href="/admin/role-assignments" :class="['admin-nav-item', navClass('/admin/role-assignments')]">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <path d="M4 5h16M4 12h16M4 19h16" />
+                        <circle cx="8" cy="5" r="2" />
+                        <circle cx="16" cy="12" r="2" />
+                        <circle cx="10" cy="19" r="2" />
+                    </svg>
+                    Assign Admin Roles
                 </a>
                 <a v-if="isSuperAdmin" href="/admin/user-types" :class="['admin-nav-item', navClass('/admin/user-types')]">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">

@@ -46,11 +46,22 @@ class PublicDownloadsTest extends TestCase
         $this->get('/open-account/minor')->assertOk();
         $this->get('/open-account/estate')->assertOk();
 
-        foreach (['individual', 'corporate', 'joint', 'minor', 'estate'] as $type) {
+        $formFiles = [
+            'individual' => 'HCML KYC Individual.pdf',
+            'corporate' => 'HCML kyc corporate.pdf',
+            'joint' => 'HCML kyc Joint account.pdf',
+            'minor' => 'HCML kyc Minor Account.pdf',
+            'estate' => 'HCML kyc ESTATE ACCOUNT.pdf',
+        ];
+
+        foreach ($formFiles as $type => $fileName) {
             $response = $this->get("/resources/downloads/account-opening/{$type}.pdf")
                 ->assertDownload("{$type}-account-opening-form.pdf");
 
-            $this->assertStringStartsWith('%PDF-', $response->getContent());
+            $this->assertSame(
+                realpath(public_path($fileName)),
+                $response->baseResponse->getFile()->getPathname(),
+            );
         }
     }
 

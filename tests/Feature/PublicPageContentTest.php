@@ -123,6 +123,48 @@ class PublicPageContentTest extends TestCase
                 ->where('content.board_member_1_image', $photoPath));
     }
 
+    public function test_clearing_a_board_member_profile_removes_the_photo_and_stored_file(): void
+    {
+        Storage::fake('public');
+        $admin = $this->admin();
+
+        $this->actingAs($admin)
+            ->post('/admin/page-content/board', [
+                'board_member_1_name' => 'Amina Example',
+                'board_member_1_role' => 'Board Chair',
+                'board_member_1_bio' => 'A board biography.',
+                'board_member_1_image' => UploadedFile::fake()->createWithContent(
+                    'amina.png',
+                    base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/r1sAAAAASUVORK5CYII='),
+                ),
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $photoPath = SiteSetting::where('key', 'board_member_1_image')->value('value');
+        Storage::disk('public')->assertExists($photoPath);
+
+        $this->actingAs($admin)
+            ->post('/admin/page-content/board', [
+                'board_member_1_name' => '',
+                'board_member_1_role' => '',
+                'board_member_1_bio' => '',
+                'board_member_1_image' => null,
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('site_settings', [
+            'key' => 'board_member_1_image',
+            'value' => '',
+        ]);
+        Storage::disk('public')->assertMissing($photoPath);
+
+        $this->get('/board-management')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('content.board_member_1_image', ''));
+    }
+
     public function test_admin_cannot_upload_unsupported_board_member_file_type(): void
     {
         Storage::fake('public');
@@ -236,5 +278,15 @@ class PublicPageContentTest extends TestCase
                 ->component('Resources/Index')
                 ->where('content.resources_title', 'Investor Learning Centre')
                 ->has('markets'));
+    }
+
+    public function test_public_pages_receive_the_configured_whatsapp_business_phone(): void
+    {
+        config(['services.whatsapp.business_phone' => '+234 801 234 5678']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('whatsappBusinessPhone', '+234 801 234 5678'));
     }
 }

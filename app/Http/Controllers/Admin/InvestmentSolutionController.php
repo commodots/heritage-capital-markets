@@ -27,6 +27,8 @@ class InvestmentSolutionController extends Controller
             'slug' => ['nullable', 'string', 'max:255'],
             'short_description' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
+            'overview_eyebrow' => ['nullable', 'string', 'max:100'],
+            'overview_title' => ['nullable', 'string', 'max:255'],
             'featured_image' => [
                 'nullable',
                 'image',
@@ -68,6 +70,8 @@ class InvestmentSolutionController extends Controller
             'slug' => ['nullable', 'string', 'max:255'],
             'short_description' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
+            'overview_eyebrow' => ['nullable', 'string', 'max:100'],
+            'overview_title' => ['nullable', 'string', 'max:255'],
             'featured_image' => [
                 'nullable',
                 'image',

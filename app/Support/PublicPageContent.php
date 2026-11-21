@@ -183,8 +183,6 @@ class PublicPageContent
             'solution_detail_hero_eyebrow' => ['Investment Solutions', 100, false, 'text', 'Page Sections'],
             'solution_detail_talk_button' => ['Talk to an Expert', 100, false, 'text', 'Page Sections'],
             'solution_detail_all_button' => ['All Solutions', 100, false, 'text', 'Page Sections'],
-            'solution_detail_overview_eyebrow' => ['Overview', 100, false, 'text', 'Page Sections'],
-            'solution_detail_overview_title' => ['A solution designed around your objectives', 255, false, 'text', 'Page Sections'],
             'solution_detail_why_eyebrow' => ['Why Heritage', 100, false, 'text', 'Page Sections'],
             'solution_detail_why_title' => ['Professional insight. Client focus.', 255, false, 'text', 'Page Sections'],
             'solution_detail_why_body' => ['Our approach combines professional expertise, market insight and a clear understanding of client objectives.', 1500, true, 'text', 'Page Sections'],

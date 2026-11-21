@@ -14,6 +14,9 @@
         td.label { color: #627186; font-weight: bold; width: 32%; }
         .person { border: 1px solid #dfe5ec; margin: 0 0 10px; padding: 7px; }
         .person h3 { color: #102b4e; font-size: 10px; margin: 0 0 4px; }
+        .disclosure { page-break-inside: avoid; }
+        .disclosure p, .disclosure li { margin: 5px 0; }
+        .disclosure ol { padding-left: 18px; }
         .muted { color: #627186; }
         .footer { border-top: 1px solid #dfe5ec; color: #627186; font-size: 8px; margin-top: 20px; padding-top: 7px; }
     </style>
@@ -36,8 +39,20 @@
     </table>
 
     @php
-        $peopleLists = ['directors' => 'Directors / signatories', 'administrators' => 'Estate administrators', 'joint_applicants' => 'Joint account holders'];
+        $peopleLists = [
+            'directors' => 'Directors / signatories',
+            'administrators' => 'Estate administrators',
+            'joint_applicants' => 'Joint account holders',
+            'legal_signatories' => 'Legal disclosure signatories',
+        ];
+        $personHeadings = [
+            'directors' => 'Director / signatory',
+            'administrators' => 'Estate administrator',
+            'joint_applicants' => 'Joint account holder',
+            'legal_signatories' => 'Signatory',
+        ];
         $formData = $application->form_data ?? [];
+        $formatLabel = fn ($key, $labels) => $labels[$key] ?? ucfirst(str_replace('_', ' ', $key));
     @endphp
 
     <h2>Application details</h2>
@@ -45,8 +60,8 @@
         @foreach ($formData as $key => $value)
             @continue(is_array($value) || $value === null || $value === '')
             <tr>
-                <td class="label">{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
-                <td>{{ is_bool($value) ? ($value ? 'Yes' : 'No') : $value }}</td>
+                <td class="label">{{ $key === 'declaration_accepted' ? 'Conditions Accepted' : $formatLabel($key, $fieldLabels) }}</td>
+                <td>{{ $key === 'declaration_accepted' ? ($value ? 'Accepted' : 'Not accepted') : (is_bool($value) ? ($value ? 'Yes' : 'No') : $value) }}</td>
             </tr>
         @endforeach
     </table>
@@ -56,12 +71,12 @@
             <h2>{{ $title }}</h2>
             @foreach ($formData[$key] as $index => $person)
                 <div class="person">
-                    <h3>{{ rtrim($title, 's') }} {{ $index + 1 }}</h3>
+                    <h3>{{ $personHeadings[$key] }} {{ $index + 1 }}</h3>
                     <table>
                         @foreach ($person as $field => $value)
                             @continue(is_array($value) || $value === null || $value === '')
                             <tr>
-                                <td class="label">{{ ucfirst(str_replace('_', ' ', $field)) }}</td>
+                                <td class="label">{{ $formatLabel($field, $personFieldLabels) }}</td>
                                 <td>{{ is_bool($value) ? ($value ? 'Yes' : 'No') : $value }}</td>
                             </tr>
                         @endforeach
@@ -69,6 +84,25 @@
                 </div>
             @endforeach
         @endif
+    @endforeach
+
+    @foreach ($legalDisclosure as $section)
+        <section class="disclosure">
+            <h2>{{ $section['title'] }}</h2>
+            @if (isset($section['clauses']))
+                <ol type="a">
+                    @foreach ($section['clauses'] as $clause)
+                        <li>{{ $clause }}</li>
+                    @endforeach
+                </ol>
+            @endif
+            @foreach ($section['paragraphs'] ?? [] as $paragraph)
+                <p>{{ $paragraph }}</p>
+            @endforeach
+            @if (isset($section['acknowledgement']))
+                <p><strong>{{ $section['acknowledgement'] }}</strong></p>
+            @endif
+        </section>
     @endforeach
 
     <h2>Supporting documents</h2>

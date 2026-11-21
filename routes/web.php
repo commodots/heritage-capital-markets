@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\HomepageSettingsController;
 use App\Http\Controllers\Admin\InvestmentSolutionController as AdminInvestmentSolutionController;
-use App\Http\Controllers\Admin\LiveChatController;
 use App\Http\Controllers\Admin\MarketIndexController;
 use App\Http\Controllers\Admin\MarketQuoteController;
 use App\Http\Controllers\Admin\MediaController;
@@ -23,7 +22,6 @@ use App\Http\Controllers\Admin\PublicPageContentController;
 use App\Http\Controllers\Admin\ResearchReportController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DownloadsController;
 use App\Http\Controllers\FaqController as PublicFaqController;
@@ -130,14 +128,6 @@ Route::get('/newsletter/unsubscribe/{newsletterSubscriber}', [NewsletterControll
 Route::post('/newsletter/unsubscribe/{newsletterSubscriber}', [NewsletterController::class, 'unsubscribe'])
     ->middleware('signed')
     ->name('newsletter.unsubscribe.process');
-
-Route::prefix('chat')->group(function () {
-    Route::get('/availability', [ChatController::class, 'availability'])->middleware('throttle:60,1');
-    Route::post('/start', [ChatController::class, 'start'])->middleware('throttle:5,1');
-    Route::post('/message', [ChatController::class, 'message'])->middleware('throttle:20,1');
-    Route::get('/messages', [ChatController::class, 'messages'])->middleware('throttle:60,1');
-    Route::post('/offline-enquiry', [ChatController::class, 'offlineEnquiry'])->middleware('throttle:5,1');
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -252,23 +242,6 @@ Route::get('/404', fn () => Inertia::render('Errors/404'))
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->group(function () {
-
-        Route::middleware('feature:live_chat')->prefix('live-chat')->group(function () {
-            Route::get('/unread-count', [LiveChatController::class, 'unreadCount'])
-                ->name('admin.live-chat.unread-count');
-            Route::get('/', [LiveChatController::class, 'index'])
-                ->name('admin.live-chat');
-            Route::get('/{conversation}', [LiveChatController::class, 'show'])
-                ->name('admin.live-chat.show');
-            Route::get('/{conversation}/poll', [LiveChatController::class, 'poll'])
-                ->name('admin.live-chat.poll');
-            Route::post('/{conversation}/reply', [LiveChatController::class, 'reply'])
-                ->name('admin.live-chat.reply');
-            Route::post('/{conversation}/assign', [LiveChatController::class, 'assign'])
-                ->name('admin.live-chat.assign');
-            Route::post('/{conversation}/close', [LiveChatController::class, 'close'])
-                ->name('admin.live-chat.close');
-        });
 
         /*
     |--------------------------------------------------------------------------
@@ -643,6 +616,11 @@ Route::prefix('admin')
                 ->name('admin.user-types.store');
             Route::put('/user-types/{adminRole}', [AdminRoleController::class, 'update'])
                 ->name('admin.user-types.update');
+
+            Route::get('/role-assignments', [AdminRoleController::class, 'assignments'])
+                ->name('admin.role-assignments');
+            Route::put('/role-assignments/{user}', [AdminRoleController::class, 'assign'])
+                ->name('admin.role-assignments.assign');
 
             Route::get('/users', [AdminUserController::class, 'index'])
                 ->name('admin.users');
