@@ -26,60 +26,122 @@ const processingMembers = ref({})
 const processingIntro = ref(false)
 const imageFiles = ref({})
 const imagePreviews = ref({})
+const imageRemovals = ref({})
 
-// Determine initial member count (up to 12)
-const initialMemberCount = Math.max(
-    6,
-    ...Object.keys(props.settings)
-        .filter(k => k.startsWith('board_member_'))
-        .map(k => parseInt(k.split('_')[2]) || 0)
-)
-const activeMemberCount = ref(initialMemberCount)
+const memberCategories = [
+    { prefix: 'board_member', title: 'Board Members' },
+    { prefix: 'management_member', title: 'Management Team' },
+]
+function initialMemberCount(prefix) {
+    const populatedNumbers = Object.keys(props.settings)
+        .filter(key => key.startsWith(`${prefix}_`))
+        .map(key => parseInt(key.split('_')[2]) || 0)
+        .filter(number => ['name', 'role', 'bio', 'image'].some(part =>
+            Boolean(props.settings[`${prefix}_${number}_${part}`])
+        ))
+
+    return Math.max(1, ...populatedNumbers)
+}
+
+const activeMemberCounts = reactive(Object.fromEntries(memberCategories.map(({ prefix }) => [
+    prefix,
+    initialMemberCount(prefix),
+])))
 
 const boardFields = computed(() => Object.entries(props.group.fields ?? {}))
 const boardIntroFields = computed(() => boardFields.value.filter(([key]) =>
-    !key.startsWith('board_member_') && !key.startsWith('board_careers_')
+    !key.startsWith('board_member_') &&
+    !key.startsWith('management_member_') &&
+    !key.startsWith('board_careers_')
 ))
 const boardCareerFields = computed(() => boardFields.value.filter(([key]) =>
     key.startsWith('board_careers_')
 ))
+const headlineGroups = computed(() => {
+    const groups = new Map()
+
+    for (const [key] of boardFields.value) {
+        const lineMatch = key.match(/^(.*_title)_line_(\d+)$/)
+        const accentMatch = key.match(/^(.*_title)_accent$/)
+        const prefix = lineMatch?.[1] ?? accentMatch?.[1]
+        if (!prefix) continue
+
+        if (!groups.has(prefix)) groups.set(prefix, { prefix, parts: [] })
+        groups.get(prefix).parts.push({
+            key,
+            order: lineMatch ? Number(lineMatch[2]) : Number.MAX_SAFE_INTEGER,
+        })
+    }
+
+    return Array.from(groups.values())
+        .filter(group => group.parts.length > 1)
+        .map(group => ({
+            ...group,
+            key: `__headline_${group.prefix}`,
+            label: fieldLabel(group.prefix),
+            parts: group.parts.sort((a, b) => a.order - b.order),
+        }))
+})
+const mergedHeadlines = reactive(Object.fromEntries(headlineGroups.value.map(group => [
+    group.key,
+    group.parts.map(({ key }) => form[key] ?? '').join('\n'),
+])))
 const generalSections = computed(() => {
     const sections = new Map()
+    const groupsByPart = new Map()
+    const firstPartByKey = new Map()
+
+    for (const group of headlineGroups.value) {
+        for (const part of group.parts) groupsByPart.set(part.key, group)
+        firstPartByKey.set(group.parts[0].key, group)
+    }
 
     for (const [key, field] of boardFields.value) {
         const title = field[4] || 'Page Content'
         if (!sections.has(title)) sections.set(title, [])
-        sections.get(title).push([key, field])
+        const group = groupsByPart.get(key)
+        if (!group) {
+            sections.get(title).push([key, field])
+        } else if (firstPartByKey.has(key)) {
+            sections.get(title).push([
+                group.key,
+                [group.label, 4000, true, 'text', title, group],
+            ])
+        }
     }
 
     return Array.from(sections, ([title, fields]) => ({ title, fields }))
 })
 
-const boardMemberFields = computed(() => Array.from({ length: activeMemberCount.value }, (_, index) => {
-    const number = index + 1
-    return {
-        number,
-        fields: ['name', 'role', 'bio', 'image'].map(part => {
-            const key = `board_member_${number}_${part}`
-            const fieldDef = props.group.fields?.[key] ?? [
-                part, true, part === 'bio', part === 'image' ? 'image' : 'text'
-            ]
-            return [key, fieldDef]
-        }),
-    }
-}))
+const memberGroups = computed(() => memberCategories.map(category => ({
+    ...category,
+    members: Array.from({ length: activeMemberCounts[category.prefix] }, (_, index) => {
+        const number = index + 1
+        return {
+            number,
+            fields: ['name', 'role', 'bio', 'image'].map(part => {
+                const key = `${category.prefix}_${number}_${part}`
+                const fieldDef = props.group.fields?.[key] ?? [
+                    part, true, part === 'bio', part === 'image' ? 'image' : 'text'
+                ]
+                return [key, fieldDef]
+            }),
+        }
+    }),
+})))
 
-function addMember() {
-    if (activeMemberCount.value < 12) activeMemberCount.value++
+function addMember(prefix) {
+    if (activeMemberCounts[prefix] < 12) activeMemberCounts[prefix]++
 }
 
-function removeMember(number) {
+function removeMember(prefix, number) {
     ['name', 'role', 'bio'].forEach(part => {
-        const key = `board_member_${number}_${part}`
+        const key = `${prefix}_${number}_${part}`
         if (form[key] !== undefined) form[key] = ''
     })
-    const imageKey = `board_member_${number}_image`
+    const imageKey = `${prefix}_${number}_image`
     delete imageFiles.value[imageKey]
+    imageRemovals.value[imageKey] = true
     if (imagePreviews.value[imageKey]?.startsWith('blob:')) {
         URL.revokeObjectURL(imagePreviews.value[imageKey])
     }
@@ -88,7 +150,7 @@ function removeMember(number) {
 
 function fieldLabel(key) {
     return key
-        .replace(/^board_member_(\d+)_/, 'Member $1 ')
+        .replace(/^(?:board_member|management_member)_(\d+)_/, 'Member $1 ')
         .replace(new RegExp(`^${props.groupKey}_`), '')
         .replace(/_/g, ' ')
         .replace(/\b\w/g, letter => letter.toUpperCase())
@@ -109,23 +171,26 @@ function selectImage(key, event) {
     }
 
     imageFiles.value[key] = file
+    delete imageRemovals.value[key]
     imagePreviews.value[key] = URL.createObjectURL(file)
 }
 
-// Save an individual board member profile independently
-function saveMember(number) {
-    processingMembers.value[number] = true
+function saveMember(prefix, number) {
+    const processingKey = `${prefix}_${number}`
+    processingMembers.value[processingKey] = true
 
     const payload = {}
     
     for (const part of ['name', 'role', 'bio']) {
-        const key = `board_member_${number}_${part}`
+        const key = `${prefix}_${number}_${part}`
         payload[key] = form[key] ?? ''
     }
 
-    const imageKey = `board_member_${number}_image`
+    const imageKey = `${prefix}_${number}_image`
     if (imageFiles.value[imageKey]) {
         payload[imageKey] = imageFiles.value[imageKey]
+    } else if (imageRemovals.value[imageKey]) {
+        payload[imageKey] = null
     }
 
     router.post(`/admin/page-content/${props.groupKey}`, payload, {
@@ -133,13 +198,14 @@ function saveMember(number) {
         preserveScroll: true,
         onSuccess: () => {
             delete imageFiles.value[imageKey]
+            delete imageRemovals.value[imageKey]
             if (imagePreviews.value[imageKey]?.startsWith('blob:')) {
                 URL.revokeObjectURL(imagePreviews.value[imageKey])
             }
             delete imagePreviews.value[imageKey]
         },
         onFinish: () => {
-            processingMembers.value[number] = false
+            processingMembers.value[processingKey] = false
         },
     })
 }
@@ -149,6 +215,13 @@ function submitGeneral() {
     processingIntro.value = true
     const payload = Object.fromEntries(Object.entries(form))
     Object.assign(payload, imageFiles.value)
+
+    for (const group of headlineGroups.value) {
+        const lines = (mergedHeadlines[group.key] ?? '').split(/\r?\n/)
+        group.parts.forEach(({ key }, index) => {
+            payload[key] = lines[index] ?? ''
+        })
+    }
 
     router.post(`/admin/page-content/${props.groupKey}`, payload, {
         forceFormData: true,
@@ -165,6 +238,24 @@ function submitGeneral() {
         },
         onFinish: () => { processingIntro.value = false },
     })
+}
+
+function fieldValue(key, field) {
+    return field[5] ? mergedHeadlines[key] : form[key]
+}
+
+function setFieldValue(key, field, value) {
+    if (field[5]) {
+        mergedHeadlines[key] = value
+    } else {
+        form[key] = value
+    }
+}
+
+function fieldError(key, field) {
+    const keys = field[5]?.parts.map(part => part.key) ?? [key]
+    return keys.map(errorKey => page.props.errors[errorKey]).filter(Boolean).join(' ')
+        || page.props.errors[key]
 }
 </script>
 
@@ -210,33 +301,35 @@ function submitGeneral() {
                         </div>
                     </div>
 
-                    <!-- Board & Management Members Section -->
-                    <section class="border-t border-heritage-border pt-6">
+                    <section v-for="memberGroup in memberGroups" :key="memberGroup.prefix"
+                        class="border-t border-heritage-border pt-6">
                         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <h3 class="font-display text-lg font-semibold text-heritage-navy">Board &amp; Management Members</h3>
-                                <p class="mt-1 text-sm text-heritage-muted">Add each member’s name, role, biography, and photo. Each member can be saved individually.</p>
+                                <h3 class="font-display text-lg font-semibold text-heritage-navy">{{ memberGroup.title }}</h3>
+                                <p class="mt-1 text-sm text-heritage-muted">Add each person’s name, role, biography, and photo. Save each profile individually.</p>
                             </div>
-                            <button v-if="activeMemberCount < 12" type="button" @click="addMember"
+                            <button v-if="activeMemberCounts[memberGroup.prefix] < 12" type="button"
+                                @click="addMember(memberGroup.prefix)"
                                 class="inline-flex items-center gap-1.5 rounded border border-heritage-border bg-white px-4 py-2 text-xs font-semibold text-heritage-navy transition hover:bg-heritage-offwhite">
-                                + Add Member Profile
+                                + Add {{ memberGroup.prefix === 'board_member' ? 'Board Member' : 'Management Team Member' }}
                             </button>
                         </div>
 
                         <div class="mt-5 grid gap-5 xl:grid-cols-2">
-                            <article v-for="member in boardMemberFields" :key="member.number"
+                            <article v-for="member in memberGroup.members" :key="member.number"
                                 class="grid gap-5 rounded-lg border border-heritage-border bg-heritage-offwhite/40 p-5 sm:grid-cols-2">
                                 <div class="sm:col-span-2 flex items-center justify-between border-b border-heritage-border/60 pb-3">
-                                    <h4 class="text-sm font-semibold text-heritage-navy">Member {{ member.number }}</h4>
+                                    <h4 class="text-sm font-semibold text-heritage-navy">{{ memberGroup.title }} {{ member.number }}</h4>
                                     <div class="flex items-center gap-3">
-                                        <button type="button" @click="removeMember(member.number)"
+                                        <button type="button" @click="removeMember(memberGroup.prefix, member.number)"
                                             class="text-xs text-red-600 hover:underline">
                                             Clear Fields
                                         </button>
-                                        <button type="button" :disabled="processingMembers[member.number]"
-                                            @click="saveMember(member.number)"
+                                        <button type="button"
+                                            :disabled="processingMembers[`${memberGroup.prefix}_${member.number}`]"
+                                            @click="saveMember(memberGroup.prefix, member.number)"
                                             class="rounded bg-heritage-navy px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-heritage-deep disabled:opacity-50">
-                                            {{ processingMembers[member.number] ? 'Saving...' : `Save Member ${member.number}` }}
+                                            {{ processingMembers[`${memberGroup.prefix}_${member.number}`] ? 'Saving...' : `Save ${memberGroup.title} ${member.number}` }}
                                         </button>
                                     </div>
                                 </div>
@@ -245,9 +338,8 @@ function submitGeneral() {
                                     :class="field[2] || field[3] === 'image' ? 'sm:col-span-2' : ''">
                                     <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">{{ fieldLabel(key) }}</label>
 
-                                    <!-- Image Upload Field -->
                                     <div v-if="field[3] === 'image'" class="space-y-3">
-                                        <img v-if="imagePreviews[key] || props.settings[key]"
+                                        <img v-if="imagePreviews[key] || (props.settings[key] && !imageRemovals[key])"
                                             :src="imagePreviews[key] || imageUrl(props.settings[key])"
                                             :alt="`${fieldLabel(key)} preview`"
                                             class="h-44 w-36 rounded border border-heritage-border object-cover object-top" />
@@ -262,16 +354,14 @@ function submitGeneral() {
                                         </p>
                                     </div>
 
-                                    <!-- Bio Textarea Field -->
                                     <textarea v-else-if="field[2]" :id="key" v-model="form[key]" rows="4"
-                                        placeholder="Enter board member biography..."
+                                        :placeholder="`Enter ${memberGroup.title.toLowerCase()} biography...`"
                                         class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
 
-                                    <!-- Standard Input Field (Name, Role) -->
                                     <input v-else :id="key" v-model="form[key]" type="text"
                                         class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
 
-                                    <p v-if="!field[3] === 'image' && page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
+                                    <p v-if="field[3] !== 'image' && page.props.errors[key]" class="text-xs font-medium text-red-600 mt-1">
                                         {{ page.props.errors[key] }}
                                     </p>
                                 </div>
@@ -306,7 +396,7 @@ function submitGeneral() {
                             <div v-for="[key, field] in section.fields" :key="key"
                                 :class="field[2] || field[3] === 'image' ? 'md:col-span-2' : ''">
                                 <label :for="key" class="mb-2 block text-sm font-medium text-heritage-navy">
-                                    {{ fieldLabel(key) }}
+                                    {{ field[5]?.label || fieldLabel(key) }}
                                 </label>
                                 <div v-if="field[3] === 'image'" class="space-y-3">
                                     <img v-if="imagePreviews[key] || props.settings[key]"
@@ -320,13 +410,16 @@ function submitGeneral() {
                                         class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition file:mr-4 file:rounded file:border-0 file:bg-white file:px-3 file:py-2 file:font-semibold file:text-heritage-navy focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
                                     <p class="text-xs text-heritage-muted">JPG, JPEG, PNG or WebP; maximum 10 MB.</p>
                                 </div>
-                                <textarea v-else-if="field[2]" :id="key" v-model="form[key]" rows="3"
+                                <textarea v-else-if="field[2]" :id="key"
+                                    :value="fieldValue(key, field)"
+                                    :rows="field[5] ? field[5].parts.length : 3"
+                                    @input="setFieldValue(key, field, $event.target.value)"
                                     class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold"></textarea>
                                 <input v-else :id="key" v-model="form[key]"
                                     :type="field[3] === 'url' ? 'url' : 'text'"
                                     class="w-full rounded border border-heritage-border px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-1 focus:ring-heritage-gold" />
-                                <p v-if="page.props.errors[key]" class="mt-1 text-xs font-medium text-red-600">
-                                    {{ page.props.errors[key] }}
+                                <p v-if="fieldError(key, field)" class="mt-1 text-xs font-medium text-red-600">
+                                    {{ fieldError(key, field) }}
                                 </p>
                             </div>
                         </div>

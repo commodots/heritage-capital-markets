@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 import AdminSidebar from '@/Components/AdminSidebar.vue'
+import MarketCsvImportReview from '@/Components/Admin/MarketCsvImportReview.vue'
 
 const props = defineProps({
     indices: {
@@ -12,6 +13,8 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    csvPreview: { type: Object, default: null },
+    csvReport: { type: Object, default: null },
 })
 
 const page = usePage()
@@ -31,6 +34,7 @@ const form = useForm({
     sort_order: 1,
 })
 const csvImportForm = useForm({ csv_file: null })
+const csvActionForm = useForm({ preview_token: '' })
 const apiImportForm = useForm({})
 
 const activeCount = computed(() =>
@@ -112,6 +116,22 @@ function importCsv() {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => csvImportForm.reset(),
+    })
+}
+
+function commitCsv(token) {
+    csvActionForm.preview_token = token
+    csvActionForm.post('/admin/market-indices/import-csv/commit', {
+        preserveScroll: true,
+        onSuccess: () => csvActionForm.reset(),
+    })
+}
+
+function discardCsv() {
+    csvActionForm.reset()
+    csvActionForm.post('/admin/market-indices/import-csv/cancel', {
+        preserveScroll: true,
+        onSuccess: () => csvActionForm.reset(),
     })
 }
 
@@ -265,7 +285,6 @@ function flashMessage() {
                             <h2 class="font-bold text-heritage-navy">Import a CSV file</h2>
                             <p class="mt-1 text-xs leading-5 text-slate-500">
                                 Required columns: name, value, change, change_percent. Optional: symbol, is_positive, is_active, sort_order, as_of.
-                                Use 1 or 0 for is_positive and is_active.
                                 Existing indices are matched by symbol, or by name when no symbol is provided.
                             </p>
                         </div>
@@ -274,7 +293,7 @@ function flashMessage() {
                                 class="min-w-0 flex-1 border border-slate-300 px-3 py-2 text-sm" />
                             <button type="submit" :disabled="csvImportForm.processing || !csvImportForm.csv_file"
                                 class="rounded-md bg-heritage-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
-                                {{ csvImportForm.processing ? 'Importing…' : 'Import CSV' }}
+                                {{ csvImportForm.processing ? 'Reading…' : 'Preview CSV' }}
                             </button>
                         </div>
                         <p v-if="csvImportForm.errors.csv_file" class="text-sm text-red-600">
@@ -294,13 +313,22 @@ function flashMessage() {
                             {{ apiImportForm.processing ? 'Loading…' : 'Load API prices' }}
                         </button>
                         <p v-if="!apiConfigured" class="text-xs text-slate-500">
-                            Configure MARKET_INDICES_API_URL (and optionally MARKET_INDICES_API_TOKEN) to enable API loading.
+                            HCML approval and a valid HTTPS provider endpoint are required before API loading is enabled.
                         </p>
                         <p v-if="apiImportForm.errors.api" class="text-sm text-red-600">
                             {{ apiImportForm.errors.api }}
                         </p>
                     </div>
                 </section>
+
+                <MarketCsvImportReview
+                    :preview="csvPreview"
+                    :report="csvReport"
+                    :processing="csvActionForm.processing"
+                    :error="csvActionForm.errors.csv_file"
+                    @commit="commitCsv"
+                    @cancel="discardCsv"
+                />
 
                 <!-- Stats -->
                 <div class="mb-8 grid gap-4 sm:grid-cols-3">
@@ -761,7 +789,7 @@ function flashMessage() {
                                     v-model="form.value"
                                     type="number"
                                     step="0.01"
-                                    placeholder="102026.75"
+                                    placeholder="Enter supplied value"
                                     class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"
                                 >
 

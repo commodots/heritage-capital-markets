@@ -1,6 +1,21 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue'
 import SeoHead from '@/Components/SeoHead.vue'
+
+defineProps({
+    documents: {
+        type: Array,
+        default: () => [],
+    },
+})
+
+const accountTypes = [
+    { type: 'individual', title: 'Individual Account' },
+    { type: 'corporate', title: 'Corporate Account' },
+    { type: 'joint', title: 'Joint Account' },
+    { type: 'minor', title: 'Minor Account' },
+    { type: 'estate', title: 'Estate Account' },
+]
 </script>
 
 <template>
@@ -22,6 +37,50 @@ import SeoHead from '@/Components/SeoHead.vue'
 
         <section class="bg-white py-16 md:py-24">
             <div class="container-heritage">
+                <div class="mb-14">
+                    <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#9A6B00]">Account opening</p>
+                    <h2 class="mt-2 font-display text-3xl font-semibold text-heritage-navy">Choose an application form</h2>
+                    <p class="mt-3 max-w-2xl leading-7 text-slate-600">
+                        Start an online application or download a blank printable form. Submitted online applications
+                        are emailed to our administrators as PDFs for review.
+                    </p>
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                        <article v-for="account in accountTypes" :key="account.type"
+                            class="border border-slate-200 p-5">
+                            <span class="block font-semibold text-heritage-navy">{{ account.title }}</span>
+                            <a :href="`/open-account/${account.type}`"
+                                class="mt-3 inline-flex text-sm font-semibold text-[#9A6B00] hover:underline">
+                                Start online <span class="ml-2">→</span>
+                            </a>
+                            <a :href="`/resources/downloads/account-opening/${account.type}.pdf`"
+                                class="mt-2 block text-sm font-semibold text-heritage-navy hover:underline">
+                                Download blank PDF
+                            </a>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="mb-14 border-t border-slate-200 pt-10">
+                    <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#9A6B00]">Documents</p>
+                    <h2 class="mt-2 font-display text-3xl font-semibold text-heritage-navy">Downloadable forms & resources</h2>
+                    <div v-if="documents.length" class="mt-6 divide-y divide-slate-200 border-y border-slate-200">
+                        <article v-for="document in documents" :key="document.id"
+                            class="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h3 class="font-semibold text-heritage-navy">{{ document.name }}</h3>
+                                <p v-if="document.caption" class="mt-1 text-sm leading-6 text-slate-600">{{ document.caption }}</p>
+                            </div>
+                            <a :href="`/resources/downloads/${document.id}/file`"
+                                class="inline-flex shrink-0 font-semibold text-[#9A6B00] hover:underline">
+                                Download document <span class="ml-2">↓</span>
+                            </a>
+                        </article>
+                    </div>
+                    <p v-else class="mt-5 text-sm text-slate-500">
+                        No downloadable documents have been published yet. Online account-opening forms are available above.
+                    </p>
+                </div>
+
                 <div class="grid gap-6 md:grid-cols-3">
                     <article v-for="item in [
                         { title: 'Corporate Profile', text: 'Company information and an overview of Heritage Capital Markets.', action: 'Request Profile' },
@@ -43,13 +102,6 @@ import SeoHead from '@/Components/SeoHead.vue'
                             {{ item.action }} <span class="ml-2">→</span>
                         </a>
                     </article>
-                </div>
-
-                <div class="mt-14 border-l-4 border-heritage-gold bg-heritage-offwhite p-6 md:p-8">
-                    <p class="font-semibold text-heritage-navy">Document library</p>
-                    <p class="mt-2 text-sm leading-6 text-slate-600">
-                        The downloadable document library can be connected to the Media Library during the CMS implementation phase.
-                    </p>
                 </div>
             </div>
         </section>

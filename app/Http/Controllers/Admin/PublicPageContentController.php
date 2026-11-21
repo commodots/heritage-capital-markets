@@ -60,8 +60,12 @@ class PublicPageContentController extends Controller
                 if ($currentValues[$key] ?? null) {
                     $replacedImages[] = $currentValues[$key];
                 }
+            } elseif ($request->exists($key) && $value === null) {
+                $validated[$key] = '';
+                if ($currentValues[$key] ?? null) {
+                    $replacedImages[] = $currentValues[$key];
+                }
             } else {
-                
                 $validated[$key] = $currentValues[$key] ?? null;
             }
         }

@@ -35,7 +35,12 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'business_phone' => env('WHATSAPP_BUSINESS_PHONE'),
+    ],
+
     'market_indices' => [
+        'approved' => (bool) env('MARKET_INDICES_API_APPROVED', false),
         'url' => env('MARKET_INDICES_API_URL'),
         'token' => env('MARKET_INDICES_API_TOKEN'),
     ],

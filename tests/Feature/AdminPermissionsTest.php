@@ -58,6 +58,73 @@ class AdminPermissionsTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_super_admin_can_assign_roles_from_the_role_assignments_page(): void
+    {
+        $role = AdminRole::create([
+            'name' => 'Content Manager',
+            'permissions' => ['dashboard', 'pages'],
+            'is_active' => true,
+        ]);
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'admin_role_id' => null,
+        ]);
+        $superAdmin = User::factory()->create([
+            'is_admin' => true,
+            'is_super_admin' => true,
+        ]);
+
+        $this->actingAs($superAdmin)
+            ->get('/admin/role-assignments')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/RoleAssignments/Index')
+                ->where('users.0.id', $admin->id)
+                ->has('roles'));
+
+        $this->actingAs($superAdmin)
+            ->put("/admin/role-assignments/{$admin->id}", [
+                'admin_role_id' => $role->id,
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('users', [
+            'id' => $admin->id,
+            'admin_role_id' => $role->id,
+        ]);
+    }
+
+    public function test_non_super_admin_cannot_access_role_assignments(): void
+    {
+        $role = AdminRole::create([
+            'name' => 'User Manager',
+            'permissions' => ['dashboard', 'user_management'],
+            'is_active' => true,
+        ]);
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'admin_role_id' => $role->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/admin/role-assignments')
+            ->assertForbidden();
+    }
+
+    public function test_research_administrator_can_manage_research_and_news_but_not_other_modules(): void
+    {
+        $role = AdminRole::query()->where('name', 'Research Administrator')->firstOrFail();
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'admin_role_id' => $role->id,
+        ]);
+
+        $this->actingAs($admin)->get('/admin/research-reports')->assertOk();
+        $this->actingAs($admin)->get('/admin/articles')->assertOk();
+        $this->actingAs($admin)->get('/admin/homepage/hero-slides')->assertForbidden();
+    }
+
     public function test_super_admin_can_reactivate_a_deactivated_administrator(): void
     {
         $role = AdminRole::create([

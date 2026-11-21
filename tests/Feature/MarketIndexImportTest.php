@@ -57,6 +57,12 @@ class MarketIndexImportTest extends TestCase
 
         $this->actingAs($admin)->post('/admin/market-indices/import-csv', [
             'csv_file' => $csv,
+        ])->assertRedirect()->assertSessionHasNoErrors()
+            ->assertSessionHas('marketIndexCsvPreview');
+
+        $preview = $this->app['session.store']->get('marketIndexCsvPreview');
+        $this->actingAs($admin)->post('/admin/market-indices/import-csv/commit', [
+            'preview_token' => $preview['token'],
         ])->assertRedirect()->assertSessionHasNoErrors();
 
         $this->assertDatabaseCount('market_indices', 2);
@@ -73,9 +79,57 @@ class MarketIndexImportTest extends TestCase
         ]);
     }
 
+    public function test_index_csv_preview_reports_invalid_and_duplicate_rows_and_commits_only_valid_rows(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'is_super_admin' => true]);
+        MarketIndex::create([
+            'name' => 'NGX All-Share',
+            'symbol' => 'NGXASI',
+            'value' => 100,
+            'change_value' => 1,
+            'change_percent' => 1,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        $csv = UploadedFile::fake()->createWithContent(
+            'indices.csv',
+            "name,symbol,value,change,change_percent\n".
+            "NGX All-Share,NGXASI,105,5,5\n".
+            "New Banking Index,NGXBNK,200,2,1\n".
+            "New Banking Index,NGXBNK,201,3,2\n".
+            "Invalid Index,NGXBAD,not-a-price,1,1\n",
+        );
+
+        $this->actingAs($admin)->post('/admin/market-indices/import-csv', [
+            'csv_file' => $csv,
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $preview = $this->app['session.store']->get('marketIndexCsvPreview');
+        $this->assertTrue($preview['rows'][0]['valid']);
+        $this->assertFalse($preview['rows'][1]['valid']);
+        $this->assertFalse($preview['rows'][2]['valid']);
+        $this->assertFalse($preview['rows'][3]['valid']);
+        $this->assertDatabaseCount('market_indices', 1);
+
+        $this->actingAs($admin)->post('/admin/market-indices/import-csv/commit', [
+            'preview_token' => $preview['token'],
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $report = $this->app['session.store']->get('marketIndexCsvReport');
+        $this->assertSame(1, $report['succeeded']);
+        $this->assertSame(0, $report['failed']);
+        $this->assertSame(3, $report['invalid']);
+        $this->assertDatabaseCount('market_indices', 1);
+        $this->assertDatabaseHas('market_indices', [
+            'symbol' => 'NGXASI',
+            'value' => '105.0000',
+        ]);
+    }
+
     public function test_configured_api_prices_can_be_imported(): void
     {
         config([
+            'services.market_indices.approved' => true,
             'services.market_indices.url' => 'https://prices.example.test/api/indices',
             'services.market_indices.token' => 'api-token',
         ]);
@@ -104,6 +158,64 @@ class MarketIndexImportTest extends TestCase
             'symbol' => 'NGXBNK',
             'change_value' => '-4.5',
             'change_percent' => '-0.31',
+        ]);
+    }
+
+    public function test_market_index_api_import_requires_hcml_approval(): void
+    {
+        config([
+            'services.market_indices.approved' => false,
+            'services.market_indices.url' => 'https://prices.example.test/api/indices',
+        ]);
+
+        $this->actingAs(User::factory()->create([
+            'is_admin' => true,
+            'is_super_admin' => true,
+        ]))->post('/admin/market-indices/import-api')
+            ->assertRedirect()
+            ->assertSessionHasErrors('api');
+
+        $this->assertDatabaseCount('market_indices', 0);
+    }
+
+    public function test_seeded_demo_prices_are_hidden_and_cleared_without_affecting_real_data(): void
+    {
+        MarketIndex::create([
+            'name' => 'NGX All-Share',
+            'symbol' => 'NGXASI',
+            'value' => 102026.75,
+            'change_value' => null,
+            'change_percent' => 0.63,
+            'as_of' => now(),
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        MarketIndex::create([
+            'name' => 'NGX 30',
+            'symbol' => 'NGX30',
+            'value' => 4000,
+            'change_value' => 2,
+            'change_percent' => 0.05,
+            'as_of' => now(),
+            'is_active' => true,
+            'sort_order' => 2,
+        ]);
+
+        $migration = require database_path('migrations/2026_11_18_122000_hide_seeded_demo_market_indices.php');
+        $migration->up();
+
+        $this->assertDatabaseHas('market_indices', [
+            'symbol' => 'NGXASI',
+            'value' => null,
+            'change_value' => null,
+            'change_percent' => null,
+            'as_of' => null,
+            'is_active' => false,
+        ]);
+        $this->assertDatabaseHas('market_indices', [
+            'symbol' => 'NGX30',
+            'value' => '4000.0000',
+            'is_active' => true,
         ]);
     }
 }

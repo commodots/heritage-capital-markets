@@ -22,6 +22,8 @@ const form = useForm({
     slug: '',
     short_description: '',
     description: '',
+    overview_eyebrow: 'Overview',
+    overview_title: 'A solution designed around your objectives',
     featured_image: null,
     icon: '',
     button_label: 'Learn More',
@@ -47,6 +49,8 @@ function openCreate() {
     form.slug = ''
     form.short_description = ''
     form.description = ''
+    form.overview_eyebrow = 'Overview'
+    form.overview_title = 'A solution designed around your objectives'
     form.featured_image = null
     form.icon = ''
     form.button_label = 'Learn More'
@@ -65,6 +69,8 @@ function openEdit(solution) {
     form.slug = solution.slug || ''
     form.short_description = solution.short_description || ''
     form.description = solution.description || ''
+    form.overview_eyebrow = solution.overview_eyebrow || 'Overview'
+    form.overview_title = solution.overview_title || 'A solution designed around your objectives'
     form.featured_image = null
     form.icon = solution.icon || ''
     form.button_label = solution.button_label || 'Learn More'
@@ -591,16 +597,45 @@ function flashMessage() {
                             </div>
                         </div>
 
-                        <!-- Full description -->
+                        <!-- Overview -->
+                        <div>
+                            <h3 class="text-sm font-bold text-heritage-navy">
+                                Overview
+                            </h3>
+                            <p class="mt-1 text-xs text-slate-400">
+                                This copy appears in the overview section of this solution’s public page.
+                            </p>
+                        </div>
+
                         <div>
                             <label class="mb-2 block text-sm font-semibold text-slate-700">
-                                Full Description
+                                Overview Eyebrow
                             </label>
+                            <input v-model="form.overview_eyebrow" type="text"
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
+                            <div v-if="form.errors.overview_eyebrow" class="mt-1 text-xs text-red-600">
+                                {{ form.errors.overview_eyebrow }}
+                            </div>
+                        </div>
 
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">
+                                Overview Heading
+                            </label>
+                            <input v-model="form.overview_title" type="text"
+                                class="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20">
+                            <div v-if="form.errors.overview_title" class="mt-1 text-xs text-red-600">
+                                {{ form.errors.overview_title }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-slate-700">
+                                Overview Text
+                            </label>
                             <textarea v-model="form.description" rows="6"
-                                placeholder="Detailed description for the solution page..."
+                                placeholder="Describe this investment solution..."
                                 class="w-full resize-y rounded-md border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-heritage-gold focus:ring-2 focus:ring-heritage-gold/20"></textarea>
-
                             <div v-if="form.errors.description" class="mt-1 text-xs text-red-600">
                                 {{ form.errors.description }}
                             </div>
